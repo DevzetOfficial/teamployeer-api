@@ -2,10 +2,14 @@
   "name": "Teamployeer",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon srt/index.js"
   },
   "author": "Temployeer",
   "license": "ISC",
-  "description": "Advance Hrm and Crm"
+  "description": "Advance Hrm and Crm",
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
 }
