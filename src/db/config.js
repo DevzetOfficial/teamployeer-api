@@ -1,20 +1,20 @@
 import { PrismaClient } from "@prisma/client";
 
-let prisma;
+let connectDB;
 
-const connectDB = async () => {
+const connectDBFn = async () => {
     try {
-        prisma = new PrismaClient({
+        connectDB = new PrismaClient({
             log: ["query", "info", "warn", "error"],
             // errorFormat: "colorless",
         });
-        await prisma.$connect();
+        await connectDB.$connect();
         console.log("DB connected successfully.");
     } catch (error) {
         console.error("DB connecting failed:", error);
     }
 };
 
-connectDB();
+connectDBFn();
 
-export default prisma;
+export default connectDB;
