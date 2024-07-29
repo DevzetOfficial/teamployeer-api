@@ -1,21 +1,22 @@
 import dotenv from "dotenv"
-import connectDB from "./db/config.js"
-import {app} from "./app.js"
-
-import bcrypt from "bcrypt"
-
+import connectBD from "./db/config.js"
+import { app } from "./app.js"
 dotenv.config({
-    path: "./env"
-});
-
-const port = process.env.PORT || 5000
-
-app.get('/', (req, res) => {
-    res.send('Hello World! Test')
-  })
-
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`)
+    path: './.env'
 })
 
+app.get('/', (req, res) => {
+    res.send('Hello world')
+})
 
+const PORT = process.env.PORT || 3000
+
+connectBD()
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`Server is running at port: ${PORT}`);
+        })
+    })
+    .catch((error) => {
+        console.log("DB connection failed! ", error);
+    })

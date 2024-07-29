@@ -1,21 +1,15 @@
-import { PrismaClient } from "@prisma/client";
+import mongoose from "mongoose"
 
-let connectDB;
 
-const connectDBFn = async () => {
+const connectBD = async () => {
+
     try {
-        connectDB = new PrismaClient({
-            log: ["query", "info", "warn", "error"],
-            // errorFormat: "colorless",
-        });
-        await connectDB.$connect();
-        console.log("DB connected successfully.");
+        const connectionInstance = await mongoose.connect(`${process.env.MONGODB_URI}`)
+        console.log(`DB connect successfully: ${connectionInstance.connection.host}`);
     } catch (error) {
-        console.error("DB connecting failed:", error);
-        process.exit(1);
+        console.log("DB connection failed!", error);
+        process.exit(1)
     }
-};
+}
 
-connectDBFn();
-
-export default connectDB;
+export default connectBD

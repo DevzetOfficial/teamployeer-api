@@ -6,26 +6,23 @@ const app = express()
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
-    credentials: true,
-    optionsSuccessStatus: 200,
-    // allowedHeaders: ["Content-Type", "Authorization"],
-    // exposedHeaders: ["Content-Type", "Authorization"],
-    // methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
 }))
 
-app.use(express.json({
-    limit: "5mb",
-    extended: true,
-}))
 
-app.use(express.urlencoded({
-    limit: "5mb",
-    extended: true,
-}))
-
+app.use(express.json({ limit: "1mb" }))
+app.use(express.urlencoded({ extended: true, limit: "1mb" }))
 app.use(express.static("public"))
-
 app.use(cookieParser())
+
+// import routes
+import authRoute from "./routes/auth.route.js"
+
+
+
+// route declaration
+app.use("/api/v1", authRoute)
+
 
 
 
