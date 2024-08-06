@@ -7,36 +7,10 @@ import jwt from "jsonwebtoken"
 import mongoose from "mongoose"
 import { json } from "express"
 
-const generateAccessAndRefreshToken = async (userId) => {
-
-    try {
-
-        const user = await User.findById(userId)
-        const accessToken = user.generateAccessToken()
-        const refreshToken = user.generateRefreshToken()
-
-        user.refreshToken = refreshToken
-        await user.save({ validateBaforeSave: false })
-
-        return { accessToken, refreshToken }
-
-    } catch (error) {
-        throw new ApiError(500, "Somethis went wrong while generating access and refresh token!")
-    }
-}
 
 const registerUser = asyncHandler(async (req, res) => {
 
-    const avatarFile = await uploadOnCloudinary(req.file.path)
-
-    console.log(avatarFile)
-
-    return res.status(200).json(req.file)
-
     const { fullName, email, password } = req.body
-
-    console.log(fullName, email, password);
-    console.log('ok')
 
     if ([fullName, email, password].some((field) => field?.trim() === "")) {
         throw new ApiError(400, "All fields are required")
@@ -48,22 +22,18 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(409, "User with email already exists")
     }
 
-    let avatarImagePath;
-    if (req.files && Array.isArray(req.files.avatarImage) && req.files.avatarImage.lenght > 0) {
-        avatarImagePath = req.files.avatarImage[0].path
+    let avatarPath;
+    if (req.files && Array.isArray(req.files.avatar) && req.files.avatar.lenght > 0) {
+        avatarPath = req.files.avatar[0].path
     }
 
-    const avatar = await uploadOnCloudinary(avatarImagePath)
-
-    if (!avatar) {
-        throw new ApiError(400, "Avater file is required")
-    }
+    const avatar = await uploadOnCloudinary(avatarPath)
 
     const user = await User.create({
         fullName,
         email,
         password,
-        avatar: avatar.url
+        avatar: (avatar ? avatar.url : '')
     })
 
     const createdUser = await User.findById(user._id).select("-password -refreshToken")
@@ -77,16 +47,13 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
 
-
-    return res.status(200).json(req.body)
-
     const { email, password } = req.body
 
     if (!email) {
         throw new ApiError(400, "Email is required")
     }
 
-    const user = await User.findOne({ $eq: email })
+    const user = await User.findOne({ email: email })
 
     if (!user) {
         throw new ApiError(404, "User does not exists")
@@ -132,7 +99,6 @@ const logoutUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "Logged out successfully"))
 })
 
-
 const refreshAccessToken = asyncHandler(async (req, res) => {
 
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
@@ -171,6 +137,28 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         throw new ApiError(401, error?.message || "Invalid refresh token!")
     }
 })
+
+
+const generateAccessAndRefreshToken = async (userId) => {
+
+    try {
+
+        const user = await User.findById(userId)
+        const accessToken = user.generateAccessToken()
+        const refreshToken = user.generateRefreshToken()
+
+        user.refreshToken = refreshToken
+        await user.save({ validateBaforeSave: false })
+
+        return { accessToken, refreshToken }
+
+    } catch (error) {
+        throw new ApiError(500, "Somethis went wrong while generating access and refresh token!")
+    }
+}
+
+
+
 
 const changeCurrentPassword = asyncHandler(async (req, res) => {
 

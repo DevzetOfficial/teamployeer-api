@@ -1,9 +1,9 @@
 import { ApiError } from "../utilities/ApiError.js"
 import { asyncHandler } from "../utilities/asyncHandler.js"
-import jwt from "jsonwebtoken"
 import { User } from "../models/user.model.js"
+import jwt from "jsonwebtoken"
 
-export const authCheck = asyncHandler(async (req, _, next) => {
+const authCheck = asyncHandler(async (req, _, next) => {
 
     try {
 
@@ -29,3 +29,5 @@ export const authCheck = asyncHandler(async (req, _, next) => {
         throw new ApiError(401, error?.message || "Invalid access token!")
     }
 })
+
+export default authCheck
