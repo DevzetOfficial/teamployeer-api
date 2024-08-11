@@ -20,16 +20,39 @@ const userSchema = new Schema(
         avatar: {
             type: String
         },
-        password: {
-            type: String,
-            required: [true, 'Password is required']
+        company : {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Company"
         },
-        googleId: {
+        employee : {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Employee"
+        },
+        client : {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Client"
+        },
+        userType: {
+            type: String,
+            required: true,
+            lowecase: true,
+            trim: true,
+            enum: [
+                 values: ["owner", "employee", "client"],
+                 message: "Either: owner, employee, client"
+
+            ]
+        },
+        isActive: {
+            type: Boolean,
+            default: false
+        },
+        otpCode: {
             type: String
         },
         refreshToken: {
             type: String
-        }
+        },
     },
     {
         timestamps: true
