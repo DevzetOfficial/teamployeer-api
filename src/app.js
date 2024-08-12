@@ -20,7 +20,10 @@ app.use(express.urlencoded({ extended: true, limit: "1mb" }))
 app.use(express.static("public"))
 app.use(cookieParser())
 
+
+
 // import routes
+import countryRoute from "./routes/universal.route.js"
 import authRoute from "./routes/auth.route.js"
 
 
@@ -30,6 +33,7 @@ import authRoute from "./routes/auth.route.js"
 
 
 // route declaration
+app.use("/api/v1", countryRoute)
 app.use("/api/v1", authRoute)
 
 

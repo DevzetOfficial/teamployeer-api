@@ -4,8 +4,6 @@ import { User } from "../models/userModel.js"
 import { uploadOnCloudinary } from "../utilities/cloudinary.js"
 import { ApiResponse } from "../utilities/ApiResponse.js"
 import jwt from "jsonwebtoken"
-import mongoose from "mongoose"
-import { json } from "express"
 
 
 const registerUser = asyncHandler(async (req, res) => {

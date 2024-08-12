@@ -1,6 +1,10 @@
 import { ApiError } from "../utilities/ApiError.js"
 import { asyncHandler } from "../utilities/asyncHandler.js"
+<<<<<<< HEAD
 import { User } from "../models/userModel.js"
+=======
+import { User } from "../models/user.model.js"
+>>>>>>> a3910393e624c2f320976f785b2dbba2e1f93f66
 import jwt from "jsonwebtoken"
 
 const authCheck = asyncHandler(async (req, _, next) => {
