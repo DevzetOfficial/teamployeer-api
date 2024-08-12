@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { upload } from "../middlewares/multer.middleware.js"
+import { upload } from "../middlewares/multerMiddleware.js"
 import authCheck from "../middlewares/authMiddleware.js"
 import { registerUser, loginUser, logoutUser, refreshAccessToken } from "../controllers/authController.js"
 

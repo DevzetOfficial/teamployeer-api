@@ -23,8 +23,8 @@ app.use(cookieParser())
 
 
 // import routes
-import countryRoute from "./routes/universal.route.js"
-import authRoute from "./routes/auth.route.js"
+import countryRoute from "./routes/universalRoute.js"
+import authRoute from "./routes/authRoute.js"
 
 
 

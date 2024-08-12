@@ -20,28 +20,27 @@ const userSchema = new Schema(
         avatar: {
             type: String
         },
-        company : {
+        company: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Company"
         },
-        employee : {
+        employee: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Employee"
         },
-        client : {
+        client: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Client"
         },
         userType: {
             type: String,
             required: true,
-            lowecase: true,
+            lowercase: true,
             trim: true,
-            enum: [
-                 values: ["owner", "employee", "client"],
-                 message: "Either: owner, employee, client"
-
-            ]
+            enum: {
+                values: ["owner", "employee", "client"],
+                message: "userType must be either: owner, employee, or client"
+            }
         },
         isActive: {
             type: Boolean,
@@ -59,16 +58,16 @@ const userSchema = new Schema(
     }
 )
 
-userSchema.pre("save", async function (next) {
+/* userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
 
     this.password = await bcrypt.hash(this.password, 10)
     next()
-})
+}) */
 
-userSchema.methods.isPasswordCorrect = async function (password) {
+/* userSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password)
-}
+} */
 
 userSchema.methods.generateAccessToken = function () {
     return jwt.sign(

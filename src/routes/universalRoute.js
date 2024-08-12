@@ -1,6 +1,6 @@
 import { Router } from "express"
 import authCheck from "../middlewares/authMiddleware.js"
-import { countryList } from "../controllers/universal.controller.js"
+import { countryList } from "../controllers/universalController.js"
 
 const route = Router()
 
