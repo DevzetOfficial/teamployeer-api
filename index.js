@@ -3,8 +3,8 @@ dotenv.config({
     path: './.env'
 })
 
-import connectBD from "./db/config.js"
-import { app } from "./app.js"
+import connectBD from "./src/db/config.js"
+import { app } from "./src/app.js"
 
 
 app.get('/', (req, res) => {
