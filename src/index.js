@@ -8,7 +8,7 @@ import { app } from "./app.js"
 
 
 app.get('/', (req, res) => {
-    res.send('Hello world')
+    res.send('Welcome to Teamployeer')
 })
 
 const port = process.env.PORT || 3000
