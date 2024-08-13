@@ -8,21 +8,21 @@ const countryList = asyncHandler(async (req, res) => {
 
     const countrys = await Country.find({}).select("-__v")
 
-    return res.status(201).json(new ApiResponse(200, countrys, "success"))
+    return res.status(201).json(new ApiResponse(201, countrys, "success"))
 })
 
 const employeeLevelList = asyncHandler(async (req, res) => {
 
     const employeeLevel = await EmployeeLevel.find({}).select("-__v")
 
-    return res.status(201).json(new ApiResponse(200, employeeLevel, "success"))
+    return res.status(201).json(new ApiResponse(201, employeeLevel, "success"))
 })
 
 const employeeTypeList = asyncHandler(async (req, res) => {
 
     const employeeType = await EmployeeType.find({}).select("-__v")
 
-    return res.status(201).json(new ApiResponse(200, employeeType, "success"))
+    return res.status(201).json(new ApiResponse(201, employeeType, "success"))
 })
 
 
