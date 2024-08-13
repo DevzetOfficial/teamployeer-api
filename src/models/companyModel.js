@@ -20,7 +20,6 @@ const companySchema = new Schema(
         email: {
             type: String,
             required: true,
-            unique: true,
             lowecase: true,
             trim: true,
             index: true

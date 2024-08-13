@@ -4,6 +4,11 @@ import bcrypt from "bcrypt"
 
 const userSchema = new Schema(
     {
+        company: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true,
+            ref: "Company"
+        },
         fullName: {
             type: String,
             required: true,
@@ -11,18 +16,11 @@ const userSchema = new Schema(
         },
         email: {
             type: String,
-            required: true,
+            required: [true, 'Email is required'],
             unique: true,
             lowecase: true,
             trim: true,
             index: true
-        },
-        avatar: {
-            type: String
-        },
-        company: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Company"
         },
         employee: {
             type: mongoose.Schema.Types.ObjectId,
@@ -39,18 +37,23 @@ const userSchema = new Schema(
             trim: true,
             enum: {
                 values: ["owner", "employee", "client"],
-                message: "userType must be either: owner, employee, or client"
+                message: "User type must be owner either: owner, employee, or client"
             }
+        },
+        avatar: {
+            type: String
         },
         isActive: {
             type: Boolean,
             default: false
         },
-        otpCode: {
-            type: String
+        googleId: {
+            type: String,
+            index: true
         },
         refreshToken: {
-            type: String
+            type: String,
+            index: true
         },
     },
     {
@@ -68,6 +71,23 @@ const userSchema = new Schema(
 /* userSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password)
 } */
+
+
+userSchema.pre(/^filter/, async function (next) {
+    this.populate({
+        path: "employee",
+        select: "_id name"
+    })
+    next()
+})
+
+userSchema.pre(/^filter/, async function (next) {
+    this.populate({
+        path: "client",
+        select: "_id clientName"
+    })
+    next()
+})
 
 userSchema.methods.generateAccessToken = function () {
     return jwt.sign(

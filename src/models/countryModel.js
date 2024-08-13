@@ -20,7 +20,7 @@ const countrySchema = new Schema(
             type: String,
             trim: true
         },
-        dial_code: {
+        dialCode: {
             type: String,
             trim: true
         },

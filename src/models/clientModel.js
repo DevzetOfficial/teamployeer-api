@@ -5,9 +5,15 @@ const clientSchema = new Schema(
         company: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
+            ref: "Company",
+            index: true
+        },
+        clientId: {
+            type: String,
+            required: true,
             trim: true
         },
-        name: {
+        clientName: {
             type: String,
             required: true,
             trim: true
@@ -20,10 +26,8 @@ const clientSchema = new Schema(
         email: {
             type: String,
             required: true,
-            unique: true,
             lowecase: true,
-            trim: true,
-            index: true
+            trim: true
         },
         mobile: {
             type: String,
@@ -33,21 +37,37 @@ const clientSchema = new Schema(
             type: String,
             trim: true,
         },
-        startTime: {
+        country: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true,
+            ref: "Country"
+        },
+        source: {
             type: String,
-            trim: true,
+            require: true,
+            trim: true
         },
-        endTime: {
+        sourceList: {
             type: String,
-            trim: true,
+            trim: true
         },
-        logo: {
-            type: String
+        avatar: {
+            type: String,
+            trim: true
         },
+        note: {
+            type: String,
+            trim: true
+        }
     },
     {
         timestamps: true
     }
 )
+
+clientSchema.pre(/^find/, function (next) {
+    this.populate("country");
+    next()
+});
 
 export const Client = mongoose.model("Client", clientSchema)
