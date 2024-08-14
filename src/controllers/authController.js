@@ -3,50 +3,103 @@ import { ApiResponse } from "../utilities/ApiResponse.js"
 import { ApiError } from "../utilities/ApiError.js"
 
 import { User } from "../models/userModel.js"
+import { Company } from "../models/companyModel.js"
 import { uploadOnCloudinary } from "../utilities/cloudinary.js"
+import sendMail from "../utilities/mailer.js"
+import { generateOTP } from "../utilities/helper.js"
 import jwt from "jsonwebtoken"
 
+// send otp email
+export const sendOtp = asyncHandler(async (req, res) => {
 
-const registerUser = asyncHandler(async (req, res) => {
+    const { email } = req.body
 
-    const { fullName, email, password } = req.body
-
-    if ([fullName, email, password].some((field) => field?.trim() === "")) {
-        throw new ApiError(400, "All fields are required")
+    if (!email) {
+        throw new ApiError(400, "Email is required")
     }
 
-    const existedUser = await User.findOne({ $or: [{ email }] })
-
-    if (existedUser) {
-        throw new ApiError(409, "User with email already exists")
+    const otpCode = generateOTP(6)
+    const mailData = {
+        otp: otpCode
     }
 
-    let avatarPath;
-    if (req.files && Array.isArray(req.files.avatar) && req.files.avatar.lenght > 0) {
-        avatarPath = req.files.avatar[0].path
+    try {
+
+        await sendMail(
+            email,
+            'Your One-Time (OTP) for Teamployeer',
+            mailData,
+            'sendOtp'
+        );
+
+        const otpSecret = {
+            otp: otpCode,
+            email: email
+        }
+
+        const options = {
+            httpOnly: true,
+            secure: true
+        }
+
+        return res.status(201)
+            .cookie("otpSecret", otpSecret, options)
+            .json(new ApiResponse(200, {}, "The OTP has been sent to your email address."))
+    } catch (error) {
+        throw new ApiError(500, 'Error sending email: ' + error.message)
     }
-
-    const avatar = await uploadOnCloudinary(avatarPath)
-
-    const user = await User.create({
-        fullName,
-        email,
-        password,
-        avatar: (avatar ? avatar.url : '')
-    })
-
-    const createdUser = await User.findById(user._id).select("-password -refreshToken")
-
-    if (!createdUser) {
-        throw new ApiError(500, "Something went wrong while registering the user!")
-    }
-
-    return res.status(201).json(new ApiResponse(200, createdUser, "User registered successful."))
 })
 
-const loginUser = asyncHandler(async (req, res) => {
+// send otp email
+export const verifyOtp = asyncHandler(async (req, res) => {
 
-    const { email, password } = req.body
+    const { email, otp } = req.cookies.otpSecret
+
+    if ([email, otp].some((field) => field?.trim() === "")) {
+        throw new ApiError(400, "Invalid credentials.")
+    }
+
+    const { otpCode } = req.body
+
+    if (!otpCode) {
+        throw new ApiError(400, "OTP is required")
+    }
+
+    if (otpCode != otp) {
+        throw new ApiError(400, "Invalid credentials.")
+    }
+
+
+    const userInfo = await User.findOne({ $or: [{ email }] })
+    const isLogin = (userInfo ? true : false)
+
+    const otpSecret = {
+        email: email,
+        otp: otpCode,
+        isLogin: isLogin
+    }
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res.status(201)
+        .cookie("otpSecret", otpSecret, options)
+        .json(new ApiResponse(200, {}, "OTP verify successful."))
+})
+
+export const loginUser = asyncHandler(async (req, res) => {
+
+    const { email, otp, isLogin } = req.cookies.otpSecret
+
+    if ([email, otp].some((field) => field?.trim() === "")) {
+        throw new ApiError(400, "Invalid credentials.")
+    }
+
+    if (!isLogin) {
+        throw new ApiError(400, "Invalid credentials.")
+    }
 
     if (!email) {
         throw new ApiError(400, "Email is required")
@@ -58,15 +111,9 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(404, "User does not exists")
     }
 
-    const isPasswordValid = await user.isPasswordCorrect(password)
-
-    if (!isPasswordValid) {
-        throw new ApiError(401, "Invalide user credentials")
-    }
-
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id)
 
-    const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
+    const loggedInUser = await User.findById(user._id).select("-refreshToken")
 
     const options = {
         httpOnly: true,
@@ -74,12 +121,82 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     return res.status(200)
+        .clearCookie("otpSecret", options)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToekn", refreshToken, options)
         .json(new ApiResponse(200, { user: loggedInUser, accessToken, refreshToken }, "User logged in successfully."))
 })
 
-const logoutUser = asyncHandler(async (req, res) => {
+
+export const registerUser = asyncHandler(async (req, res) => {
+
+    const { email, otp, isLogin } = req.cookies.otpSecret
+
+    if ([email, otp].some((field) => field?.trim() === "")) {
+        throw new ApiError(400, "Invalid credentials.")
+    }
+
+    if (isLogin) {
+        throw new ApiError(400, "Invalid credentials.")
+    }
+
+    const formData = req.body
+
+    const company = await Company.create({
+        companyName: formData.companyName,
+        companyType: formData.companyType,
+        companySize: formData.companySize,
+        email: formData.email,
+        mobile: '',
+        address: '',
+        startTime: '',
+        endTime: '',
+        logo: ''
+    })
+
+    const companyInfo = await Company.findById(company._id).select("-__v")
+
+    if (!companyInfo) {
+        throw new ApiError(500, "Something went wrong while registering the user!")
+    }
+
+    const user = await User.create({
+        company: company._id,
+        fullName: formData.fullName,
+        email: formData.email,
+        avatar: '',
+        userType: 'owner',
+        role: '',
+        googleId: '',
+        isActive: true,
+        refreshToken: '',
+    })
+
+    const userInfo = await User.findById(user._id).select("-__v -refreshToken")
+
+    if (!userInfo) {
+        throw new ApiError(500, "Something went wrong while registering the user!")
+    }
+
+    const otpSecret = {
+        email: email,
+        otp: otp,
+        isLogin: true
+    }
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res.status(201)
+        .cookie("otpSecret", otpSecret, options)
+        .json(new ApiResponse(200, { companyInfo, userInfo }, "User registered successful."))
+})
+
+
+
+export const logoutUser = asyncHandler(async (req, res) => {
 
     await User.findByIdAndUpdate(
         req.user._id,
@@ -98,7 +215,7 @@ const logoutUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "Logged out successfully"))
 })
 
-const refreshAccessToken = asyncHandler(async (req, res) => {
+export const refreshAccessToken = asyncHandler(async (req, res) => {
 
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
 
@@ -138,7 +255,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 })
 
 
-const generateAccessAndRefreshToken = async (userId) => {
+export const generateAccessAndRefreshToken = async (userId) => {
 
     try {
 
@@ -158,32 +275,12 @@ const generateAccessAndRefreshToken = async (userId) => {
 
 
 
-
-const changeCurrentPassword = asyncHandler(async (req, res) => {
-
-    const { oldPassowrd, newPassword } = req.body
-
-    const user = await User.findById(req.user?._id)
-
-    const isPasswordCorrect = await user.isPasswordCorrect(oldPassowrd)
-
-    if (!isPasswordCorrect) {
-        throw new ApiError(400, "Invalide old password")
-    }
-
-    user.password = newPassword
-    await user.save({ validateBeforeSave: false })
-
-    return res.status(200)
-        .json(new ApiResponse(200, {}, "Password change successful"))
-})
-
-const getCurrentUser = asyncHandler(async (req, res) => {
+export const getCurrentUser = asyncHandler(async (req, res) => {
     return res.status(200)
         .json(new ApiResponse(200, req.user, "User fatched successfully"))
 })
 
-const updateAccountDetails = asyncHandler(async (req, res) => {
+export const updateAccountDetails = asyncHandler(async (req, res) => {
 
     const { fullName, email } = req.body
 
@@ -206,7 +303,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, user, "Account details update successfully"))
 })
 
-const updateUserAvatar = asyncHandler(async (req, res) => {
+export const updateUserAvatar = asyncHandler(async (req, res) => {
 
     const avatarLocalPath = req.file?.path
     if (!avatarLocalPath) {
@@ -232,17 +329,3 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     return res.status(2000)
         .json(new ApiResponse(200, user, "Avatar update successfully"))
 })
-
-export {
-    registerUser,
-    loginUser,
-    logoutUser,
-    refreshAccessToken,
-    changeCurrentPassword,
-    getCurrentUser,
-    updateAccountDetails,
-    updateUserAvatar
-}
-
-
-

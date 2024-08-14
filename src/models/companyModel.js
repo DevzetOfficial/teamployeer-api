@@ -8,14 +8,14 @@ const companySchema = new Schema(
             trim: true
         },
         companyType: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
             required: true,
-            trim: true
+            ref: "CompanyType"
         },
         companySize: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
             required: true,
-            trim: true
+            ref: "CompanySize"
         },
         email: {
             type: String,
@@ -48,5 +48,22 @@ const companySchema = new Schema(
         timestamps: true
     }
 )
+
+
+companySchema.pre(/^filter/, async function (next) {
+    this.populate({
+        path: "companyType",
+        select: "_id name"
+    })
+    next()
+})
+
+companySchema.pre(/^filter/, async function (next) {
+    this.populate({
+        path: "companySize",
+        select: "_id name"
+    })
+    next()
+})
 
 export const Company = mongoose.model("Company", companySchema)

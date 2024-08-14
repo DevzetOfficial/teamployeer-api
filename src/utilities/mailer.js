@@ -33,12 +33,13 @@ transporter.use('compile', hbs(handlebarOptions));
 const sendMail = async (to, subject, context, template) => {
 
     const mailOptions = {
-        from: process.env.SENDER_EMAIL,
+        from: process.env.MAIL_FROM_ADDRESS,
         to: to,
         subject: subject,
         context: context,
         template: (template ? template : 'default')
     };
+
 
     return new Promise((resolve, reject) => {
         transporter.sendMail(mailOptions, (error, info) => {
