@@ -41,8 +41,9 @@ const companySchema = new Schema(
             trim: true,
         },
         logo: {
-            type: String
-        },
+            type: String,
+            trim: true
+        }
     },
     {
         timestamps: true

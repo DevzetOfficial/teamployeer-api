@@ -25,6 +25,7 @@ app.use(cookieParser())
 // import routes
 import countryRoute from "./routes/universalRoute.js"
 import authRoute from "./routes/authRoute.js"
+import teamRoute from "./routes/teamRoute.js"
 
 
 
@@ -35,6 +36,7 @@ import authRoute from "./routes/authRoute.js"
 // route declaration
 app.use("/api/v1", countryRoute)
 app.use("/api/v1", authRoute)
+app.use("/api/v1", teamRoute)
 
 
 

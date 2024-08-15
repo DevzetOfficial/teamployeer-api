@@ -6,7 +6,7 @@ import { User } from "../models/userModel.js"
 import { Company } from "../models/companyModel.js"
 import { uploadOnCloudinary } from "../utilities/cloudinary.js"
 import sendMail from "../utilities/mailer.js"
-import { generateOTP } from "../utilities/helper.js"
+import { generateCode } from "../utilities/helper.js"
 import jwt from "jsonwebtoken"
 
 // send otp email
@@ -18,9 +18,10 @@ export const sendOtp = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Email is required")
     }
 
-    const otpCode = generateOTP(6)
+    const otpCode = generateCode(6)
     const mailData = {
-        otp: otpCode
+        otp: otpCode,
+        email: email
     }
 
     try {
@@ -69,13 +70,12 @@ export const verifyOtp = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid credentials.")
     }
 
-
     const userInfo = await User.findOne({ $or: [{ email }] })
     const isLogin = (userInfo ? true : false)
 
     const otpSecret = {
         email: email,
-        otp: otpCode,
+        otp: otp,
         isLogin: isLogin
     }
 
@@ -93,11 +93,9 @@ export const loginUser = asyncHandler(async (req, res) => {
 
     const { email, otp, isLogin } = req.cookies.otpSecret
 
-    if ([email, otp].some((field) => field?.trim() === "")) {
-        throw new ApiError(400, "Invalid credentials.")
-    }
+    console.log(req.cookies.otpSecret);
 
-    if (!isLogin) {
+    if ([email, otp].some((field) => field?.trim() === "")) {
         throw new ApiError(400, "Invalid credentials.")
     }
 
@@ -105,8 +103,11 @@ export const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Email is required")
     }
 
-    const user = await User.findOne({ email: email })
+    if (!isLogin) {
+        throw new ApiError(400, "Invalid credentials.")
+    }
 
+    const user = await User.findOne({ email: email })
     if (!user) {
         throw new ApiError(404, "User does not exists")
     }
@@ -114,6 +115,40 @@ export const loginUser = asyncHandler(async (req, res) => {
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id)
 
     const loggedInUser = await User.findById(user._id).select("-refreshToken")
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res.status(200)
+        .clearCookie("otpSecret", options)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToekn", refreshToken, options)
+        .json(new ApiResponse(200, { user: loggedInUser, accessToken, refreshToken }, "User logged in successfully."))
+})
+
+export const googleLoginUser = asyncHandler(async (req, res) => {
+
+    const { email, googleId } = req.body
+
+    if (!email) {
+        throw new ApiError(400, "Email is required")
+    }
+
+    if (!googleId) {
+        throw new ApiError(400, "Google Id is required")
+    }
+
+    const user = await User.findOne({ email: email, googleId: googleId })
+
+    if (!user) {
+        throw new ApiError(404, "User does not exists")
+    }
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id)
+
+    const loggedInUser = await User.findById(user._id).select("-googleId -refreshToken")
 
     const options = {
         httpOnly: true,
@@ -161,12 +196,11 @@ export const registerUser = asyncHandler(async (req, res) => {
     }
 
     const user = await User.create({
-        company: company._id,
+        companyId: company._id,
         fullName: formData.fullName,
         email: formData.email,
         avatar: '',
         userType: 'owner',
-        role: '',
         googleId: '',
         isActive: true,
         refreshToken: '',

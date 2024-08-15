@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const clientSchema = new Schema(
     {
-        company: {
+        companyId: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
             ref: "Company",
@@ -13,7 +13,7 @@ const clientSchema = new Schema(
             required: true,
             trim: true
         },
-        clientName: {
+        name: {
             type: String,
             required: true,
             trim: true

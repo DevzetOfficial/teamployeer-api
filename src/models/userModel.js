@@ -4,7 +4,7 @@ import bcrypt from "bcrypt"
 
 const userSchema = new Schema(
     {
-        company: {
+        companyId: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
             ref: "Company"
@@ -16,7 +16,7 @@ const userSchema = new Schema(
         },
         email: {
             type: String,
-            required: [true, 'Email is required'],
+            required: [true, "Email is required"],
             unique: true,
             lowecase: true,
             trim: true,
@@ -46,6 +46,10 @@ const userSchema = new Schema(
         isActive: {
             type: Boolean,
             default: false
+        },
+        role: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Role"
         },
         googleId: {
             type: String,

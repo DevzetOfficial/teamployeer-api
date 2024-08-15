@@ -8,10 +8,10 @@ import {
 const route = Router()
 
 route.route("/countries").get(countryList)
-route.route("/employee-level").get(employeeLevelList)
-route.route("/employee-type").get(employeeTypeList)
-route.route("/company-type").get(companyTypeList)
-route.route("/company-size").get(companySizeList)
+route.route("/employee-levels").get(employeeLevelList)
+route.route("/employee-types").get(employeeTypeList)
+route.route("/company-types").get(companyTypeList)
+route.route("/company-sizes").get(companySizeList)
 
 export default route
 

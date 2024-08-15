@@ -1,4 +1,4 @@
-export const generateOTP = (length) => {
+export const generateCode = (length) => {
     const characters = '0123456789';
     let otp = '';
 
