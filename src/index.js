@@ -1,7 +1,5 @@
 import dotenv from "dotenv"
-dotenv.config({
-    path: './.env'
-})
+dotenv.config()
 
 import connectBD from "./db/config.js"
 import { app } from "./app.js"
