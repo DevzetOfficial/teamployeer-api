@@ -91,9 +91,11 @@ export const verifyOtp = asyncHandler(async (req, res) => {
 
 export const loginUser = asyncHandler(async (req, res) => {
 
-    const { email, otp, isLogin } = req.cookies.otpSecret
+    if (!req.cookies.otpSecret) {
+        throw new ApiError(400, "Invalid credentials.")
+    }
 
-    console.log(req.cookies.otpSecret);
+    const { email, otp, isLogin } = req.cookies.otpSecret
 
     if ([email, otp].some((field) => field?.trim() === "")) {
         throw new ApiError(400, "Invalid credentials.")
@@ -164,6 +166,10 @@ export const googleLoginUser = asyncHandler(async (req, res) => {
 
 
 export const registerUser = asyncHandler(async (req, res) => {
+
+    if (!req.cookies.otpSecret) {
+        throw new ApiError(400, "Invalid credentials.")
+    }
 
     const { email, otp, isLogin } = req.cookies.otpSecret
 

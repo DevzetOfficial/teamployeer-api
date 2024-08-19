@@ -4,6 +4,13 @@ import { ApiError } from "../utilities/ApiError.js"
 
 import { Team } from "../models/teamModel.js"
 
+export const getData = asyncHandler(async (req, res) => {
+
+    const teams = await Team.find({}).select("-__v")
+
+    return res.status(201).json(new ApiResponse(200, teams, "Team create successful."))
+})
+
 
 export const storeData = asyncHandler(async (req, res) => {
 
@@ -29,6 +36,40 @@ export const storeData = asyncHandler(async (req, res) => {
     const company = Team.create(data)
 
     console.log(company)
+
+
+    return res.status(201).json(new ApiResponse(200, company, "Team create successful."))
+})
+
+export const updateData = asyncHandler(async (req, res) => {
+
+    console.log(req.body)
+
+    return res.status(200).json(req.params.id)
+
+    const formData = req.body
+
+    if (!formData.name) {
+        throw new ApiError(400, "Company name is required")
+    }
+
+    const data = {
+        companyId: req.user.companyId,
+        name: formData.name
+    }
+
+    if (formData.teamHead) {
+        data.teamHead = formData.teamHead
+    }
+
+    if (formData.employes) {
+        data.employes = formData.employes
+    }
+
+    const company = Team.create(data)
+
+    console.log(company)
+
 
     return res.status(201).json(new ApiResponse(200, company, "Team create successful."))
 })
