@@ -57,6 +57,8 @@ export const sendOtp = asyncHandler(async (req, res) => {
 // send otp email
 export const verifyOtp = asyncHandler(async (req, res) => {
 
+    console.log(req.cookies.otpSecret, req.body)
+
     if (!req.cookies.otpSecret) {
         throw new ApiError(400, "Invalid credentials.")
     }
