@@ -42,7 +42,8 @@ export const sendOtp = asyncHandler(async (req, res) => {
 
         const options = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production"
+            secure: process.env.NODE_ENV === "production",
+            sameSite: 'None'
         }
 
         return res.status(201)
@@ -91,7 +92,8 @@ export const verifyOtp = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production"
+        secure: process.env.NODE_ENV === "production",
+        sameSite: 'None'
     }
 
     return res.status(201)
@@ -130,7 +132,8 @@ export const loginUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production"
+        secure: process.env.NODE_ENV === "production",
+        sameSite: 'None'
     }
 
     return res.status(200)
@@ -164,7 +167,8 @@ export const googleLoginUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production"
+        secure: process.env.NODE_ENV === "production",
+        sameSite: 'None'
     }
 
     return res.status(200)
@@ -236,7 +240,8 @@ export const registerUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production"
+        secure: process.env.NODE_ENV === "production",
+        sameSite: 'None'
     }
 
     return res.status(201)
@@ -256,7 +261,8 @@ export const logoutUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production"
+        secure: process.env.NODE_ENV === "production",
+        sameSite: 'None'
     }
 
     return res.status(200)
@@ -289,7 +295,8 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 
         const options = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production"
+            secure: process.env.NODE_ENV === "production",
+            sameSite: 'None'
         }
 
         const { newAccessToken, newRefreshToken } = await generateAccessAndRefreshToken(user._id)
