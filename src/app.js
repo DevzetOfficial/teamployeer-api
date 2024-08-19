@@ -9,11 +9,11 @@ app.use(cors({
     credentials: true,
 }))
 
-app.use((req, res, next) => {
-    res.setHeader('Content-Type', 'text/html');
-    res.setHeader('X-Foo', 'bar');
-    next();
-});
+// app.use((req, res, next) => {
+//     res.setHeader('Content-Type', 'text/html');
+//     res.setHeader('X-Foo', 'bar');
+//     next();
+// });
 
 
 app.use(express.json({ limit: "1mb" }))
