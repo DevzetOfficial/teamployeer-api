@@ -5,7 +5,7 @@ import { getData, storeData, updateData } from "../controllers/teamController.js
 const route = Router()
 
 route.route("/team").post(authCheck, storeData)
-route.route("/team:id").get(authCheck, getData).patch(authCheck, updateData)
+route.route("/team:id?").get(authCheck, getData).patch(authCheck, updateData)
 
 export default route
 

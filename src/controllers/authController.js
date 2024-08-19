@@ -35,12 +35,13 @@ export const sendOtp = asyncHandler(async (req, res) => {
 
         const otpSecret = {
             otp: otpCode,
-            email: email
+            email: email,
+            expireTime: Date.now() + 60 * 1000
         }
 
         const options = {
             httpOnly: true,
-            secure: true
+            secure: process.env.NODE_ENV === "production"
         }
 
         return res.status(201)
@@ -54,10 +55,14 @@ export const sendOtp = asyncHandler(async (req, res) => {
 // send otp email
 export const verifyOtp = asyncHandler(async (req, res) => {
 
-    const { email, otp } = req.cookies.otpSecret
+    const { email, otp, expireTime } = req.cookies.otpSecret
 
     if ([email, otp].some((field) => field?.trim() === "")) {
         throw new ApiError(400, "Invalid credentials.")
+    }
+
+    if (!expireTime || Date.now() > expireTime) {
+        throw new ApiError(400, "OTP has expired")
     }
 
     const { otpCode } = req.body
@@ -81,7 +86,7 @@ export const verifyOtp = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: true
+        secure: process.env.NODE_ENV === "production"
     }
 
     return res.status(201)
@@ -120,7 +125,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: true
+        secure: process.env.NODE_ENV === "production"
     }
 
     return res.status(200)
@@ -154,7 +159,7 @@ export const googleLoginUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: true
+        secure: process.env.NODE_ENV === "production"
     }
 
     return res.status(200)
@@ -226,7 +231,7 @@ export const registerUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: true
+        secure: process.env.NODE_ENV === "production"
     }
 
     return res.status(201)
@@ -246,7 +251,7 @@ export const logoutUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: true
+        secure: process.env.NODE_ENV === "production"
     }
 
     return res.status(200)
@@ -279,7 +284,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 
         const options = {
             httpOnly: true,
-            secure: true
+            secure: process.env.NODE_ENV === "production"
         }
 
         const { newAccessToken, newRefreshToken } = await generateAccessAndRefreshToken(user._id)

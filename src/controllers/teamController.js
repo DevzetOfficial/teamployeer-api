@@ -6,6 +6,8 @@ import { Team } from "../models/teamModel.js"
 
 export const getData = asyncHandler(async (req, res) => {
 
+    console.log(req.params.id)
+
     const teams = await Team.find({}).select("-__v")
 
     return res.status(201).json(new ApiResponse(200, teams, "Team create successful."))

@@ -39,6 +39,4 @@ app.use("/api/v1", authRoute)
 app.use("/api/v1", teamRoute)
 
 
-
-
 export { app }
