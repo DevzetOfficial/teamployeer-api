@@ -19,6 +19,7 @@ export const sendOtp = asyncHandler(async (req, res) => {
     }
 
     const otpCode = generateCode(6)
+
     const mailData = {
         otp: otpCode,
         email: email
@@ -54,6 +55,10 @@ export const sendOtp = asyncHandler(async (req, res) => {
 
 // send otp email
 export const verifyOtp = asyncHandler(async (req, res) => {
+
+    if (!req.cookies.otpSecret) {
+        throw new ApiError(400, "Invalid credentials.")
+    }
 
     const { email, otp, expireTime } = req.cookies.otpSecret
 
@@ -91,7 +96,7 @@ export const verifyOtp = asyncHandler(async (req, res) => {
 
     return res.status(201)
         .cookie("otpSecret", otpSecret, options)
-        .json(new ApiResponse(200, {}, "OTP verify successful."))
+        .json(new ApiResponse(200, { isLogin: isLogin }, "OTP verify successful."))
 })
 
 export const loginUser = asyncHandler(async (req, res) => {
