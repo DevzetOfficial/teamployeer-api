@@ -29,11 +29,11 @@ app.use(express.static("public"))
 app.use(cookieParser())
 
 
-
 // import routes
 import countryRoute from "./routes/universalRoute.js"
 import authRoute from "./routes/authRoute.js"
 import teamRoute from "./routes/teamRoute.js"
+import clientRoute from "./routes/clientRoute.js"
 
 
 
@@ -44,6 +44,7 @@ import teamRoute from "./routes/teamRoute.js"
 // route declaration
 app.use("/api/v1", countryRoute)
 app.use("/api/v1", authRoute)
-app.use("/api/v1/team", teamRoute)
+app.use("/api/v1", teamRoute)
+app.use("/api/v1", clientRoute)
 
 export { app }

@@ -4,11 +4,11 @@ import { getAllData, getData, createData, updateData, deleteData } from "../cont
 
 const route = Router()
 
-route.route("/")
+route.route("/team")
     .get(authCheck, getAllData)
     .post(authCheck, createData)
 
-route.route("/:id")
+route.route("/team/:id")
     .get(authCheck, getData)
     .patch(authCheck, updateData)
     .delete(authCheck, deleteData)

@@ -7,7 +7,7 @@ const route = Router()
 
 route.route("/auth/send-otp").post(sendOtp)
 route.route("/auth/verify-otp").post(verifyOtp)
-route.route("/auth/register").post(upload.single('avatar'), registerUser)
+route.route("/auth/register").post(upload.single("avatar"), registerUser)
 route.route("/auth/login").post(loginUser)
 route.route("/auth/glogin").post(googleLoginUser)
 route.route("/auth/logout").post(authCheck, logoutUser)

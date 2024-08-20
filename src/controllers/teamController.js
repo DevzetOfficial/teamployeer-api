@@ -18,11 +18,11 @@ export const createData = asyncHandler(async (req, res) => {
     };
 
     if (formData.teamHead) {
-        data.teamHead = mongoose.Types.ObjectId(formData.teamHead);
+        data.teamHead = formData.teamHead;
     }
 
-    if (formData.employes && Array.isArray(formData.employes)) {
-        data.employes = formData.employes.map(emp => mongoose.Types.ObjectId(emp));
+    if (formData.employees && Array.isArray(formData.employees)) {
+        data.employees = formData.employees;
     }
 
     const newTeam = await Team.create(data);
@@ -66,8 +66,8 @@ export const updateData = asyncHandler(async (req, res) => {
         data.teamHead = formData.teamHead;
     }
 
-    if (formData.employes) {
-        data.employes = formData.employes;
+    if (formData.employees && Array.isArray(formData.employees)) {
+        data.employees = formData.employees;
     }
 
     const team = await Team.findByIdAndUpdate(
@@ -85,7 +85,7 @@ export const updateData = asyncHandler(async (req, res) => {
 
 export const deleteData = asyncHandler(async (req, res) => {
 
-    const team = Team.findById(req.params.id)
+    const team = await Team.findById(req.params.id)
 
     if (!team) {
         throw new ApiError(404, "Team not found!")
