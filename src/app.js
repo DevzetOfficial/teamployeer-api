@@ -1,20 +1,27 @@
 import express from "express"
 import cors from "cors"
+import helmet from "helmet"
+import rateLimit from "express-rate-limit"
 import cookieParser from "cookie-parser"
 
 const app = express()
 
+// Set Access Origin
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
     credentials: true,
 }))
 
-// app.use((req, res, next) => {
-//     res.setHeader('Content-Type', 'text/html');
-//     res.setHeader('X-Foo', 'bar');
-//     next();
-// });
+// Set security HTTP headers
+app.use(helmet())
 
+// Limit requests from same API
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 100,
+    message: 'Too many requests from this IP, please try again in an hour!'
+});
+app.use(limiter);
 
 app.use(express.json({ limit: "1mb" }))
 app.use(express.urlencoded({ extended: true, limit: "1mb" }))
@@ -37,7 +44,6 @@ import teamRoute from "./routes/teamRoute.js"
 // route declaration
 app.use("/api/v1", countryRoute)
 app.use("/api/v1", authRoute)
-app.use("/api/v1", teamRoute)
-
+app.use("/api/v1/team", teamRoute)
 
 export { app }

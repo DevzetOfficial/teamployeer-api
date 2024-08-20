@@ -4,106 +4,95 @@ import { ApiError } from "../utilities/ApiError.js"
 
 import { Team } from "../models/teamModel.js"
 
-export const getData = asyncHandler(async (req, res) => {
+export const createData = asyncHandler(async (req, res) => {
 
-    console.log(req.params.id)
-
-    const teams = await Team.find({}).select("-__v")
-
-    return res.status(201).json(new ApiResponse(200, teams, "Team create successful."))
-})
-
-
-export const storeData = asyncHandler(async (req, res) => {
-
-    const formData = req.body
+    const formData = req.body;
 
     if (!formData.name) {
-        throw new ApiError(400, "Company name is required")
+        throw new ApiError(400, "Team name is required");
     }
 
     const data = {
         companyId: req.user.companyId,
         name: formData.name
-    }
+    };
 
     if (formData.teamHead) {
-        data.teamHead = formData.teamHead
+        data.teamHead = mongoose.Types.ObjectId(formData.teamHead);
     }
 
-    if (formData.employes) {
-        data.employes = formData.employes
+    if (formData.employes && Array.isArray(formData.employes)) {
+        data.employes = formData.employes.map(emp => mongoose.Types.ObjectId(emp));
     }
 
-    const company = Team.create(data)
+    const newTeam = await Team.create(data);
 
-    console.log(company)
+    if (!newTeam) {
+        throw new ApiError(400, "Invalid credentials.")
+    }
 
+    return res.status(201).json(new ApiResponse(201, newTeam, "Team created successfully."));
+})
 
-    return res.status(201).json(new ApiResponse(200, company, "Team create successful."))
+export const getAllData = asyncHandler(async (req, res) => {
+
+    const teams = await Team.find().select("-__v")
+
+    return res.status(201).json(new ApiResponse(200, teams, "Team retrieved successfully."))
+})
+
+export const getData = asyncHandler(async (req, res) => {
+
+    const team = await Team.findById(req.params.id).select("-__v");
+
+    if (!team) {
+        throw new ApiError(400, "Team not found")
+    }
+
+    return res.status(200).json(new ApiResponse(200, team, "Team retrieved successfully"));
+
 })
 
 export const updateData = asyncHandler(async (req, res) => {
 
-    console.log(req.body)
-
-    return res.status(200).json(req.params.id)
-
-    const formData = req.body
-
-    if (!formData.name) {
-        throw new ApiError(400, "Company name is required")
-    }
+    const formData = req.body;
 
     const data = {
         companyId: req.user.companyId,
         name: formData.name
-    }
+    };
 
     if (formData.teamHead) {
-        data.teamHead = formData.teamHead
+        data.teamHead = formData.teamHead;
     }
 
     if (formData.employes) {
-        data.employes = formData.employes
+        data.employes = formData.employes;
     }
 
-    const company = Team.create(data)
-
-    console.log(company)
-
-
-    return res.status(201).json(new ApiResponse(200, company, "Team create successful."))
-})
-
-
-
-
-
-
-export const updateUserAvatar = asyncHandler(async (req, res) => {
-
-    const avatarLocalPath = req.file?.path
-    if (!avatarLocalPath) {
-        throw new ApiError(400, "Avatar file is mission")
-    }
-
-    const avatar = await uploadOnCloudinary(avatarLocalPath)
-
-    if (!avatar) {
-        throw new ApiError(400, "Error while uploading on avatar")
-    }
-
-    const user = await User.findByIdAndUpdate(
-        req.user?._id,
-        {
-            $set: {
-                avatar: avatar.url
-            }
-        },
+    const team = await Team.findByIdAndUpdate(
+        req.params.id,
+        data,
         { new: true }
-    ).select("-password")
+    );
 
-    return res.status(2000)
-        .json(new ApiResponse(200, user, "Avatar update successfully"))
+    if (!team) {
+        throw new ApiError(404, "Team not found");
+    }
+
+    return res.status(200).json(new ApiResponse(200, team, "Team updated successfully."));
 })
+
+export const deleteData = asyncHandler(async (req, res) => {
+
+    const team = Team.findById(req.params.id)
+
+    if (!team) {
+        throw new ApiError(404, "Team not found!")
+    }
+
+    await Team.findByIdAndDelete(req.params.id);
+
+    return res.status(200).json(new ApiResponse(200, {}, "Team delete successfully."));
+})
+

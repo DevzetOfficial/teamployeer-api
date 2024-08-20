@@ -4,11 +4,11 @@ const teamSchema = new Schema(
     {
         companyId: {
             type: mongoose.Schema.Types.ObjectId,
-            required: true,
+            required: [true, "Comapny field is required"],
         },
         name: {
             type: String,
-            required: true,
+            required: [true, "Team name is required"],
             trim: true,
         },
         teamHead: {
