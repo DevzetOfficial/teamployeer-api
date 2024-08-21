@@ -11,7 +11,6 @@ export const createData = asyncHandler(async (req, res) => {
 
     const formData = req.body;
 
-
     if (!formData.name) {
         throw new ApiError(400, "Client name is required");
     }
@@ -22,7 +21,7 @@ export const createData = asyncHandler(async (req, res) => {
 
     let uploadAvatar
     if (req.file?.path) {
-        uploadAvatar = await uploadOnCloudinary(req.file.path)
+        uploadAvatar = await uploadOnCloudinary(req.file?.path)
     }
 
     const data = {
@@ -65,6 +64,37 @@ export const getInactiveData = asyncHandler(async (req, res) => {
     return res.status(201).json(new ApiResponse(200, clients, "Client retrieved successfully."))
 })
 
+export const getCountData = asyncHandler(async (req, res) => {
+
+
+    const clients = await Client.aggregate([
+        {
+            $group: {
+                _id: "$status",
+                count: { $sum: 1 }
+            }
+        }
+    ])
+
+
+    let active, inactive = 0;
+
+    if (clients) {
+        clients.forEach(row => {
+
+            if (row._id === 1) {
+                active = row.count
+            }
+
+            if (row._id === 0) {
+                inactive = row.count
+            }
+        })
+    }
+
+    return res.status(201).json(new ApiResponse(200, { active, inactive }, "Client retrieved successfully."))
+})
+
 export const getData = asyncHandler(async (req, res) => {
 
     const client = await Client.findById(req.params.id).select("-__v");
@@ -74,7 +104,6 @@ export const getData = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json(new ApiResponse(200, client, "Client retrieved successfully"));
-
 })
 
 export const updateData = asyncHandler(async (req, res) => {
