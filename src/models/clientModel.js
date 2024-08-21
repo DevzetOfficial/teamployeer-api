@@ -4,7 +4,7 @@ const clientSchema = new Schema(
     {
         companyId: {
             type: mongoose.Schema.Types.ObjectId,
-            required: true,
+            required: [true, "Company id is required"],
             ref: "Company",
             index: true
         },
@@ -15,23 +15,24 @@ const clientSchema = new Schema(
         },
         name: {
             type: String,
-            required: true,
+            required: [true, "Client name is required"],
             trim: true
         },
         companyName: {
             type: String,
-            required: true,
+            required: [true, "Company name is required"],
             trim: true
         },
         email: {
             type: String,
-            required: true,
+            required: [true, "Email is required"],
             lowecase: true,
             trim: true
         },
         mobile: {
             type: String,
-            trim: true,
+            required: [true, "Phone number is required"],
+            trim: true
         },
         address: {
             type: String,
@@ -39,12 +40,12 @@ const clientSchema = new Schema(
         },
         country: {
             type: mongoose.Schema.Types.ObjectId,
-            required: true,
+            required: [true, "Country is required"],
             ref: "Country"
         },
         source: {
             type: String,
-            require: true,
+            required: [true, "Source is required"],
             trim: true
         },
         sourceLink: {
