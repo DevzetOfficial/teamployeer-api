@@ -144,7 +144,7 @@ export const deleteData = asyncHandler(async (req, res) => {
     }
 
     if (client.status === 0) {
-        await Client.findByIdAndDelete(req.params.id);
+        await Client.findByIdAndUpdate(req.params.id, { status: 1 }, { new: true });
     } else {
         await Client.findByIdAndUpdate(req.params.id, { status: 0 }, { new: true });
     }
