@@ -50,9 +50,17 @@ export const createData = asyncHandler(async (req, res) => {
     return res.status(201).json(new ApiResponse(201, newClient, "Client created successfully."));
 })
 
-export const getAllData = asyncHandler(async (req, res) => {
+export const getActiveData = asyncHandler(async (req, res) => {
 
-    const clients = await Client.find().select("-__v")
+    const clients = await Client.find({ status: 1 }).select("-__v")
+
+    return res.status(201).json(new ApiResponse(200, clients, "Client retrieved successfully."))
+})
+
+
+export const getInactiveData = asyncHandler(async (req, res) => {
+
+    const clients = await Client.find({ status: 0 }).select("-__v")
 
     return res.status(201).json(new ApiResponse(200, clients, "Client retrieved successfully."))
 })

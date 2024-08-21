@@ -1,7 +1,7 @@
 import { Router } from "express"
 import authCheck from "../middlewares/authMiddleware.js"
 import { upload } from "../middlewares/multerMiddleware.js"
-import { getAllData, getData, createData, updateData, deleteData } from "../controllers/clientController.js"
+import { getActiveData, getInactiveData, getData, createData, updateData, deleteData } from "../controllers/clientController.js"
 
 const route = Router()
 
@@ -16,8 +16,11 @@ route.route("/clients/:id")
 
 
 route.route("/clients")
-    .get(getAllData)
+    .get(getActiveData)
     .post(upload.single("avatar"), createData)
+
+route.route("/clients/inactive")
+    .get(getInactiveData)
 
 route.route("/clients/:id")
     .get(getData)
