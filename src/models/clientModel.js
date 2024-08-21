@@ -58,6 +58,10 @@ const clientSchema = new Schema(
         note: {
             type: String,
             trim: true
+        },
+        status: {
+            type: Number,
+            default: 1
         }
     },
     {
@@ -66,7 +70,10 @@ const clientSchema = new Schema(
 )
 
 clientSchema.pre(/^find/, function (next) {
-    this.populate("country");
+    this.populate({
+        path: "country",
+        select: "_id code name image"
+    });
     next()
 });
 

@@ -5,14 +5,24 @@ import { getAllData, getData, createData, updateData, deleteData } from "../cont
 
 const route = Router()
 
-route.route("/clients")
+/* route.route("/clients")
     .get(authCheck, getAllData)
     .post(authCheck, upload.single("avatar"), createData)
 
 route.route("/clients/:id")
     .get(authCheck, getData)
     .patch(authCheck, upload.single("avatar"), updateData)
-    .delete(authCheck, deleteData)
+    .delete(authCheck, deleteData) */
+
+
+route.route("/clients")
+    .get(getAllData)
+    .post(upload.single("avatar"), createData)
+
+route.route("/clients/:id")
+    .get(getData)
+    .patch(upload.single("avatar"), updateData)
+    .delete(deleteData)
 
 export default route
 

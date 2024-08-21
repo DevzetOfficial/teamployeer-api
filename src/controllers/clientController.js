@@ -2,6 +2,7 @@ import { asyncHandler } from "../utilities/asyncHandler.js"
 import { ApiResponse } from "../utilities/ApiResponse.js"
 import { ApiError } from "../utilities/ApiError.js"
 import { generateCode } from "../utilities/helper.js"
+import { uploadOnCloudinary, destroyOnCloudinary } from "../utilities/cloudinary.js"
 
 
 import { Client } from "../models/clientModel.js"
@@ -19,6 +20,11 @@ export const createData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Company name is required");
     }
 
+    let uploadAvatar
+    if (req.file.path) {
+        uploadAvatar = await uploadOnCloudinary(req.file.path)
+    }
+
     const data = {
         companyId: req.user.companyId,
         clientId: generateCode(7),
@@ -30,7 +36,7 @@ export const createData = asyncHandler(async (req, res) => {
         country: formData.country,
         source: formData.source,
         sourceLink: formData.sourceLink,
-        avatar: "",
+        avatar: uploadAvatar?.url || "",
         note: formData.note,
     }
 
@@ -64,7 +70,19 @@ export const getData = asyncHandler(async (req, res) => {
 
 export const updateData = asyncHandler(async (req, res) => {
 
+    const clientInfo = await Client.findById(req.params.id)
+
     const data = req.body;
+
+    let uploadAvatar
+    if (req.file && req.file.path) {
+        uploadAvatar = await uploadOnCloudinary(req.file.path)
+        data.avatar = uploadAvatar?.url || ""
+
+        if (clientInfo && clientInfo.avatar) {
+            await destroyOnCloudinary(clientInfo.avatar);
+        }
+    }
 
     const client = await Client.findByIdAndUpdate(
         req.params.id,
@@ -87,7 +105,11 @@ export const deleteData = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Client not found!")
     }
 
-    await Client.findByIdAndDelete(req.params.id);
+    if (client.status === 0) {
+        await Client.findByIdAndDelete(req.params.id);
+    } else {
+        await Client.findByIdAndUpdate(req.params.id, { status: 0 }, { new: true });
+    }
 
     return res.status(200).json(new ApiResponse(200, {}, "Client delete successfully."));
 })

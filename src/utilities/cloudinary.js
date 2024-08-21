@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from "cloudinary"
-//import fs from "fs"
+import fs from "fs"
 
 
 cloudinary.config({
@@ -18,20 +18,44 @@ const uploadOnCloudinary = async (filePath) => {
             resource_type: "auto"
         })
 
-        // remove the locally saved temporary file as the upload operation got failed
-        //fs.unlinkSync(localFilePath)
+        // remove the locally saved temporary file
+        fs.unlinkSync(filePath)
         return response;
 
     } catch (error) {
 
         console.log(error)
 
-        // remove the locally saved temporary file as the upload operation got failed
-        //fs.unlinkSync(localFilePath)
+        // remove the locally saved temporary file
+        fs.unlinkSync(filePath)
+        return null;
+    }
+}
+
+
+const destroyOnCloudinary = async (filePath) => {
+
+    try {
+
+        if (!filePath) return null
+
+        const urlObj = new URL(filePath);
+        const pathname = urlObj.pathname;
+        const filename = pathname.substring(pathname.lastIndexOf('/') + 1);
+        const publicId = filename.split('.').slice(0, -1).join('.');
+
+        //upload the file on cloudinary
+        const response = await cloudinary.uploader.destroy(publicId);
+
+        return response;
+
+    } catch (error) {
+
+        console.log(error)
         return null;
     }
 }
 
 
 
-export { uploadOnCloudinary }
+export { uploadOnCloudinary, destroyOnCloudinary }
