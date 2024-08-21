@@ -21,12 +21,13 @@ export const createData = asyncHandler(async (req, res) => {
     }
 
     let uploadAvatar
-    if (req.file.path) {
+    if (req.file?.path) {
         uploadAvatar = await uploadOnCloudinary(req.file.path)
     }
 
     const data = {
-        companyId: req.user.companyId,
+        //companyId: req.user.companyId,
+        companyId: "66bdec36e1877685a60200ac",
         clientId: generateCode(7),
         name: formData.name,
         companyName: formData.companyName,
@@ -75,8 +76,8 @@ export const updateData = asyncHandler(async (req, res) => {
     const data = req.body;
 
     let uploadAvatar
-    if (req.file && req.file.path) {
-        uploadAvatar = await uploadOnCloudinary(req.file.path)
+    if (req.file && req.file?.path) {
+        uploadAvatar = await uploadOnCloudinary(req.file?.path)
         data.avatar = uploadAvatar?.url || ""
 
         if (clientInfo && clientInfo.avatar) {

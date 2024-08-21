@@ -47,7 +47,7 @@ const clientSchema = new Schema(
             require: true,
             trim: true
         },
-        sourceList: {
+        sourceLink: {
             type: String,
             trim: true
         },

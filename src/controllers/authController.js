@@ -4,7 +4,6 @@ import { ApiError } from "../utilities/ApiError.js"
 
 import { User } from "../models/userModel.js"
 import { Company } from "../models/companyModel.js"
-import { uploadOnCloudinary } from "../utilities/cloudinary.js"
 import sendMail from "../utilities/mailer.js"
 import { generateCode } from "../utilities/helper.js"
 import jwt from "jsonwebtoken"
