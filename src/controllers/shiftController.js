@@ -1,10 +1,9 @@
 import { asyncHandler } from "../utilities/asyncHandler.js"
 import { ApiResponse } from "../utilities/ApiResponse.js"
 import { ApiError } from "../utilities/ApiError.js"
-import { generateCode } from "../utilities/helper.js"
-
 
 import { Shift } from "../models/shiftModel.js"
+
 
 export const createData = asyncHandler(async (req, res) => {
 
@@ -42,7 +41,6 @@ export const getAllData = asyncHandler(async (req, res) => {
 
     return res.status(201).json(new ApiResponse(200, results, "Shift retrieved successfully."))
 })
-
 
 export const getData = asyncHandler(async (req, res) => {
 

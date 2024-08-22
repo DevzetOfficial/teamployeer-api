@@ -35,6 +35,7 @@ import authRoute from "./routes/authRoute.js"
 import teamRoute from "./routes/teamRoute.js"
 import clientRoute from "./routes/clientRoute.js"
 import employeeRoute from "./routes/employeeRoute.js"
+import shiftRoute from "./routes/shiftRoute.js"
 
 
 
@@ -48,5 +49,6 @@ app.use("/api/v1", authRoute)
 app.use("/api/v1", teamRoute)
 app.use("/api/v1", clientRoute)
 app.use("/api/v1", employeeRoute)
+app.use("/api/v1", shiftRoute)
 
 export { app }

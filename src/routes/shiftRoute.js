@@ -2,7 +2,7 @@ import { Router } from "express"
 import authCheck from "../middlewares/authMiddleware.js"
 import {
     createData, getAllData, getData,
-    createData, updateData, deleteData
+    updateData, deleteData
 } from "../controllers/shiftController.js"
 
 const route = Router()
