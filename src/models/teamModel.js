@@ -5,6 +5,7 @@ const teamSchema = new Schema(
         companyId: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Comapny field is required"],
+            index: true
         },
         name: {
             type: String,
@@ -21,7 +22,9 @@ const teamSchema = new Schema(
                 ref: "Employee"
             }
         ]
-
+    },
+    {
+        timestamps: true
     }
 )
 

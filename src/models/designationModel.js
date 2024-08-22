@@ -12,6 +12,9 @@ const designationSchema = new Schema(
             required: true,
             trim: true,
         }
+    },
+    {
+        timestamps: true
     }
 )
 

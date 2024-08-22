@@ -18,6 +18,9 @@ const roleSchema = new Schema(
                 ref: "Permission"
             }
         ]
+    },
+    {
+        timestamps: true
     }
 )
 
