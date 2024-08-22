@@ -66,7 +66,6 @@ export const getInactiveData = asyncHandler(async (req, res) => {
 
 export const getCountData = asyncHandler(async (req, res) => {
 
-
     const clients = await Client.aggregate([
         {
             $group: {
@@ -75,7 +74,6 @@ export const getCountData = asyncHandler(async (req, res) => {
             }
         }
     ])
-
 
     let active, inactive = 0;
 
