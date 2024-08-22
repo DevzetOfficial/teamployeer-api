@@ -127,4 +127,4 @@ employeeSchema.pre(/^find/, function (next) {
     next()
 })
 
-export const Client = mongoose.model("Client", employeeSchema)
+export const Employee = mongoose.model("Employee", employeeSchema)

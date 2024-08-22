@@ -34,6 +34,7 @@ import countryRoute from "./routes/universalRoute.js"
 import authRoute from "./routes/authRoute.js"
 import teamRoute from "./routes/teamRoute.js"
 import clientRoute from "./routes/clientRoute.js"
+import employeeRoute from "./routes/employeeRoute.js"
 
 
 
@@ -46,5 +47,6 @@ app.use("/api/v1", countryRoute)
 app.use("/api/v1", authRoute)
 app.use("/api/v1", teamRoute)
 app.use("/api/v1", clientRoute)
+app.use("/api/v1", employeeRoute)
 
 export { app }

@@ -4,28 +4,19 @@ import { upload } from "../middlewares/multerMiddleware.js"
 import {
     getActiveData, getInactiveData, getCountData,
     getData, createData, updateData, deleteData
-} from "../controllers/clientController.js"
+} from "../controllers/employeeController.js"
 
 const route = Router()
 
-/* route.route("/clients")
-    .get(authCheck, getAllData)
-    .post(authCheck, upload.single("avatar"), createData)
 
-route.route("/clients/:id")
-    .get(authCheck, getData)
-    .patch(authCheck, upload.single("avatar"), updateData)
-    .delete(authCheck, deleteData) */
-
-
-route.route("/client")
+route.route("/employee")
     .get(getActiveData)
     .post(upload.single("avatar"), createData)
 
-route.route("/client/inactive").get(getInactiveData)
-route.route("/client/count").get(getCountData)
+route.route("/employee/inactive").get(getInactiveData)
+route.route("/employee/count").get(getCountData)
 
-route.route("/client/:id")
+route.route("/employee/:id")
     .get(getData)
     .patch(upload.single("avatar"), updateData)
     .delete(deleteData)
