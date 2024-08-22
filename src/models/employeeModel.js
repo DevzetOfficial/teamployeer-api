@@ -43,7 +43,6 @@ const employeeSchema = new Schema(
         },
         team: {
             type: mongoose.Schema.Types.ObjectId,
-            require: true,
             ref: "Team"
         },
         designation: {
@@ -100,6 +99,12 @@ const employeeSchema = new Schema(
         bicOrswiftNumber: {
             type: String,
             trim: true
+        },
+        status: {
+            type: Number,
+            required: true,
+            default: 1,
+            enum: [0, 1]
         }
     },
     {
