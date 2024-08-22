@@ -10,53 +10,44 @@ import { CompanySize } from "../models/companySizeModel.js"
 // country list
 export const countryList = asyncHandler(async (req, res) => {
 
-    const countrys = await Country.find({}).select("-__v")
+    const countrys = await Country.find({})
 
-    return res.status(201).json(new ApiResponse(200, countrys, "success"))
+    return res.status(201).json(new ApiResponse(200, countrys, "Country retrieved successfully"))
 })
 
 
 // employee level list
 export const employeeLevelList = asyncHandler(async (req, res) => {
 
-    const employeeLevel = await EmployeeLevel.find({}).select("-__v")
+    const employeeLevel = await EmployeeLevel.find({})
 
-    return res.status(201).json(new ApiResponse(200, employeeLevel, "success"))
+    return res.status(201).json(new ApiResponse(200, employeeLevel, "Employee level retrieved successfully"))
 })
 
 
 // employee type list
 export const employeeTypeList = asyncHandler(async (req, res) => {
 
-    const employeeType = await EmployeeType.find({}).select("-__v")
+    const employeeType = await EmployeeType.find({})
 
-    return res.status(201).json(new ApiResponse(200, employeeType, "success"))
+    return res.status(201).json(new ApiResponse(200, employeeType, "Employee type retrieved successfully"))
 })
 
 
 // company type list
 export const companyTypeList = asyncHandler(async (req, res) => {
 
-    const companyType = await CompanyType.find({}).select("-__v")
+    const companyType = await CompanyType.find({})
 
-    return res.status(201).json(new ApiResponse(200, companyType, "success"))
+    return res.status(201).json(new ApiResponse(200, companyType, "Company type retrieved successfully"))
 })
 
 
-// company type list
+// company size list
 export const companySizeList = asyncHandler(async (req, res) => {
 
-    const companySize = await CompanySize.find({}).select("-__v")
+    const companySize = await CompanySize.find({})
 
-    return res.status(201).json(new ApiResponse(200, companySize, "success"))
+    return res.status(201).json(new ApiResponse(200, companySize, "Company type retrieved successfully"))
 })
-
-
-/* const createList = [
-    {
-        name: "1-3"
-    }
-] */
-
-
 

@@ -1,7 +1,7 @@
 import dotenv from "dotenv"
 dotenv.config()
 import { ApiError } from "./utilities/ApiError.js"
-import connectBD from "./db/config.js"
+import connectDB from "./db/config.js"
 import { app } from "./app.js"
 
 
@@ -15,7 +15,7 @@ app.all('*', (req, res, next) => {
 
 const port = process.env.PORT || 3000
 
-connectBD()
+connectDB()
     .then(() => {
         app.listen(port, () => {
             console.log(`Server is running at port: ${port}`);

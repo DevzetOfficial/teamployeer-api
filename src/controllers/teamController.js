@@ -32,14 +32,14 @@ export const createData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid credentials.")
     }
 
-    return res.status(201).json(new ApiResponse(201, newTeam, "Team created successfully."));
+    return res.status(201).json(new ApiResponse(201, newTeam, "Team created successfully"));
 })
 
 export const getAllData = asyncHandler(async (req, res) => {
 
     const teams = await Team.find().select("-__v")
 
-    return res.status(201).json(new ApiResponse(200, teams, "Team retrieved successfully."))
+    return res.status(201).json(new ApiResponse(200, teams, "Team retrieved successfully"))
 })
 
 export const getData = asyncHandler(async (req, res) => {
