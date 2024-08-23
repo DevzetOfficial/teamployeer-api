@@ -84,19 +84,14 @@ export const deleteData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66c57d08fff68ef283165008"
     const filters = { _id: req.params.id, companyId: companyId }
 
-    const info = await Shift.findOne(filters)
+    const shift = await Shift.findOne(filters)
 
-    if (!info) {
+    if (!shift) {
         throw new ApiError(400, "Shift not found!")
     }
 
-    let shift
-    if (info.status === 0) {
-        shift = await Shift.findByIdAndUpdate(info.id, { status: 1 }, { new: true });
-    } else {
-        shift = await Shift.findByIdAndUpdate(info.id, { status: 0 }, { new: true });
-    }
+    await Shift.findOneAndDelete(filters)
 
-    return res.status(201).json(new ApiResponse(200, shift, "Shift delete successfully."));
+    return res.status(201).json(new ApiResponse(200, {}, "Shift delete successfully."));
 })
 

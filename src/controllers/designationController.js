@@ -38,7 +38,7 @@ export const getData = asyncHandler(async (req, res) => {
 
     const filters = { _id: req.params.id, companyId: companyId }
 
-    const info = await Designation.findOne(filters).select("-__v");
+    const info = await Designation.findOne(filters)
 
     if (!info) {
         throw new ApiError(400, "Designation not found")
@@ -53,17 +53,17 @@ export const updateData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66c57d08fff68ef283165008"
     const filters = { _id: req.params.id, companyId: companyId }
 
-    const info = await Designation.findOneAndUpdate(
+    const designation = await Designation.findOneAndUpdate(
         filters,
         req.body,
         { new: true }
     );
 
-    if (!info) {
+    if (!designation) {
         throw new ApiError(404, "Designation not found");
     }
 
-    return res.status(200).json(new ApiResponse(200, info, "Designation updated successfully."));
+    return res.status(200).json(new ApiResponse(200, designation, "Designation updated successfully."));
 })
 
 export const deleteData = asyncHandler(async (req, res) => {
@@ -71,9 +71,9 @@ export const deleteData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66c57d08fff68ef283165008"
     const filters = { _id: req.params.id, companyId: companyId }
 
-    const info = await Designation.findOneAndDelete(filters)
+    const designation = await Designation.findOne(filters)
 
-    if (!info) {
+    if (!designation) {
         throw new ApiError(404, "Designation not found!")
     }
 

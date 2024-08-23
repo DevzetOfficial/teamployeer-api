@@ -17,8 +17,8 @@ app.use(helmet())
 
 // Limit requests from same API
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    limit: 100,
+    windowMs: 10 * 60 * 1000,
+    limit: 500,
     message: 'Too many requests from this IP, please try again in an hour!'
 });
 app.use(limiter);
@@ -37,6 +37,7 @@ import clientRoute from "./routes/clientRoute.js"
 import employeeRoute from "./routes/employeeRoute.js"
 import shiftRoute from "./routes/shiftRoute.js"
 import companyRoute from "./routes/companyRoute.js"
+import designationRoute from "./routes/designationRoute.js"
 
 
 
@@ -52,5 +53,6 @@ app.use("/api/v1", clientRoute)
 app.use("/api/v1", employeeRoute)
 app.use("/api/v1", shiftRoute)
 app.use("/api/v1", companyRoute)
+app.use("/api/v1", designationRoute)
 
 export { app }
