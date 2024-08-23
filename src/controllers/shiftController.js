@@ -79,8 +79,7 @@ export const updateData = asyncHandler(async (req, res) => {
     return res.status(201).json(new ApiResponse(200, info, "Shift update successfully."));
 })
 
-
-export const updateStatus = asyncHandler(async (req, res) => {
+export const deleteData = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66c57d08fff68ef283165008"
     const filters = { _id: req.params.id, companyId: companyId }
@@ -98,23 +97,6 @@ export const updateStatus = asyncHandler(async (req, res) => {
         shift = await Shift.findByIdAndUpdate(info.id, { status: 0 }, { new: true });
     }
 
-    return res.status(201).json(new ApiResponse(200, shift, "Status update successfully."));
-})
-
-
-export const deleteData = asyncHandler(async (req, res) => {
-
-    const companyId = req.user?.companyId || "66c57d08fff68ef283165008"
-    const filters = { _id: req.params.id, companyId: companyId }
-
-    const info = await Shift.findOneAndDelete(filters)
-
-    if (!info) {
-        throw new ApiError(404, "Shift not found!")
-    }
-
-    await info.deleteOne();
-
-    return res.status(201).json(new ApiResponse(200, {}, "Shift delete successfully."));
+    return res.status(201).json(new ApiResponse(200, shift, "Shift delete successfully."));
 })
 

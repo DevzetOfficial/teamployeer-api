@@ -135,18 +135,22 @@ export const updateData = asyncHandler(async (req, res) => {
 
 export const deleteData = asyncHandler(async (req, res) => {
 
-    const client = await Client.findById(req.params.id)
+    const companyId = req.user?.companyId || "66c57d08fff68ef283165008"
+    const filters = { _id: req.params.id, companyId: companyId }
 
-    if (!client) {
+    const info = await Client.findOne(filters)
+
+    if (!info) {
         throw new ApiError(404, "Client not found!")
     }
 
-    if (client.status === 0) {
-        await Client.findByIdAndUpdate(req.params.id, { status: 1 }, { new: true });
+    let client
+    if (info.status === 0) {
+        client = await Client.findByIdAndUpdate(info.id, { status: 1 }, { new: true });
     } else {
-        await Client.findByIdAndUpdate(req.params.id, { status: 0 }, { new: true });
+        client = await Client.findByIdAndUpdate(info.id, { status: 0 }, { new: true });
     }
 
-    return res.status(200).json(new ApiResponse(200, {}, "Client delete successfully."));
+    return res.status(200).json(new ApiResponse(200, client, "Client delete successfully."));
 })
 
