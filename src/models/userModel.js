@@ -6,8 +6,9 @@ const userSchema = new Schema(
     {
         companyId: {
             type: mongoose.Schema.Types.ObjectId,
-            required: true,
-            ref: "Company"
+            required: [true, "Comapny field is required"],
+            ref: "Company",
+            index: true
         },
         fullName: {
             type: String,

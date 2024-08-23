@@ -50,16 +50,17 @@ const companySchema = new Schema(
     }
 )
 
-
-companySchema.pre(/^filter/, async function (next) {
+companySchema.pre(/^find/, function (next) {
     this.populate({
         path: "companyType",
         select: "_id name"
     })
     next()
-})
+});
 
-companySchema.pre(/^filter/, async function (next) {
+
+
+companySchema.pre(/^find/, async function (next) {
     this.populate({
         path: "companySize",
         select: "_id name"

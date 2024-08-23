@@ -26,7 +26,7 @@ export const createData = asyncHandler(async (req, res) => {
 
     const data = {
         //companyId: req.user.companyId,
-        companyId: "66bdec36e1877685a60200ac",
+        companyId: "66c57d08fff68ef283165008",
         clientId: generateCode(7),
         name: formData.name,
         companyName: formData.companyName,
@@ -51,7 +51,9 @@ export const createData = asyncHandler(async (req, res) => {
 
 export const getActiveData = asyncHandler(async (req, res) => {
 
-    const clients = await Employee.find({ status: 1 }).select("-__v")
+    const filters = { companyId: "66c57d08fff68ef283165008", status: 1 }
+
+    const clients = await Employee.find(filters).select("-__v")
 
     return res.status(201).json(new ApiResponse(200, clients, "Employee retrieved successfully."))
 })
@@ -59,7 +61,9 @@ export const getActiveData = asyncHandler(async (req, res) => {
 
 export const getInactiveData = asyncHandler(async (req, res) => {
 
-    const clients = await Employee.find({ status: 0 }).select("-__v")
+    const filters = { companyId: "66c57d08fff68ef283165008", status: 0 }
+
+    const clients = await Employee.find(filters).select("-__v")
 
     return res.status(201).json(new ApiResponse(200, clients, "Employee retrieved successfully."))
 })
@@ -68,6 +72,9 @@ export const getCountData = asyncHandler(async (req, res) => {
 
     const clients = await Employee.aggregate([
         {
+            $match: {
+                companyId: "66c57d08fff68ef283165008"
+            },
             $group: {
                 _id: "$status",
                 count: { $sum: 1 }
@@ -75,7 +82,8 @@ export const getCountData = asyncHandler(async (req, res) => {
         }
     ])
 
-    let active, inactive = 0;
+    let active = 0;
+    let inactive = 0;
 
     if (clients) {
         clients.forEach(row => {

@@ -5,6 +5,7 @@ const teamSchema = new Schema(
         companyId: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Comapny field is required"],
+            ref: "Company",
             index: true
         },
         name: {

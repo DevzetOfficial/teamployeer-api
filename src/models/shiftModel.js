@@ -5,6 +5,7 @@ const shiftSchema = new Schema(
         companyId: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Comapny field is required"],
+            ref: "Company",
             index: true
         },
         name: {
@@ -12,9 +13,9 @@ const shiftSchema = new Schema(
             required: [true, "Shift name is required"],
             trim: true,
         },
-        cordinator: {
-            type: String,
-            trim: true,
+        coordinator: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Employee"
         },
         startTime: {
             type: String,
@@ -37,10 +38,24 @@ const shiftSchema = new Schema(
                 message: props => 'At least one work day must be selected.'
             }
         },
+        status: {
+            type: Number,
+            required: true,
+            default: 1,
+            enum: [0, 1]
+        }
     },
     {
         timestamps: true
     }
 )
+
+shiftSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: "coordinator",
+        select: "_id name email"
+    })
+    next()
+})
 
 export const Shift = mongoose.model("Shift", shiftSchema)

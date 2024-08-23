@@ -5,12 +5,21 @@ import { EmployeeLevel } from "../models/employeeLevelModel.js"
 import { EmployeeType } from "../models/employeeTypeModel.js"
 import { CompanyType } from "../models/companyTypeModel.js"
 import { CompanySize } from "../models/companySizeModel.js"
+import { ProvationPeriod } from "../models/provationPeriodModel.js"
+
+// Provation period list
+export const provationPeriodList = asyncHandler(async (req, res) => {
+
+    const provationPeriod = await ProvationPeriod.find()
+
+    return res.status(201).json(new ApiResponse(200, provationPeriod, "Provation period retrieved successfully"))
+})
 
 
 // country list
 export const countryList = asyncHandler(async (req, res) => {
 
-    const countrys = await Country.find({})
+    const countrys = await Country.find()
 
     return res.status(201).json(new ApiResponse(200, countrys, "Country retrieved successfully"))
 })
@@ -19,7 +28,7 @@ export const countryList = asyncHandler(async (req, res) => {
 // employee level list
 export const employeeLevelList = asyncHandler(async (req, res) => {
 
-    const employeeLevel = await EmployeeLevel.find({})
+    const employeeLevel = await EmployeeLevel.find()
 
     return res.status(201).json(new ApiResponse(200, employeeLevel, "Employee level retrieved successfully"))
 })
@@ -28,7 +37,7 @@ export const employeeLevelList = asyncHandler(async (req, res) => {
 // employee type list
 export const employeeTypeList = asyncHandler(async (req, res) => {
 
-    const employeeType = await EmployeeType.find({})
+    const employeeType = await EmployeeType.find()
 
     return res.status(201).json(new ApiResponse(200, employeeType, "Employee type retrieved successfully"))
 })
@@ -37,16 +46,16 @@ export const employeeTypeList = asyncHandler(async (req, res) => {
 // company type list
 export const companyTypeList = asyncHandler(async (req, res) => {
 
-    const companyType = await CompanyType.find({})
+    const companyType = await CompanyType.find()
 
     return res.status(201).json(new ApiResponse(200, companyType, "Company type retrieved successfully"))
 })
 
 
-// company size list
+// Company size list
 export const companySizeList = asyncHandler(async (req, res) => {
 
-    const companySize = await CompanySize.find({})
+    const companySize = await CompanySize.find()
 
     return res.status(201).json(new ApiResponse(200, companySize, "Company type retrieved successfully"))
 })

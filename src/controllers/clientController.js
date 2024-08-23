@@ -26,7 +26,7 @@ export const createData = asyncHandler(async (req, res) => {
 
     const data = {
         //companyId: req.user.companyId,
-        companyId: "66bdec36e1877685a60200ac",
+        companyId: "66c57d08fff68ef283165008",
         clientId: generateCode(7),
         name: formData.name,
         companyName: formData.companyName,

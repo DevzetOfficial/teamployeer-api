@@ -4,12 +4,13 @@ const designationSchema = new Schema(
     {
         companyId: {
             type: mongoose.Schema.Types.ObjectId,
-            required: true,
-            trim: true,
+            required: [true, "Comapny  is required"],
+            ref: "Company",
+            index: true
         },
         name: {
             type: String,
-            required: true,
+            required: [true, "Name is required"],
             trim: true,
         }
     },

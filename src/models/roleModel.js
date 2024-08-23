@@ -4,17 +4,19 @@ const roleSchema = new Schema(
     {
         companyId: {
             type: mongoose.Schema.Types.ObjectId,
-            required: true,
-            trim: true,
+            required: [true, "Comapny field is required"],
+            ref: "Company",
+            index: true
         },
         name: {
             type: String,
-            required: true,
+            required: [true, "Role name is required"],
             trim: true,
         },
         permissions: [
             {
                 type: mongoose.Schema.Types.ObjectId,
+                required: [true, "Permission field is required"],
                 ref: "Permission"
             }
         ]
@@ -24,7 +26,7 @@ const roleSchema = new Schema(
     }
 )
 
-roleSchema.pre(/^filter/, async function (next) {
+roleSchema.pre(/^find/, async function (next) {
     this.populate("permissions")
 })
 
