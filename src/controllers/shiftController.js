@@ -57,7 +57,7 @@ export const getData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Shift not found")
     }
 
-    return res.status(200).json(new ApiResponse(200, info, "Shift retrieved successfully"));
+    return res.status(201).json(new ApiResponse(200, info, "Shift retrieved successfully"));
 })
 
 
@@ -76,7 +76,7 @@ export const updateData = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Shift not found!")
     }
 
-    return res.status(200).json(new ApiResponse(200, info, "Shift update successfully."));
+    return res.status(201).json(new ApiResponse(200, info, "Shift update successfully."));
 })
 
 
@@ -88,14 +88,17 @@ export const updateStatus = asyncHandler(async (req, res) => {
     const info = await Shift.findOne(filters)
 
     if (!info) {
-        throw new ApiError(404, "Shift not found!")
+        throw new ApiError(400, "Shift not found!")
     }
 
-    info.status = (info.status ? 0 : 1)
+    let shift
+    if (info.status === 0) {
+        shift = await Shift.findByIdAndUpdate(info.id, { status: 1 }, { new: true });
+    } else {
+        shift = await Shift.findByIdAndUpdate(info.id, { status: 0 }, { new: true });
+    }
 
-    await info.save();
-
-    return res.status(200).json(new ApiResponse(200, {}, "Status update successfully."));
+    return res.status(201).json(new ApiResponse(200, shift, "Status update successfully."));
 })
 
 
@@ -112,6 +115,6 @@ export const deleteData = asyncHandler(async (req, res) => {
 
     await info.deleteOne();
 
-    return res.status(200).json(new ApiResponse(200, {}, "Shift delete successfully."));
+    return res.status(201).json(new ApiResponse(200, {}, "Shift delete successfully."));
 })
 
