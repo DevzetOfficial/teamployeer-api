@@ -26,15 +26,19 @@ export const createData = asyncHandler(async (req, res) => {
 
     const newEmployee = await Employee.create(data);
 
+    if (!newEmployee) {
+        throw new ApiError(400, "Invalid credentials.")
+    }
+
     // update team employees
-    await Team.findByIdAndUpdate(
+    const updateTeam = await Team.findByIdAndUpdate(
         newEmployee.team,
-        { $push: { employees: newEmployee._id } },  // Add employee ID to the team
+        { $push: { employees: newEmployee._id } },
         { new: true }
     ).populate('employees'); 
 
 
-    if (!newEmployee) {
+    if (!updateTeam) {
         throw new ApiError(400, "Invalid credentials.")
     }
 
