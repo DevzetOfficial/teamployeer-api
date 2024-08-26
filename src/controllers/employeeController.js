@@ -7,6 +7,7 @@ import mongoose from "mongoose"
 
 
 import { Employee } from "../models/employeeModel.js"
+import { Team } from "../models/teamModel.js"
 
 export const createData = asyncHandler(async (req, res) => {
 
@@ -23,6 +24,14 @@ export const createData = asyncHandler(async (req, res) => {
     }
 
     const newEmployee = await Employee.create(data);
+
+    // update team employees
+    await Team.findByIdAndUpdate(
+        newEmployee.team,
+        { $push: { employees: newEmployee._id } },  // Add employee ID to the team
+        { new: true }
+    ).populate('employees'); 
+
 
     if (!newEmployee) {
         throw new ApiError(400, "Invalid credentials.")
