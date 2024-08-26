@@ -3,7 +3,6 @@ import { ApiResponse } from "../utilities/ApiResponse.js"
 import { ApiError } from "../utilities/ApiError.js"
 
 import { Team } from "../models/teamModel.js"
-import { Employee } from "../models/employeeModel.js"
 
 export const createData = asyncHandler(async (req, res) => {
 
@@ -77,7 +76,9 @@ export const getData = asyncHandler(async (req, res) => {
 
     const filters = {companyId: companyId, _id: req.params.id}
 
-    const team = await Team.findOne(filters).select("-__v");
+    const team = await Team.findOne(filters)
+    .populate({path: "teamHead", select: "_id, name email mobile avatar"})
+    .populate({path: "employees", select: "_id name email mobile avatar"})
 
     if (!team) {
         throw new ApiError(400, "Team not found")

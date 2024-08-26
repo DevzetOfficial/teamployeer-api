@@ -61,6 +61,12 @@ const employeeSchema = new Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Employee"
         },
+        shift: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: [true, "Shift period is required"],
+            ref: "Shift"
+            
+        },
         provationPeriod: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Provation period is required"],
@@ -91,7 +97,7 @@ const employeeSchema = new Schema(
             required: [true, "Branch address is required"],
             trim: true
         },
-        accountName: {
+        accountHolderName: {
             type: String,
             required: [true, "Account nmae is required"],
             trim: true

@@ -8,6 +8,7 @@ import mongoose from "mongoose"
 
 import { Employee } from "../models/employeeModel.js"
 import { Team } from "../models/teamModel.js"
+import { populate } from "dotenv"
 
 export const createData = asyncHandler(async (req, res) => {
 
@@ -82,8 +83,6 @@ export const getCountData = asyncHandler(async (req, res) => {
         }
     ]);
 
-    console.log(employees)
-
     let active = 0;
     let inactive = 0;
 
@@ -109,7 +108,7 @@ export const getData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, _id: req.params.id }
 
-    const employee = await Employee.findOne(filters)
+    const employee = await Employee.findOne(filters).populate({path: "supervisor", select: "_id name email mobile avatar"})
 
     if (!employee) {
         throw new ApiError(400, "Employee not found")
