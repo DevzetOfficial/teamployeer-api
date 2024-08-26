@@ -7,7 +7,7 @@ import { Company } from "../models/companyModel.js"
 
 export const getData = asyncHandler(async (req, res) => {
 
-    const companyId = "66c57d08fff68ef283165008";
+    const companyId = "66bdec36e1877685a60200ac";
 
     const comapny = await Company.findById(companyId);
 
@@ -21,7 +21,7 @@ export const getData = asyncHandler(async (req, res) => {
 
 export const updateData = asyncHandler(async (req, res) => {
 
-    const companyId = "66c57d08fff68ef283165008";
+    const companyId = "66bdec36e1877685a60200ac";
 
     const info = Company.findById(companyId);
 

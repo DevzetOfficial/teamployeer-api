@@ -3,9 +3,8 @@ import mongoose, { Schema } from "mongoose";
 const designationSchema = new Schema(
     {
         companyId: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: String,
             required: [true, "Comapny  is required"],
-            ref: "Company",
             index: true
         },
         name: {

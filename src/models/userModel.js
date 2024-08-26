@@ -5,9 +5,8 @@ import bcrypt from "bcrypt"
 const userSchema = new Schema(
     {
         companyId: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: [true, "Comapny field is required"],
-            ref: "Company",
+            type: String,
+            required: [true, "Comapny  is required"],
             index: true
         },
         fullName: {

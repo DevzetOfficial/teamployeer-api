@@ -3,9 +3,8 @@ import mongoose, { Schema } from "mongoose";
 const clientSchema = new Schema(
     {
         companyId: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: [true, "Company id is required"],
-            ref: "Company",
+            type: String,
+            required: [true, "Comapny  is required"],
             index: true
         },
         clientId: {

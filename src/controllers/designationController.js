@@ -6,7 +6,7 @@ import { Designation } from "../models/designationModel.js"
 
 export const createData = asyncHandler(async (req, res) => {
 
-    const companyId = req.user?.companyId || "66c57d08fff68ef283165008"
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
 
     const data = req.body;
 
@@ -23,7 +23,7 @@ export const createData = asyncHandler(async (req, res) => {
 
 export const getAllData = asyncHandler(async (req, res) => {
 
-    const companyId = req.user?.companyId || "66c57d08fff68ef283165008"
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
 
     const filters = { companyId: companyId }
 
@@ -34,7 +34,7 @@ export const getAllData = asyncHandler(async (req, res) => {
 
 export const getData = asyncHandler(async (req, res) => {
 
-    const companyId = req.user?.companyId || "66c57d08fff68ef283165008"
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
 
     const filters = { _id: req.params.id, companyId: companyId }
 
@@ -50,7 +50,7 @@ export const getData = asyncHandler(async (req, res) => {
 
 export const updateData = asyncHandler(async (req, res) => {
 
-    const companyId = req.user?.companyId || "66c57d08fff68ef283165008"
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
     const filters = { _id: req.params.id, companyId: companyId }
 
     const designation = await Designation.findOneAndUpdate(
@@ -68,7 +68,7 @@ export const updateData = asyncHandler(async (req, res) => {
 
 export const deleteData = asyncHandler(async (req, res) => {
 
-    const companyId = req.user?.companyId || "66c57d08fff68ef283165008"
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
     const filters = { _id: req.params.id, companyId: companyId }
 
     const designation = await Designation.findOne(filters)

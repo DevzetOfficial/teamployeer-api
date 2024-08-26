@@ -3,9 +3,8 @@ import mongoose, { Schema } from "mongoose";
 const employeeSchema = new Schema(
     {
         companyId: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: String,
             required: [true, "Comapny  is required"],
-            ref: "Company",
             index: true
         },
         employeeId: {
@@ -125,23 +124,30 @@ const employeeSchema = new Schema(
 )
 
 employeeSchema.pre(/^find/, function (next) {
-    this.populate("employeeType");
+    this.populate("employeeType")
     next()
 })
 
 employeeSchema.pre(/^find/, function (next) {
-    this.populate("employeeLevel");
+    this.populate({
+        path: "team",
+        select: "_id name"
+    })
     next()
 })
 
 employeeSchema.pre(/^find/, function (next) {
-    this.populate("designation");
+    this.populate({
+        path: "designation",
+        select: "_id name"
+    })
     next()
 })
 
 employeeSchema.pre(/^find/, function (next) {
-    this.populate("team");
+    this.populate("employeeLevel")
     next()
 })
+
 
 export const Employee = mongoose.model("Employee", employeeSchema)

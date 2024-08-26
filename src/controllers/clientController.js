@@ -26,7 +26,7 @@ export const createData = asyncHandler(async (req, res) => {
 
     const data = {
         //companyId: req.user.companyId,
-        companyId: "66c57d08fff68ef283165008",
+        companyId: "66bdec36e1877685a60200ac",
         clientId: generateCode(7),
         name: formData.name,
         companyName: formData.companyName,
@@ -66,7 +66,14 @@ export const getInactiveData = asyncHandler(async (req, res) => {
 
 export const getCountData = asyncHandler(async (req, res) => {
 
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
+
     const clients = await Client.aggregate([
+        {
+            $match: {
+                companyId: { $eq: companyId }
+            }
+        },
         {
             $group: {
                 _id: "$status",
@@ -135,7 +142,7 @@ export const updateData = asyncHandler(async (req, res) => {
 
 export const deleteData = asyncHandler(async (req, res) => {
 
-    const companyId = req.user?.companyId || "66c57d08fff68ef283165008"
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
     const filters = { _id: req.params.id, companyId: companyId }
 
     const info = await Client.findOne(filters)
