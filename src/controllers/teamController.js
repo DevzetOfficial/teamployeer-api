@@ -71,7 +71,6 @@ export const getCountData = asyncHandler(async (req, res) => {
 
 export const getData = asyncHandler(async (req, res) => {
 
-
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
 
     const filters = {companyId: companyId, _id: req.params.id}
@@ -90,8 +89,8 @@ export const getData = asyncHandler(async (req, res) => {
 
 export const updateData = asyncHandler(async (req, res) => {
 
-     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
-     const filters = {companyId: companyId, _id: req.params.id}
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+    const filters = {companyId: companyId, _id: req.params.id}
 
     const formData = req.body;
 
