@@ -6,7 +6,7 @@ import {
     getData, createData, updateData, updateOffboarding, deleteData
 } from "../controllers/employeeController.js"
 
-import {getAll}
+
 
 const route = Router()
 
@@ -26,7 +26,7 @@ route.route("/employee/:id")
     
 route.route("/employee/offboarding/:id").patch(updateOffboarding)
 
-route.route("/employee/document/:id").get()
+//route.route("/employee/document/:id").get()
 
 export default route
 
