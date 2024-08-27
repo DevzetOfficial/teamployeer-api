@@ -8,7 +8,6 @@ import mongoose from "mongoose"
 
 import { Employee } from "../models/employeeModel.js"
 import { Team } from "../models/teamModel.js"
-import { populate } from "dotenv"
 
 export const createData = asyncHandler(async (req, res) => {
 
@@ -18,6 +17,10 @@ export const createData = asyncHandler(async (req, res) => {
 
     data.companyId = companyId
     data.employeeId = generateCode(5)
+
+    if(!data.supervisor){
+        delete data.supervisor
+    }
 
     if (req.file?.path) {
         const uploadAvatar = await uploadOnCloudinary(req.file?.path)
