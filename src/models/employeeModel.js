@@ -161,6 +161,14 @@ employeeSchema.pre(/^find/, function (next) {
 
 employeeSchema.pre(/^find/, function (next) {
     this.populate({
+        path: "provationPeriod",
+        select: "_id name"
+    })
+    next()
+})
+
+employeeSchema.pre(/^find/, function (next) {
+    this.populate({
         path: "designation",
         select: "_id name"
     })

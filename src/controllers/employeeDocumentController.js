@@ -1,114 +1,56 @@
 import { asyncHandler } from "../utilities/asyncHandler.js"
 import { ApiResponse } from "../utilities/ApiResponse.js"
 import { ApiError } from "../utilities/ApiError.js"
-import { generateCode } from "../utilities/helper.js"
 import { uploadOnCloudinary, destroyOnCloudinary } from "../utilities/cloudinary.js"
-import mongoose from "mongoose"
 
 
+import { EmployeeDocument } from "../models/employeeDecumentModel.js"
 import { Employee } from "../models/employeeModel.js"
-import { Team } from "../models/teamModel.js"
 
 export const createData = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
 
+    const filters = { companyId: companyId, _id: req.params.id }
+
+    const employeeInfo = Employee.findOne(filters)
+
+    if(!employeeInfo){
+        throw new ApiError(400, "Employee not found!")
+    }
+
     const data = req.body
 
-    data.companyId = companyId
-    data.employeeId = generateCode(5)
+    data.companyId = employeeInfo.companyId
+    data.employeeId = employeeInfo._id
 
-    if(!data.supervisor){
-        delete data.supervisor
+    if(!req.file?.path){
+        throw new ApiError(400, "Attachment is required")
     }
 
-    if (req.file?.path) {
-        const uploadAvatar = await uploadOnCloudinary(req.file?.path)
-        data.avatar = uploadAvatar?.url || ''
-    }
+    const attachmentPath = await uploadOnCloudinary(req.file?.path)
+    data.attachment = attachmentPath?.url || ''
 
-    const newEmployee = await Employee.create(data);
+    const newDocument = await EmployeeDocument.create(data);
 
-    if (!newEmployee) {
+    if (!newDocument) {
         throw new ApiError(400, "Invalid credentials.")
     }
 
-    // update team employees
-    const updateTeam = await Team.findByIdAndUpdate(
-        newEmployee.team,
-        { $push: { employees: newEmployee._id } },
-        { new: true }
-    ).populate('employees'); 
-
-
-    if (!updateTeam) {
-        throw new ApiError(400, "Invalid credentials.")
-    }
-
-    return res.status(201).json(new ApiResponse(201, newEmployee, "Employee created successfully."));
+    return res.status(201).json(new ApiResponse(201, newDocument, "Employee document add successfully."));
 })
 
-export const getActiveData = asyncHandler(async (req, res) => {
+export const getAllData = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
 
-    const filters = { companyId: companyId, status: 1 }
+    const filters = { companyId: companyId, employeeId: req.params.id }
 
-    const clients = await Employee.find(filters)
-    .populate({path: "supervisor", select: "_id name avatar"})
+    const documents = await EmployeeDocument.find(filters)
 
-    return res.status(201).json(new ApiResponse(200, clients, "Employee retrieved successfully."))
+    return res.status(201).json(new ApiResponse(200, documents, "Employee documents retrieved successfully."))
 })
 
-
-export const getInactiveData = asyncHandler(async (req, res) => {
-
-
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
-
-    const filters = { companyId: companyId, status: 0 }
-
-    const clients = await Employee.find(filters).select("-__v")
-
-    return res.status(201).json(new ApiResponse(200, clients, "Employee retrieved successfully."))
-})
-
-export const getCountData = asyncHandler(async (req, res) => {
-
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const employees = await Employee.aggregate([
-        {
-            $match: {
-                companyId: { $eq: companyId }
-            }
-        },
-        {
-            $group: {
-                _id: "$status",
-                count: { $sum: 1 }
-            }
-        }
-    ]);
-
-    let active = 0;
-    let inactive = 0;
-
-    if (employees) {
-        employees.forEach(row => {
-
-            if (row._id === 1) {
-                active = row.count
-            }
-
-            if (row._id === 0) {
-                inactive = row.count
-            }
-        })
-    }
-
-    return res.status(201).json(new ApiResponse(200, { active, inactive }, "Employee retrieved successfully."))
-})
 
 export const getData = asyncHandler(async (req, res) => {
 
