@@ -133,6 +133,10 @@ export const updateData = asyncHandler(async (req, res) => {
 
     const employeeInfo = await Employee.findOne(filters)
 
+    if (!employeeInfo) {
+        throw new ApiError(404, "Employee not found");
+    }
+
     const data = req.body;
 
     if (req.file && req.file?.path) {
@@ -144,7 +148,43 @@ export const updateData = asyncHandler(async (req, res) => {
         }
     }
 
-    const employee = await Employee.findByIdAndUpdate(
+    const employee = await Employee.findOneAndUpdate(
+        filters,
+        data,
+        { new: true }
+    );
+
+    return res.status(200).json(new ApiResponse(200, employee, "Employee updated successfully."));
+})
+
+
+export const updateOffboarding = asyncHandler(async (req, res) => {
+
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+
+    const filters = { companyId: companyId, _id: req.params.id }
+
+    const employeeInfo = await Employee.findOne(filters)
+    
+    if (!employeeInfo) {
+        throw new ApiError(404, "Employee not found");
+    }
+
+    const data = req.body;
+
+    if(!data?.offboardingDate){
+        throw new ApiError(404, "Offboardin date is required");
+    }
+
+    if(!data?.offboardingType){
+        throw new ApiError(404, "Offboardin type is required");
+    }
+
+    if(!data?.reason){
+        throw new ApiError(404, "Reason is required");
+    }
+
+    const employee = await Employee.findOneAndUpdate(
         filters,
         data,
         { new: true }
