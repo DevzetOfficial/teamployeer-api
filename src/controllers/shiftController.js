@@ -42,14 +42,14 @@ export const getAllData = asyncHandler(async (req, res) => {
 
     const results = await Shift.find(filters)
 
-    const ObjectId = require
+    /* const ObjectId = require
     const shiftData = await Shift.aggregate([
         {
             $match: {companyId: companyId}
         }
     ])
 
-    console.log(shiftData)
+    console.log(shiftData) */
 
 
     return res.status(201).json(new ApiResponse(200, results, "Shift retrieved successfully."))
