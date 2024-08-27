@@ -6,6 +6,24 @@ import { EmployeeType } from "../models/employeeTypeModel.js"
 import { CompanyType } from "../models/companyTypeModel.js"
 import { CompanySize } from "../models/companySizeModel.js"
 import { ProvationPeriod } from "../models/provationPeriodModel.js"
+import { OffboardingType } from "../models/offboardingTypeModel.js"
+import { OffboardingReason } from "../models/offboardingReasonModel.js"
+
+// Offboarding reason list
+export const offboardingReasonList = asyncHandler(async (req, res) => {
+
+    const results = await OffboardingReason.find().select("_id name")
+
+    return res.status(201).json(new ApiResponse(200, results, "Offboarding reason retrieved successfully"))
+})
+
+// Offboarding type list
+export const offboardingTypeList = asyncHandler(async (req, res) => {
+
+    const results = await OffboardingType.find().select("_id name")
+
+    return res.status(201).json(new ApiResponse(200, results, "Offboarding type retrieved successfully"))
+})
 
 // Provation period list
 export const provationPeriodList = asyncHandler(async (req, res) => {
@@ -14,7 +32,6 @@ export const provationPeriodList = asyncHandler(async (req, res) => {
 
     return res.status(201).json(new ApiResponse(200, provationPeriod, "Provation period retrieved successfully"))
 })
-
 
 // country list
 export const countryList = asyncHandler(async (req, res) => {

@@ -55,6 +55,7 @@ export const getActiveData = asyncHandler(async (req, res) => {
     const filters = { companyId: companyId, status: 1 }
 
     const clients = await Employee.find(filters)
+    .populate({path: "supervisor", select: "_id name avatar"})
 
     return res.status(201).json(new ApiResponse(200, clients, "Employee retrieved successfully."))
 })
