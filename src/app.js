@@ -11,6 +11,8 @@ const app = express()
 //  Set favicon
 app.use(favicon(path.resolve('./public/favicon.ico')))
 
+app.set('trust proxy', 1);
+
 // Set Access Origin
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
