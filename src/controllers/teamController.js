@@ -12,9 +12,10 @@ export const createData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Team name is required");
     }
 
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+
     const data = {
-        //companyId: req.user.companyId,
-        companyId: "66bdec36e1877685a60200ac",
+        companyId: companyId,
         name: formData.name
     };
 
@@ -35,16 +36,48 @@ export const createData = asyncHandler(async (req, res) => {
     return res.status(201).json(new ApiResponse(201, newTeam, "Team created successfully"));
 })
 
+
 export const getAllData = asyncHandler(async (req, res) => {
 
-    const teams = await Team.find().select("-__v")
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+
+    const filters = {companyId: companyId}
+
+    const teams = await Team.find(filters).select("-__v")
 
     return res.status(201).json(new ApiResponse(200, teams, "Team retrieved successfully"))
 })
 
+
+export const getCountData = asyncHandler(async (req, res) => {
+
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+
+    const teamList = await Team.find({companyId}).select('_id name employees')
+
+    const teams = []
+
+    teamList.map(row => {
+        teams.push({
+            _id: row._id,
+            name: row.name,
+            count: row.employees.length
+        });
+    });
+
+    return res.status(201).json(new ApiResponse(200, teams, "Team retrieved successfully"))
+})
+
+
 export const getData = asyncHandler(async (req, res) => {
 
-    const team = await Team.findById(req.params.id).select("-__v");
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+
+    const filters = {companyId: companyId, _id: req.params.id}
+
+    const team = await Team.findOne(filters)
+    .populate({path: "teamHead", select: "_id, name email mobile avatar"})
+    .populate({path: "employees", select: "_id name email mobile avatar"})
 
     if (!team) {
         throw new ApiError(400, "Team not found")
@@ -55,6 +88,9 @@ export const getData = asyncHandler(async (req, res) => {
 })
 
 export const updateData = asyncHandler(async (req, res) => {
+
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+    const filters = {companyId: companyId, _id: req.params.id}
 
     const formData = req.body;
 
@@ -70,8 +106,8 @@ export const updateData = asyncHandler(async (req, res) => {
         data.employees = formData.employees;
     }
 
-    const team = await Team.findByIdAndUpdate(
-        req.params.id,
+    const team = await Team.findOneAndUpdate(
+        filters,
         data,
         { new: true }
     );
@@ -85,13 +121,16 @@ export const updateData = asyncHandler(async (req, res) => {
 
 export const deleteData = asyncHandler(async (req, res) => {
 
-    const team = await Team.findById(req.params.id)
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+     const filters = {companyId: companyId, _id: req.params.id}
+
+    const team = await Team.findOne(filters)
 
     if (!team) {
         throw new ApiError(404, "Team not found!")
     }
 
-    await Team.findByIdAndDelete(req.params.id);
+    await Team.findOneAndDelete(filters);
 
     return res.status(200).json(new ApiResponse(200, {}, "Team delete successfully."));
 })

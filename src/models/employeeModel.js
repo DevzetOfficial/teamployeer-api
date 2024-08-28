@@ -61,10 +61,15 @@ const employeeSchema = new Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Employee"
         },
+        shift: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: [true, "Shift period is required"],
+            ref: "Shift"
+        },
         provationPeriod: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Provation period is required"],
-            trim: true
+            ref: "ProvationPeriod"
         },
         onboardingDate: {
             type: Date,
@@ -91,7 +96,7 @@ const employeeSchema = new Schema(
             required: [true, "Branch address is required"],
             trim: true
         },
-        accountName: {
+        accountHolderName: {
             type: String,
             required: [true, "Account nmae is required"],
             trim: true
@@ -111,6 +116,21 @@ const employeeSchema = new Schema(
             required: [true, "Bic or Swift number is required"],
             trim: true
         },
+        offboardingDate: {
+            type: Date
+        },
+        offboardingType: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "OffboardingType"
+        },
+        reason: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "OffboardingReason"
+        },
+        note: {
+            type: String,
+            trim: true
+        },
         status: {
             type: Number,
             required: true,
@@ -124,13 +144,24 @@ const employeeSchema = new Schema(
 )
 
 employeeSchema.pre(/^find/, function (next) {
-    this.populate("employeeType")
+    this.populate({
+        path: "employeeType",
+        select: "_id name"
+    })
     next()
 })
 
 employeeSchema.pre(/^find/, function (next) {
     this.populate({
         path: "team",
+        select: "_id name"
+    })
+    next()
+})
+
+employeeSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: "provationPeriod",
         select: "_id name"
     })
     next()
@@ -145,7 +176,35 @@ employeeSchema.pre(/^find/, function (next) {
 })
 
 employeeSchema.pre(/^find/, function (next) {
-    this.populate("employeeLevel")
+    this.populate({
+        path: "employeeLevel",
+        select: "_id name"
+    })
+    next()
+})
+
+
+employeeSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: "shift",
+        select: "_id name"
+    })
+    next()
+})
+
+employeeSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: "offboardingType",
+        select: "_id name"
+    })
+    next()
+})
+
+employeeSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: "reason",
+        select: "_id name"
+    })
     next()
 })
 

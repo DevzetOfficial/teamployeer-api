@@ -3,8 +3,9 @@ import mongoose, { Schema } from "mongoose";
 const shiftSchema = new Schema(
     {
         companyId: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
             required: [true, "Comapny  is required"],
+            ref: "Company",
             index: true
         },
         name: {
