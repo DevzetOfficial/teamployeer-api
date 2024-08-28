@@ -3,8 +3,12 @@ import cors from "cors"
 import helmet from "helmet"
 import rateLimit from "express-rate-limit"
 import cookieParser from "cookie-parser"
+import favicon from "serve-favicon"
+import path from "path"
 
 const app = express()
+
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 
 // Set Access Origin
 app.use(cors({
