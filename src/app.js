@@ -8,7 +8,7 @@ import path from "path"
 
 const app = express()
 
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
+app.use(favicon(path.resolve('./public/favicon.ico')))
 
 // Set Access Origin
 app.use(cors({
