@@ -3,8 +3,15 @@ import cors from "cors"
 import helmet from "helmet"
 import rateLimit from "express-rate-limit"
 import cookieParser from "cookie-parser"
+import favicon from "serve-favicon"
+import path from "path"
 
 const app = express()
+
+//  Set favicon
+app.use(favicon(path.resolve('./public/favicon.ico')))
+
+app.set('trust proxy', 1);
 
 // Set Access Origin
 app.use(cors({
@@ -18,8 +25,8 @@ app.use(helmet())
 // Limit requests from same API
 const limiter = rateLimit({
     windowMs: 10 * 60 * 1000,
-    limit: 500,
-    message: 'Too many requests from this IP, please try again'
+    limit: 200,
+    message: 'Too many requests from this IP, please try after some time again.'
 });
 app.use(limiter);
 
@@ -38,9 +45,6 @@ import employeeRoute from "./routes/employeeRoute.js"
 import shiftRoute from "./routes/shiftRoute.js"
 import companyRoute from "./routes/companyRoute.js"
 import designationRoute from "./routes/designationRoute.js"
-
-
-
 
 
 
