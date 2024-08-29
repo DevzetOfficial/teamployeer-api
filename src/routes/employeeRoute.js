@@ -6,6 +6,8 @@ import {
     getData, createData, updateData, updateOffboarding, deleteData
 } from "../controllers/employeeController.js"
 
+import {documentCreate, getAllDocument, updateDocument, deleteDocument} from "../controllers/employeeDocumentController.js"
+
 
 
 const route = Router()
@@ -26,7 +28,14 @@ route.route("/employee/:id")
     
 route.route("/employee/offboarding/:id").patch(updateOffboarding)
 
-//route.route("/employee/document/:id").get()
+
+route.route("/employee/:employeeId/document")
+    .get(getAllDocument)
+    .post(upload.single("attachment"), documentCreate)
+
+route.route("/employee/:employeeId/document/:id")
+    .patch(upload.single("attachment"), updateDocument)
+    .delete(deleteDocument)
 
 export default route
 

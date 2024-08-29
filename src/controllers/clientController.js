@@ -11,9 +11,6 @@ export const createData = asyncHandler(async (req, res) => {
 
     const formData = req.body;
 
-
-    return res.status(201).json(formData)
-
     if (!formData.name) {
         throw new ApiError(400, "Client name is required");
     }
@@ -27,9 +24,10 @@ export const createData = asyncHandler(async (req, res) => {
         uploadAvatar = await uploadOnCloudinary(req.file?.path)
     }
 
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+
     const data = {
-        //companyId: req.user.companyId,
-        companyId: "66bdec36e1877685a60200ac",
+        companyId: companyId,
         clientId: generateCode(7),
         name: formData.name,
         companyName: formData.companyName,

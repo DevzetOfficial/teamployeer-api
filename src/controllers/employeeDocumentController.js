@@ -3,32 +3,26 @@ import { ApiResponse } from "../utilities/ApiResponse.js"
 import { ApiError } from "../utilities/ApiError.js"
 import { uploadOnCloudinary, destroyOnCloudinary } from "../utilities/cloudinary.js"
 
-
 import { EmployeeDocument } from "../models/employeeDecumentModel.js"
 import { Employee } from "../models/employeeModel.js"
 
-export const createData = asyncHandler(async (req, res) => {
+
+export const documentCreate = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
 
-    const filters = { companyId: companyId, _id: req.params.id }
-
-    const employeeInfo = Employee.findOne(filters)
-
-    if(!employeeInfo){
-        throw new ApiError(400, "Employee not found!")
-    }
-
     const data = req.body
+    data.companyId = companyId
+    data.employeeId = req.params?.employeeId
 
-    data.companyId = employeeInfo.companyId
-    data.employeeId = employeeInfo._id
+    data.submitted = Date.now()
 
     if(!req.file?.path){
         throw new ApiError(400, "Attachment is required")
     }
 
     const attachmentPath = await uploadOnCloudinary(req.file?.path)
+
     data.attachment = attachmentPath?.url || ''
 
     const newDocument = await EmployeeDocument.create(data);
@@ -40,11 +34,12 @@ export const createData = asyncHandler(async (req, res) => {
     return res.status(201).json(new ApiResponse(201, newDocument, "Employee document add successfully."));
 })
 
-export const getAllData = asyncHandler(async (req, res) => {
+
+export const getAllDocument = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
 
-    const filters = { companyId: companyId, employeeId: req.params.id }
+    const filters = { companyId: companyId, employeeId: req.params.employeeId }
 
     const documents = await EmployeeDocument.find(filters)
 
@@ -52,46 +47,31 @@ export const getAllData = asyncHandler(async (req, res) => {
 })
 
 
-export const getData = asyncHandler(async (req, res) => {
+export const updateDocument = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
 
-    const filters = { companyId: companyId, _id: req.params.id }
+    const filters = { companyId: companyId, employeeId: req.params?.employeeId, _id: id}
 
-    const employee = await Employee.findOne(filters).populate({path: "supervisor", select: "_id name email mobile avatar"})
+    const documentInfo = await EmployeeDocument.findOne(filters)
 
-    if (!employee) {
-        throw new ApiError(400, "Employee not found")
-    }
-
-    return res.status(200).json(new ApiResponse(200, employee, "Employee retrieved successfully"));
-})
-
-export const updateData = asyncHandler(async (req, res) => {
-
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
-
-    const filters = { companyId: companyId, _id: req.params.id }
-
-    const employeeInfo = await Employee.findOne(filters)
-
-    if (!employeeInfo) {
-        throw new ApiError(404, "Employee not found");
+    if (!documentInfo) {
+        throw new ApiError(404, "Employee document not found");
     }
 
     const data = req.body;
 
-    if (req.file && req.file?.path) {
-        const uploadAvatar = await uploadOnCloudinary(req.file?.path)
-        data.avatar = uploadAvatar?.url || ""
+    /* if (req.file && req.file?.path) {
+        const uploadAttachemnt = await uploadOnCloudinary(req.file?.path)
+        data.attachment = uploadAttachemnt?.url || ""
 
-        if (employeeInfo && employeeInfo.avatar) {
-            await destroyOnCloudinary(employeeInfo.avatar);
+        if (documentInfo && documentInfo.avatar) {
+            await destroyOnCloudinary(documentInfo.attachment);
         }
-    }
+    } */
 
-    const employee = await Employee.findOneAndUpdate(
-        filters,
+    const employee = await Employee.findById(
+        documentInfo._id,
         data,
         { new: true }
     );
@@ -100,63 +80,24 @@ export const updateData = asyncHandler(async (req, res) => {
 })
 
 
-export const updateOffboarding = asyncHandler(async (req, res) => {
+export const deleteDocument = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
 
-    const filters = { companyId: companyId, _id: req.params.id }
+    const filters = { companyId: companyId, employeeId: req.params?.employeeId, _id: req.params?.id }
 
-    const employeeInfo = await Employee.findOne(filters)
-    
-    if (!employeeInfo) {
-        throw new ApiError(404, "Employee not found");
+    const documentInfo = await EmployeeDocument.findOne(filters)
+
+    if (!documentInfo) {
+        throw new ApiError(404, "Employee document not found!")
     }
 
-    const data = req.body;
-
-    if(!data?.offboardingDate){
-        throw new ApiError(404, "Offboardin date is required");
+    if(documentInfo.attachment){
+        await destroyOnCloudinary(documentInfo.attachment);
     }
 
-    if(!data?.offboardingType){
-        throw new ApiError(404, "Offboardin type is required");
-    }
-
-    if(!data?.reason){
-        throw new ApiError(404, "Reason is required");
-    }
-    
-    data.status = 0
-
-    const employee = await Employee.findOneAndUpdate(
-        filters,
-        data,
-        { new: true }
-    );
-
-
-    return res.status(200).json(new ApiResponse(200, employee, "Employee updated successfully."));
-})
-
-export const deleteData = asyncHandler(async (req, res) => {
-
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
-
-    const filters = { companyId: companyId, _id: req.params.id }
-
-    const info = await Employee.findOne(filters)
-
-    if (!info) {
-        throw new ApiError(404, "Employee not found!")
-    }
-
-    let employee
-    if (info.status === 0) {
-        employee = await Employee.findByIdAndUpdate(info._id, { status: 1 }, { new: true });
-    } else {
-        employee = await Employee.findByIdAndUpdate(info._id, { status: 0 }, { new: true });
-    }
-
-    return res.status(200).json(new ApiResponse(200, employee, "Employee status update successfully."));
+    await EmployeeDocument.findByIdAndDelete(documentInfo._id)
+  
+    return res.status(200).json(new ApiResponse(200, {}, "Employee docemnt delete successfully."));
 })
 

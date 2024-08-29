@@ -8,4 +8,16 @@ export const generateCode = (length) => {
     }
 
     return otp;
-};
+}
+
+export const dateFormat = (inputDate = Date.new()) => {
+
+    const timestamp = new Date(inputDate);
+
+    // Extract year and month
+    const year = timestamp.getFullYear();
+    const month = ('0' + (timestamp.getMonth() + 1)).slice(-2);
+    const date = ('0' + (timestamp.getDate() + 1)).slice(-2);
+
+    return year +"-"+ month +"-"+ date
+}
