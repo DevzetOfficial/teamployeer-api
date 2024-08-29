@@ -3,7 +3,7 @@ import authCheck from "../middlewares/authMiddleware.js"
 import {
     countryList, companyTypeList, companySizeList,
     employeeLevelList, employeeTypeList, provationPeriodList,
-    offboardingTypeList, offboardingReasonList
+    offboardingTypeList, offboardingReasonList, projectStatusList
 } from "../controllers/universalController.js"
 
 const route = Router()
@@ -19,6 +19,7 @@ route.route("/employee-types").get(employeeTypeList)
 route.route("/provation-period").get(provationPeriodList)
 route.route("/offboarding-types").get(offboardingTypeList)
 route.route("/offboarding-reasons").get(offboardingReasonList)
+route.route("/project-status").get(projectStatusList)
 
 export default route
 

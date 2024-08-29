@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utilities/asyncHandler.js"
 import { ApiResponse } from "../utilities/ApiResponse.js"
 import { ApiError } from "../utilities/ApiError.js"
+import { dateFormat } from "../utilities/helper.js"
 import { uploadOnCloudinary, destroyOnCloudinary } from "../utilities/cloudinary.js"
 
 import { EmployeeDocument } from "../models/employeeDecumentModel.js"
@@ -15,7 +16,9 @@ export const documentCreate = asyncHandler(async (req, res) => {
     data.companyId = companyId
     data.employeeId = req.params?.employeeId
 
-    data.submitted = Date.now()
+    data.submitted = dateFormat(Date.now())
+
+    console.log(data.submitted)
 
     if(!req.file?.path){
         throw new ApiError(400, "Attachment is required")

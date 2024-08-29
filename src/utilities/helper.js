@@ -10,7 +10,7 @@ export const generateCode = (length) => {
     return otp;
 }
 
-export const dateFormat = (inputDate = Date.new()) => {
+export const dateFormat = (inputDate) => {
 
     const timestamp = new Date(inputDate);
 

@@ -8,6 +8,16 @@ import { CompanySize } from "../models/companySizeModel.js"
 import { ProvationPeriod } from "../models/provationPeriodModel.js"
 import { OffboardingType } from "../models/offboardingTypeModel.js"
 import { OffboardingReason } from "../models/offboardingReasonModel.js"
+import { ProjectStatus } from "../models/projectStatusModel.js"
+
+
+// Project status list
+export const projectStatusList = asyncHandler(async (req, res) => {
+
+    const results = await ProjectStatus.find().select("_id name")
+
+    return res.status(201).json(new ApiResponse(200, results, "Project status retrieved successfully"))
+})
 
 // Offboarding reason list
 export const offboardingReasonList = asyncHandler(async (req, res) => {
