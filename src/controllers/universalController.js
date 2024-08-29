@@ -72,7 +72,7 @@ export const companyTypeList = asyncHandler(async (req, res) => {
 // Company size list
 export const companySizeList = asyncHandler(async (req, res) => {
 
-    const companySize = await CompanySize.find().sort({"position": "asc"})
+    const companySize = await CompanySize.find().select("_id name").sort({"position": "asc"})
 
     return res.status(201).json(new ApiResponse(200, companySize, "Company type retrieved successfully"))
 })
