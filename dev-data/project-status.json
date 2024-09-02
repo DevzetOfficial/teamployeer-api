@@ -1,18 +1,18 @@
 [
   {
     "name": "Ongoing",
-    "posigion": 1
+    "position": 1
   },
   {
     "name": "On Hold",
-    "posigion": 2
+    "position": 2
   },
   {
     "name": "Completed",
-    "posigion": 3
+    "position": 3
   },
   {
     "name": "Canceled",
-    "posigion": 4
+    "position": 4
   }
 ]

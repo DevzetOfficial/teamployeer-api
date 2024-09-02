@@ -14,7 +14,7 @@ import { ProjectStatus } from "../models/projectStatusModel.js"
 // Project status list
 export const projectStatusList = asyncHandler(async (req, res) => {
 
-    const results = await ProjectStatus.find().select("_id name")
+    const results = await ProjectStatus.find().select("_id name").sort({"position": "asc"})
 
     return res.status(201).json(new ApiResponse(200, results, "Project status retrieved successfully"))
 })
