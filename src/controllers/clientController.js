@@ -83,7 +83,8 @@ export const getCountData = asyncHandler(async (req, res) => {
         }
     ])
 
-    let active, inactive = 0;
+    let active = 0 
+    let inactive = 0
 
     if (clients) {
         clients.forEach(row => {
