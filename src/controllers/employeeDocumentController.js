@@ -18,7 +18,7 @@ export const documentCreate = asyncHandler(async (req, res) => {
 
     data.submitted = dateFormat(Date.now())
 
-    console.log(data.submitted)
+    console.log(data)
 
     if(!req.file?.path){
         throw new ApiError(400, "Attachment is required")
@@ -63,6 +63,8 @@ export const updateDocument = asyncHandler(async (req, res) => {
     }
 
     const data = req.body;
+
+    data.approved = dateFormat(Date.new())
 
     /* if (req.file && req.file?.path) {
         const uploadAttachemnt = await uploadOnCloudinary(req.file?.path)

@@ -38,11 +38,15 @@ const employeeDocumentSchema = new Schema(
         submitted: {
             type: Date,
             required: [true, "Submitted date is required"],
-            get: (date) => date.toISOString().split('T')[0]
+            get: (date) => {
+                return date ? date.toISOString().split('T')[0] : date;
+            }
         },
         approved: {
             type: Date,
-            get: (date) => date.toISOString().split('T')[0]
+            get: (date) => {
+                return date ? date.toISOString().split('T')[0] : date;
+            }
         },
         status: {
             type: String,
@@ -55,6 +59,8 @@ const employeeDocumentSchema = new Schema(
         timestamps: true
     }
 )
+
+employeeDocumentSchema.set('toJSON', { getters: true });
 
 
 export const EmployeeDocument = mongoose.model("EmployeeDocument", employeeDocumentSchema)
