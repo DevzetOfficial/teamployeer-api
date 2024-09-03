@@ -34,7 +34,7 @@ route.route("/employee/:employeeId/document")
     .post(upload.single("attachment"), documentCreate)
 
 route.route("/employee/:employeeId/document/:id")
-    .patch(upload.single("attachment"), updateDocument)
+    .patch(updateDocument)
     .delete(deleteDocument)
 
 export default route

@@ -1,7 +1,6 @@
 import { asyncHandler } from "../utilities/asyncHandler.js"
 import { ApiResponse } from "../utilities/ApiResponse.js"
 import { ApiError } from "../utilities/ApiError.js"
-import { dateFormat } from "../utilities/helper.js"
 import { uploadOnCloudinary, destroyOnCloudinary } from "../utilities/cloudinary.js"
 
 import { EmployeeDocument } from "../models/employeeDecumentModel.js"
@@ -52,26 +51,34 @@ export const updateDocument = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
 
-    const filters = { companyId: companyId, employeeId: req.params?.employeeId, _id: id}
+    const {employeeId, id} = req.body
+
+    if (!employeeId) {
+        throw new ApiError(404, "Employee id not found");
+    }
+
+    if (!id) {
+        throw new ApiError(404, "Document id not found");
+    }
+
+    const filters = { companyId: companyId, employeeId: employeeId, _id: id}
 
     const documentInfo = await EmployeeDocument.findOne(filters)
+
+    console.log(documentInfo)
 
     if (!documentInfo) {
         throw new ApiError(404, "Employee document not found");
     }
 
-    const data = req.body;
+    const data = {}
 
-    data.approved = Date.new()
+    if(!req.body?.status){
+        throw new ApiError(404, "Status not found"); 
+    }
 
-    /* if (req.file && req.file?.path) {
-        const uploadAttachemnt = await uploadOnCloudinary(req.file?.path)
-        data.attachment = uploadAttachemnt?.url || ""
-
-        if (documentInfo && documentInfo.avatar) {
-            await destroyOnCloudinary(documentInfo.attachment);
-        }
-    } */
+    data.status = req.body.status
+    data.approved = Date.now()
 
     const employee = await Employee.findById(
         documentInfo._id,

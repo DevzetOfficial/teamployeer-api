@@ -11,6 +11,8 @@ export const createData = asyncHandler(async (req, res) => {
 
     const formData = req.body;
 
+    console.log(formData)
+
     if (!formData.name) {
         throw new ApiError(400, "Client name is required");
     }
