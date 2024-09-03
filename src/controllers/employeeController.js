@@ -3,7 +3,6 @@ import { ApiResponse } from "../utilities/ApiResponse.js"
 import { ApiError } from "../utilities/ApiError.js"
 import { generateCode } from "../utilities/helper.js"
 import { uploadOnCloudinary, destroyOnCloudinary } from "../utilities/cloudinary.js"
-import mongoose from "mongoose"
 
 
 import { Employee } from "../models/employeeModel.js"
@@ -42,7 +41,7 @@ export const createData = asyncHandler(async (req, res) => {
 
 
     if (!updateTeam) {
-        throw new ApiError(400, "Invalid credentials.")
+        throw new ApiError(400, "Invalid team credentials.")
     }
 
     return res.status(201).json(new ApiResponse(201, newEmployee, "Employee created successfully."));

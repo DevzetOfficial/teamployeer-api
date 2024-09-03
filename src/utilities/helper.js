@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 export const generateCode = (length) => {
     const characters = '0123456789';
     let otp = '';
@@ -20,4 +22,10 @@ export const dateFormat = (inputDate) => {
     const date = ('0' + (timestamp.getDate() + 1)).slice(-2);
 
     return year +"-"+ month +"-"+ date
+}
+
+export const objectId = (id) => {
+    if (typeof id === 'string' && mongoose.Types.ObjectId.isValid(id)) {
+        return new mongoose.Types.ObjectId(id);
+    }
 }

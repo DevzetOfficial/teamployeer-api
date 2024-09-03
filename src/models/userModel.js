@@ -5,7 +5,7 @@ import bcrypt from "bcrypt"
 const userSchema = new Schema(
     {
         companyId: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
             required: [true, "Comapny  is required"],
             index: true
         },
