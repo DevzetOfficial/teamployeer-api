@@ -65,8 +65,6 @@ export const updateDocument = asyncHandler(async (req, res) => {
 
     const documentInfo = await EmployeeDocument.findOne(filters)
 
-    console.log(documentInfo)
-
     if (!documentInfo) {
         throw new ApiError(404, "Employee document not found");
     }

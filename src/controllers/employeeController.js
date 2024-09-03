@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utilities/asyncHandler.js"
 import { ApiResponse } from "../utilities/ApiResponse.js"
 import { ApiError } from "../utilities/ApiError.js"
-import { generateCode } from "../utilities/helper.js"
+import { generateCode, objectId } from "../utilities/helper.js"
 import { uploadOnCloudinary, destroyOnCloudinary } from "../utilities/cloudinary.js"
 
 
@@ -79,7 +79,7 @@ export const getCountData = asyncHandler(async (req, res) => {
     const employees = await Employee.aggregate([
         {
             $match: {
-                companyId: { $eq: companyId }
+                companyId: { $eq: objectId(companyId) }
             }
         },
         {
