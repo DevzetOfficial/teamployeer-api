@@ -8,15 +8,6 @@ import {
 
 const route = Router()
 
-/* route.route("/clients")
-    .get(authCheck, getAllData)
-    .post(authCheck, upload.single("avatar"), createData)
-
-route.route("/clients/:id")
-    .get(authCheck, getData)
-    .patch(authCheck, upload.single("avatar"), updateData)
-    .delete(authCheck, deleteData) */
-
 
 route.route("/client")
     .get(getActiveData)
