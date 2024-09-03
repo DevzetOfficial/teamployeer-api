@@ -11,8 +11,6 @@ export const createData = asyncHandler(async (req, res) => {
 
     const formData = req.body;
 
-    console.log(formData)
-
     if (!formData.name) {
         throw new ApiError(400, "Client name is required");
     }
@@ -54,7 +52,11 @@ export const createData = asyncHandler(async (req, res) => {
 
 export const getActiveData = asyncHandler(async (req, res) => {
 
-    const clients = await Client.find({ status: 1 }).select("-__v")
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+
+    const filters = { companyId: companyId, status: 1 }
+
+    const clients = await Client.find(filters).select("-__v")
 
     return res.status(201).json(new ApiResponse(200, clients, "Client retrieved successfully."))
 })
@@ -62,7 +64,11 @@ export const getActiveData = asyncHandler(async (req, res) => {
 
 export const getInactiveData = asyncHandler(async (req, res) => {
 
-    const clients = await Client.find({ status: 0 }).select("-__v")
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+
+    const filters = { companyId: companyId, status: 0 }
+
+    const clients = await Client.find(filters).select("-__v")
 
     return res.status(201).json(new ApiResponse(200, clients, "Client retrieved successfully."))
 })
@@ -106,7 +112,11 @@ export const getCountData = asyncHandler(async (req, res) => {
 
 export const getData = asyncHandler(async (req, res) => {
 
-    const client = await Client.findById(req.params.id).select("-__v");
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+
+    const filters = { companyId: companyId, _id: req.params.id }
+
+    const client = await Client.findOne(filters).select("-__v");
 
     if (!client) {
         throw new ApiError(400, "Client not found")
@@ -117,13 +127,20 @@ export const getData = asyncHandler(async (req, res) => {
 
 export const updateData = asyncHandler(async (req, res) => {
 
-    const clientInfo = await Client.findById(req.params.id)
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+
+    const filters = { companyId: companyId, _id: req.params.id }
+
+    const clientInfo = await Client.findOne(filters)
+
+    if (!clientInfo) {
+        throw new ApiError(400, "Client not found")
+    }
 
     const data = req.body;
 
-    let uploadAvatar
     if (req.file && req.file?.path) {
-        uploadAvatar = await uploadOnCloudinary(req.file?.path)
+        const uploadAvatar = await uploadOnCloudinary(req.file?.path)
         data.avatar = uploadAvatar?.url || ""
 
         if (clientInfo && clientInfo.avatar) {
@@ -132,14 +149,10 @@ export const updateData = asyncHandler(async (req, res) => {
     }
 
     const client = await Client.findByIdAndUpdate(
-        req.params.id,
+        clientInfo._id,
         data,
         { new: true }
     );
-
-    if (!client) {
-        throw new ApiError(404, "Client not found");
-    }
 
     return res.status(200).json(new ApiResponse(200, client, "Client updated successfully."));
 })
