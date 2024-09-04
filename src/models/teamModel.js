@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 const teamSchema = new Schema(
     {
         companyId: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
             required: [true, "Comapny  is required"],
             index: true
         },

@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utilities/asyncHandler.js"
 import { ApiResponse } from "../utilities/ApiResponse.js"
 import { ApiError } from "../utilities/ApiError.js"
-import { generateCode } from "../utilities/helper.js"
+import { generateCode, objectId } from "../utilities/helper.js"
 import { uploadOnCloudinary, destroyOnCloudinary } from "../utilities/cloudinary.js"
 
 
@@ -52,7 +52,11 @@ export const createData = asyncHandler(async (req, res) => {
 
 export const getActiveData = asyncHandler(async (req, res) => {
 
-    const clients = await Client.find({ status: 1 }).select("-__v")
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+
+    const filters = { companyId: companyId, status: 1 }
+
+    const clients = await Client.find(filters).select("-__v")
 
     return res.status(201).json(new ApiResponse(200, clients, "Client retrieved successfully."))
 })
@@ -60,7 +64,11 @@ export const getActiveData = asyncHandler(async (req, res) => {
 
 export const getInactiveData = asyncHandler(async (req, res) => {
 
-    const clients = await Client.find({ status: 0 }).select("-__v")
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+
+    const filters = { companyId: companyId, status: 0 }
+
+    const clients = await Client.find(filters).select("-__v")
 
     return res.status(201).json(new ApiResponse(200, clients, "Client retrieved successfully."))
 })
@@ -72,7 +80,7 @@ export const getCountData = asyncHandler(async (req, res) => {
     const clients = await Client.aggregate([
         {
             $match: {
-                companyId: { $eq: companyId }
+                companyId: { $eq: objectId(companyId) }
             }
         },
         {
@@ -83,7 +91,8 @@ export const getCountData = asyncHandler(async (req, res) => {
         }
     ])
 
-    let active, inactive = 0;
+    let active = 0 
+    let inactive = 0
 
     if (clients) {
         clients.forEach(row => {
@@ -103,7 +112,11 @@ export const getCountData = asyncHandler(async (req, res) => {
 
 export const getData = asyncHandler(async (req, res) => {
 
-    const client = await Client.findById(req.params.id).select("-__v");
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+
+    const filters = { companyId: companyId, _id: req.params.id }
+
+    const client = await Client.findOne(filters).select("-__v");
 
     if (!client) {
         throw new ApiError(400, "Client not found")
@@ -114,13 +127,20 @@ export const getData = asyncHandler(async (req, res) => {
 
 export const updateData = asyncHandler(async (req, res) => {
 
-    const clientInfo = await Client.findById(req.params.id)
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+
+    const filters = { companyId: companyId, _id: req.params.id }
+
+    const clientInfo = await Client.findOne(filters)
+
+    if (!clientInfo) {
+        throw new ApiError(400, "Client not found")
+    }
 
     const data = req.body;
 
-    let uploadAvatar
     if (req.file && req.file?.path) {
-        uploadAvatar = await uploadOnCloudinary(req.file?.path)
+        const uploadAvatar = await uploadOnCloudinary(req.file?.path)
         data.avatar = uploadAvatar?.url || ""
 
         if (clientInfo && clientInfo.avatar) {
@@ -129,14 +149,10 @@ export const updateData = asyncHandler(async (req, res) => {
     }
 
     const client = await Client.findByIdAndUpdate(
-        req.params.id,
+        clientInfo._id,
         data,
         { new: true }
     );
-
-    if (!client) {
-        throw new ApiError(404, "Client not found");
-    }
 
     return res.status(200).json(new ApiResponse(200, client, "Client updated successfully."));
 })
