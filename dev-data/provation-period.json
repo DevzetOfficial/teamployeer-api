@@ -1,17 +1,22 @@
 [
   {
-    "name": "N/A"
+    "name": "N/A",
+    "position": 1
   },
   {
-    "name": "1 months"
+    "name": "1 months",
+    "position": 2
   },
   {
-    "name": "2 months"
+    "name": "2 months",
+    "position": 3
   },
   {
-    "name": "3 months"
+    "name": "3 months",
+    "position": 4
   },
   {
-    "name": "6 months"
+    "name": "6 months",
+    "position": 5
   }
 ]

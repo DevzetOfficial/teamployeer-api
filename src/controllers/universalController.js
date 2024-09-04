@@ -38,7 +38,7 @@ export const offboardingTypeList = asyncHandler(async (req, res) => {
 // Provation period list
 export const provationPeriodList = asyncHandler(async (req, res) => {
 
-    const provationPeriod = await ProvationPeriod.find()
+    const provationPeriod = await ProvationPeriod.find().select("_id name").sort({"position": "asc"})
 
     return res.status(201).json(new ApiResponse(200, provationPeriod, "Provation period retrieved successfully"))
 })
