@@ -6,6 +6,10 @@ const employeeLevelSchema = new Schema(
             type: String,
             required: true,
             trim: true,
+        },
+        position: {
+            type: Number,
+            required: true
         }
     }
 )

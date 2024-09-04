@@ -16,7 +16,7 @@ import { LeaveStatus } from "../models/leaveStatusModel.js"
 // Leave status list
 export const leaveStatusList = asyncHandler(async (req, res) => {
 
-    const results = await LeaveStatus.find().select("_id name").sort({"position": "asc"})
+    const results = await LeaveStatus.find().select("name").sort({"position": "asc"})
 
     return res.status(201).json(new ApiResponse(200, results, "Leave status retrieved successfully"))
 })
@@ -25,7 +25,7 @@ export const leaveStatusList = asyncHandler(async (req, res) => {
 // Leave type list
 export const leaveTypeList = asyncHandler(async (req, res) => {
 
-    const results = await LeaveType.find().select("_id name").sort({"position": "asc"})
+    const results = await LeaveType.find().select("name").sort({"position": "asc"})
 
     return res.status(201).json(new ApiResponse(200, results, "Leave type retrieved successfully"))
 })
@@ -34,7 +34,7 @@ export const leaveTypeList = asyncHandler(async (req, res) => {
 // Project status list
 export const projectStatusList = asyncHandler(async (req, res) => {
 
-    const results = await ProjectStatus.find().select("_id name").sort({"position": "asc"})
+    const results = await ProjectStatus.find().select("name").sort({"position": "asc"})
 
     return res.status(201).json(new ApiResponse(200, results, "Project status retrieved successfully"))
 })
@@ -42,7 +42,7 @@ export const projectStatusList = asyncHandler(async (req, res) => {
 // Offboarding reason list
 export const offboardingReasonList = asyncHandler(async (req, res) => {
 
-    const results = await OffboardingReason.find().select("_id name")
+    const results = await OffboardingReason.find().select("name").sort({"position": "asc"})
 
     return res.status(201).json(new ApiResponse(200, results, "Offboarding reason retrieved successfully"))
 })
@@ -50,7 +50,7 @@ export const offboardingReasonList = asyncHandler(async (req, res) => {
 // Offboarding type list
 export const offboardingTypeList = asyncHandler(async (req, res) => {
 
-    const results = await OffboardingType.find().select("_id name")
+    const results = await OffboardingType.find().select("name").sort({"position": "asc"})
 
     return res.status(201).json(new ApiResponse(200, results, "Offboarding type retrieved successfully"))
 })
@@ -58,7 +58,7 @@ export const offboardingTypeList = asyncHandler(async (req, res) => {
 // Provation period list
 export const provationPeriodList = asyncHandler(async (req, res) => {
 
-    const provationPeriod = await ProvationPeriod.find().select("_id name").sort({"position": "asc"})
+    const provationPeriod = await ProvationPeriod.find().select("name").sort({"position": "asc"})
 
     return res.status(201).json(new ApiResponse(200, provationPeriod, "Provation period retrieved successfully"))
 })
@@ -75,7 +75,7 @@ export const countryList = asyncHandler(async (req, res) => {
 // employee level list
 export const employeeLevelList = asyncHandler(async (req, res) => {
 
-    const employeeLevel = await EmployeeLevel.find()
+    const employeeLevel = await EmployeeLevel.find().select("name").sort({"position": "asc"})
 
     return res.status(201).json(new ApiResponse(200, employeeLevel, "Employee level retrieved successfully"))
 })
@@ -84,7 +84,7 @@ export const employeeLevelList = asyncHandler(async (req, res) => {
 // employee type list
 export const employeeTypeList = asyncHandler(async (req, res) => {
 
-    const employeeType = await EmployeeType.find()
+    const employeeType = await EmployeeType.find().select("name").sort({"position": "asc"})
 
     return res.status(201).json(new ApiResponse(200, employeeType, "Employee type retrieved successfully"))
 })
@@ -102,7 +102,7 @@ export const companyTypeList = asyncHandler(async (req, res) => {
 // Company size list
 export const companySizeList = asyncHandler(async (req, res) => {
 
-    const companySize = await CompanySize.find().select("_id name").sort({"position": "asc"})
+    const companySize = await CompanySize.find().select("name").sort({"position": "asc"})
 
     return res.status(201).json(new ApiResponse(200, companySize, "Company type retrieved successfully"))
 })

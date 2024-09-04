@@ -1,29 +1,38 @@
 [
   {
-    "name": "Accident"
+    "name": "Accident",
+    "position": 1
   },
   {
-    "name": "Discrimination"
+    "name": "Discrimination",
+    "position": 2
   },
   {
-    "name": "Filed to do the job"
+    "name": "Filed to do the job",
+    "position": 3
   },
   {
-    "name": "Fair dismissal"
+    "name": "Fair dismissal",
+    "position": 4
   },
   {
-    "name": "Job switch"
+    "name": "Job switch",
+    "position": 5
   },
   {
-    "name": "Misconduct"
+    "name": "Misconduct",
+    "position": 6
   },
   {
-    "name": "Poor performance"
+    "name": "Poor performance",
+    "position": 7
   },
   {
-    "name": "Theft"
+    "name": "Theft",
+    "position": 8
   },
   {
-    "name": "Violence"
+    "name": "Violence",
+    "position": 1
   }
 ]

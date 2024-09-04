@@ -1,34 +1,34 @@
 [
   {
     "name": "1-3",
-    "posigion": 1
+    "position": 1
   },
   {
     "name": "4-20",
-    "posigion": 2
+    "position": 2
   },
   {
     "name": "21-50",
-    "posigion": 3
+    "position": 3
   },
   {
     "name": "51-100",
-    "posigion": 4
+    "position": 4
   },
   {
     "name": "101-200",
-    "posigion": 5
+    "position": 5
   },
   {
     "name": "201-500",
-    "posigion": 6
+    "position": 6
   },
   {
     "name": "501-1000",
-    "posigion": 7
+    "position": 7
   },
   {
     "name": "1000+",
-    "posigion": 8
+    "position": 8
   }
 ]

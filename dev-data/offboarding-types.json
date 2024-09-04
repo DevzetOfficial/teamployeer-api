@@ -1,14 +1,18 @@
 [
   {
-    "name": "Resignation"
+    "name": "Resignation",
+    "position": 1
   },
   {
-    "name": "Termination"
+    "name": "Termination",
+    "position": 2
   },
   {
-    "name": "Retirement"
+    "name": "Retirement",
+    "position": 3
   },
   {
-    "name": "Deceased"
+    "name": "Deceased",
+    "position": 4
   }
 ]

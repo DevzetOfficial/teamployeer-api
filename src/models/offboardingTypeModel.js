@@ -6,6 +6,10 @@ const offboardingTypeSchema = new Schema(
             type: String,
             required: [true, "Name is required"],
             trim: true,
+        },
+        position: {
+            type: Number,
+            required: true
         }
     },
     {

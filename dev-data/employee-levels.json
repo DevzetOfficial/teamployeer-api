@@ -1,20 +1,26 @@
 [
   {
-    "name": "Manager"
+    "name": "Manager",
+    "position": 1
   },
   {
-    "name": "Lead"
+    "name": "Lead",
+    "position": 2
   },
   {
-    "name": "Senior"
+    "name": "Senior",
+    "position": 3
   },
   {
-    "name": "Mid"
+    "name": "Mid",
+    "position": 4
   },
   {
-    "name": "Junior"
+    "name": "Junior",
+    "position": 5
   },
   {
-    "name": "Intern"
+    "name": "Intern",
+    "position": 6
   }
 ]
