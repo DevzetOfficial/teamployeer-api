@@ -4,7 +4,7 @@ const shiftSchema = new Schema(
     {
         companyId: {
             type: mongoose.Schema.Types.ObjectId,
-            required: [true, "Comapny  is required"],
+            required: [true, "Comapny is required"],
             ref: "Company",
             index: true
         },
@@ -30,12 +30,12 @@ const shiftSchema = new Schema(
         workDays: {
             type: [String],
             required: true,
-            enum: ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+            enum: ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"],
             validate: {
                 validator: function (v) {
                     return v.length > 0;
                 },
-                message: props => 'At least one work day must be selected.'
+                message: props => "At least one work day must be selected."
             }
         },
         status: {
