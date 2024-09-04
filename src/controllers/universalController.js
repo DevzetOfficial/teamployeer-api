@@ -9,6 +9,16 @@ import { ProvationPeriod } from "../models/provationPeriodModel.js"
 import { OffboardingType } from "../models/offboardingTypeModel.js"
 import { OffboardingReason } from "../models/offboardingReasonModel.js"
 import { ProjectStatus } from "../models/projectStatusModel.js"
+import { LeaveType } from "../models/leaveTypeModel.js"
+
+
+// Leave type list
+export const leaveTypeList = asyncHandler(async (req, res) => {
+
+    const results = await LeaveType.find().select("_id name").sort({"position": "asc"})
+
+    return res.status(201).json(new ApiResponse(200, results, "Leave type retrieved successfully"))
+})
 
 
 // Project status list

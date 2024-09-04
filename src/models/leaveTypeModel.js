@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const provationPeriodSchema = new Schema(
+const leaveTypeSchema = new Schema(
     {
         name: {
             type: String,
@@ -14,4 +14,4 @@ const provationPeriodSchema = new Schema(
     }
 )
 
-export const ProvationPeriod = mongoose.model("ProvationPeriod", provationPeriodSchema)
+export const LeaveType = mongoose.model("LeaveType", leaveTypeSchema)
