@@ -10,6 +10,16 @@ import { OffboardingType } from "../models/offboardingTypeModel.js"
 import { OffboardingReason } from "../models/offboardingReasonModel.js"
 import { ProjectStatus } from "../models/projectStatusModel.js"
 import { LeaveType } from "../models/leaveTypeModel.js"
+import { LeaveStatus } from "../models/leaveStatusModel.js"
+
+
+// Leave status list
+export const leaveStatusList = asyncHandler(async (req, res) => {
+
+    const results = await LeaveStatus.find().select("_id name").sort({"position": "asc"})
+
+    return res.status(201).json(new ApiResponse(200, results, "Leave status retrieved successfully"))
+})
 
 
 // Leave type list

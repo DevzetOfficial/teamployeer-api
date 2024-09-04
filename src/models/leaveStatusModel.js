@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const employeeTypeSchema = new Schema(
+const leaveStatusSchema = new Schema(
     {
         name: {
             type: String,
@@ -14,4 +14,4 @@ const employeeTypeSchema = new Schema(
     }
 )
 
-export const EmployeeType = mongoose.model("EmployeeType", employeeTypeSchema)
+export const LeaveStatus = mongoose.model("LeaveStatus", leaveStatusSchema)

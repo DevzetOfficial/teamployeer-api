@@ -1,14 +1,14 @@
 [
   {
-    "name": "Full-time",
+    "name": "Pending",
     "position": 1
   },
   {
-    "name": "Part-time",
+    "name": "Approved",
     "position": 2
   },
   {
-    "name": "Contractual",
+    "name": "Declined",
     "position": 3
   }
 ]
