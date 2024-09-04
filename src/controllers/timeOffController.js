@@ -11,9 +11,13 @@ export const createData = asyncHandler(async (req, res) => {
 
     const formData = req.body;
 
+
+
+    const attachment = req.files.map(file => `/uploads/${file.filename}`);
+
     
     let uploadAvatar
-    if (req.file?.path) {
+    if (?.path) {
         uploadAvatar = await uploadOnCloudinary(req.file?.path)
     }
 

@@ -16,6 +16,7 @@ const timeOffSchema = new Schema(
         leaveType: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Leave type is required"],
+            ref: "LeaveType"
         },
         startDate: {
             type: Date,
@@ -36,8 +37,7 @@ const timeOffSchema = new Schema(
             trim: true
         },
         attachment: {
-            type: String,
-            trim: true
+            type: [String]
         },
         status: {
             type: Number,
@@ -55,6 +55,14 @@ timeOffSchema.pre(/^find/, function (next) {
     this.populate({
         path: "employee",
         select: "name avatar"
+    })
+    next()
+})
+
+timeOffSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: "leaveType",
+        select: "name"
     })
     next()
 })

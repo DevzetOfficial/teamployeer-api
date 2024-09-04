@@ -11,7 +11,7 @@ const route = Router()
 
 route.route("/timeoff")
     .get(getActiveData)
-    .post(upload.single("avatar"), createData)
+    .post(upload.array("attarchment"), createData)
 
 route.route("/timeoff/inactive").get(getInactiveData)
 route.route("/timeoff/count").get(getCountData)

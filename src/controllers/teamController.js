@@ -77,7 +77,7 @@ export const getData = asyncHandler(async (req, res) => {
 
     const team = await Team.findOne(filters)
     .populate({path: "teamHead", select: "_id, name email mobile avatar"})
-    .populate({path: "employees", select: "_id name email mobile avatar"})
+    .populate("employees")
 
     if (!team) {
         throw new ApiError(400, "Team not found")
