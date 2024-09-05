@@ -9,34 +9,21 @@ import { TimeOff } from "../models/timeOffModel.js"
 
 export const createData = asyncHandler(async (req, res) => {
 
-    const formData = req.body;
-
-
-
-    const attachment = req.files.map(file => `/uploads/${file.filename}`);
-
-    
-    let uploadAvatar
-    if (?.path) {
-        uploadAvatar = await uploadOnCloudinary(req.file?.path)
-    }
-
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
 
-    const data = {
-        companyId: companyId,
-        TimeOffId: generateCode(7),
-        name: formData.name,
-        companyName: formData.companyName,
-        email: formData.email,
-        mobile: formData.mobile,
-        address: formData.address,
-        country: formData.country,
-        source: formData.source,
-        sourceLink: formData.sourceLink,
-        avatar: uploadAvatar?.url || "",
-        note: formData.note,
-    }
+    const data = req.body
+
+    data.companyId = companyId
+
+
+    const attachments = await Promise.all(
+        req.files.map(async (file) => {
+            const uploadAvatar = await uploadOnCloudinary(file.path);
+            return uploadAvatar?.url || '';
+        })
+    );
+
+    data.attachments = attachments
 
     const newTimeOff = await TimeOff.create(data);
 
@@ -47,27 +34,15 @@ export const createData = asyncHandler(async (req, res) => {
     return res.status(201).json(new ApiResponse(201, newTimeOff, "TimeOff created successfully."));
 })
 
-export const getActiveData = asyncHandler(async (req, res) => {
+export const getAllData = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
 
-    const filters = { companyId: companyId, status: 1 }
+    const filters = { companyId: companyId}
 
-    const TimeOffs = await TimeOff.find(filters).select("-__v")
+    const timeOffs = await TimeOff.find(filters).select("-__v")
 
-    return res.status(201).json(new ApiResponse(200, TimeOffs, "TimeOff retrieved successfully."))
-})
-
-
-export const getInactiveData = asyncHandler(async (req, res) => {
-
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
-
-    const filters = { companyId: companyId, status: 0 }
-
-    const TimeOffs = await TimeOff.find(filters).select("-__v")
-
-    return res.status(201).json(new ApiResponse(200, TimeOffs, "TimeOff retrieved successfully."))
+    return res.status(201).json(new ApiResponse(200, timeOffs, "TimeOff retrieved successfully."))
 })
 
 export const getCountData = asyncHandler(async (req, res) => {

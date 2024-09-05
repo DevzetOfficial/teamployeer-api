@@ -36,11 +36,11 @@ const timeOffSchema = new Schema(
             type: String,
             trim: true
         },
-        attachment: {
+        attachments: {
             type: [String]
         },
         status: {
-            type: Number,
+            type: String,
             required: true,
             default: "Pending",
             enum: ["Pending", "Approved", "Declined"]
