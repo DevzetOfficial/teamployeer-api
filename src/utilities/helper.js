@@ -30,6 +30,12 @@ export const objectId = (id) => {
     }
 }
 
+export const getSegment = (str) => {
+  
+    if (!str) return str
+    return str.split('/').filter(segment => segment.length > 0)
+};
+
 export const ucfirst = (str) => {
     if (!str) return str
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()

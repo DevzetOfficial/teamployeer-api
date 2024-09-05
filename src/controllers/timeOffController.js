@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utilities/asyncHandler.js"
 import { ApiResponse } from "../utilities/ApiResponse.js"
 import { ApiError } from "../utilities/ApiError.js"
-import { objectId, ucfirst } from "../utilities/helper.js"
+import { objectId, ucfirst, getSegment } from "../utilities/helper.js"
 import { uploadOnCloudinary, destroyOnCloudinary } from "../utilities/cloudinary.js"
 
 
@@ -40,11 +40,13 @@ export const getAllData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId}
 
-    const segments = req.url.split('/').filter(segment => segment.length > 0);
+    const segments = getSegment(req.url)
 
     if(segments?.[1]){
         filters.status = ucfirst(segments[1])
     }
+
+    console.log(filters)
 
     const timeOffs = await TimeOff.find(filters).select("-__v")
 
