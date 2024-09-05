@@ -16,8 +16,6 @@ const uploadOnCloudinary = async (filePath, fileName) => {
         //upload the file on cloudinary
         if(!fileName){
 
-            console.log(fileName)
-
             const response = await cloudinary.uploader.upload(filePath, { public_id: fileName }, (error, results) => {
                 if(error){
                     return error

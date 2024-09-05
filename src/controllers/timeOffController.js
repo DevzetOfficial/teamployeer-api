@@ -13,7 +13,7 @@ export const createData = asyncHandler(async (req, res) => {
 
     const data = req.body
 
-    data.companyId = companyId
+    data.companyId = objectId(companyId)
 
 
     const attachments = await Promise.all(
@@ -23,7 +23,7 @@ export const createData = asyncHandler(async (req, res) => {
             const time = d.getTime()
             const fileName = time + generateCode(6) + "-" + file.originalname.split('.').slice(0, -1).join('.')
 
-            const uploadAvatar = await uploadOnCloudinary(file.path, fileName);
+            const uploadAvatar = await uploadOnCloudinary(file.path, strSlud(fileName));
             return uploadAvatar?.url || '';
         })
     );
