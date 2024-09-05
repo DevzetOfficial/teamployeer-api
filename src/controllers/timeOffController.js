@@ -40,11 +40,11 @@ export const getAllData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId}
 
-    if(req.params?.status){
-        filters.status = ucfirst(req.params?.status)
-    }
+    const segments = req.url.split('/').filter(segment => segment.length > 0);
 
-    console.log(filters)
+    if(segments?.[1]){
+        filters.status = ucfirst(segments[1])
+    }
 
     const timeOffs = await TimeOff.find(filters).select("-__v")
 
