@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utilities/asyncHandler.js"
 import { ApiResponse } from "../utilities/ApiResponse.js"
 import { ApiError } from "../utilities/ApiError.js"
-import { generateCode, objectId, ucfirst, getSegment, strSlud } from "../utilities/helper.js"
+import { objectId, getSegments, ucfirst } from "../utilities/helper.js"
 import { uploadOnCloudinary, destroyOnCloudinary } from "../utilities/cloudinary.js"
 
 
@@ -13,17 +13,14 @@ export const createData = asyncHandler(async (req, res) => {
 
     const data = req.body
 
-    data.companyId = objectId(companyId)
+    data.companyId = companyId
 
 
     const attachments = await Promise.all(
         req.files.map(async (file) => {
 
-            const d = new Date()
-            const time = d.getTime()
-            const fileName = time + generateCode(6) + "-" + file.originalname.split('.').slice(0, -1).join('.')
+            const uploadAvatar = await uploadOnCloudinary(file.path, file.originalname);
 
-            const uploadAvatar = await uploadOnCloudinary(file.path, strSlud(fileName));
             return uploadAvatar?.url || '';
         })
     );
@@ -45,7 +42,7 @@ export const getAllData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId}
 
-    const segments = getSegment(req.url)
+    const segments = getSegments(req.url)
 
     if(segments?.[1]){
         filters.status = ucfirst(segments[1])
@@ -77,6 +74,7 @@ export const getCountData = asyncHandler(async (req, res) => {
     let pending = 0 
     let approved = 0 
     let declined = 0
+    let total = 0 
 
     if (timeOffs) {
         timeOffs.forEach(row => {
@@ -92,10 +90,12 @@ export const getCountData = asyncHandler(async (req, res) => {
             if (row._id === "Declined") {
                 declined = row.count
             }
+
+            total += row.count
         })
     }
 
-    return res.status(201).json(new ApiResponse(200, { pending, approved, declined }, "Time Off retrieved successfully."))
+    return res.status(201).json(new ApiResponse(200, { pending, approved, declined, total }, "Time Off retrieved successfully."))
 })
 
 export const getData = asyncHandler(async (req, res) => {

@@ -30,7 +30,7 @@ export const objectId = (id) => {
     }
 }
 
-export const getSegment = (str) => {
+export const getSegments = (str) => {
   
     if (!str) return str
     return str.split('/').filter(segment => segment.length > 0)
@@ -55,4 +55,4 @@ export const strSlud = (str) => {
       .replace(/\s+/g, '-')               
       .replace(/--+/g, '-')               
       .replace(/^-+|-+$/g, '');           
-  }
+}

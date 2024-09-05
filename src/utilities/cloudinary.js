@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from "cloudinary"
+import { generateCode, strSlud } from "../utilities/helper.js"
 import fs from "fs"
 
 
@@ -14,23 +15,19 @@ const uploadOnCloudinary = async (filePath, fileName) => {
         if (!filePath) return null
 
         //upload the file on cloudinary
-        if(!fileName){
+        if(fileName){
 
-            const response = await cloudinary.uploader.upload(filePath, { public_id: fileName }, (error, results) => {
-                if(error){
-                    return error
-                }else{
-                    return results
-                }
-            })
+            const d = new Date()
+            const time = d.getTime()
+            const fName = time + generateCode(6) + "-fn-" + fileName.split('.').slice(0, -1).join('.')
+
+            const response = await cloudinary.uploader.upload(filePath, { public_id: strSlud(fName) })
 
             fs.unlinkSync(filePath)
             return response;
         }
 
-        const response = await cloudinary.uploader.upload(filePath, {
-            resource_type: "auto"
-        })
+        const response = await cloudinary.uploader.upload(filePath, {resource_type: "auto"})
 
         // remove the locally saved temporary file
         fs.unlinkSync(filePath)

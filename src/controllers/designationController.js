@@ -38,13 +38,13 @@ export const getData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, _id: req.params.id }
 
-    const info = await Designation.findOne(filters)
+    const designation = await Designation.findOne(filters)
 
-    if (!info) {
+    if (!designation) {
         throw new ApiError(400, "Designation not found")
     }
 
-    return res.status(200).json(new ApiResponse(200, info, "Designation retrieved successfully"));
+    return res.status(200).json(new ApiResponse(200, designation, "Designation retrieved successfully"));
 
 })
 
