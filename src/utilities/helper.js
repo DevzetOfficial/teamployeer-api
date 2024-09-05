@@ -45,3 +45,14 @@ export const ucwords = (str) => {
     if (!str) return str
     return str.split(' ').map(word => ucfirst(word)).join(' ')
 };
+
+export const strSlud = (str) => {
+    if (!str) return str
+    return str
+      .toLowerCase()                      
+      .trim()                             
+      .replace(/[^a-z0-9\s-]/g, '-')       
+      .replace(/\s+/g, '-')               
+      .replace(/--+/g, '-')               
+      .replace(/^-+|-+$/g, '');           
+  }

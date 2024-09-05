@@ -36,7 +36,7 @@ export const getData = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
 
-    const filters = { _id: req.params.id, companyId: companyId }
+    const filters = { companyId: companyId, _id: req.params.id }
 
     const info = await Designation.findOne(filters)
 
@@ -51,30 +51,38 @@ export const getData = asyncHandler(async (req, res) => {
 export const updateData = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
-    const filters = { _id: req.params.id, companyId: companyId }
 
-    const designation = await Designation.findOneAndUpdate(
-        filters,
+    const filters = { companyId: companyId, _id: req.params.id }
+
+    const designation = await Designation.findOne(filters)
+
+    if (!designation) {
+        throw new ApiError(400, "Designation not found")
+    }
+
+    const updateDesignation = await Designation.findByIdAndUpdate(
+        designation._id,
         req.body,
         { new: true }
     );
 
-    if (!designation) {
+    if (!updateDesignation) {
         throw new ApiError(404, "Designation not found");
     }
 
-    return res.status(200).json(new ApiResponse(200, designation, "Designation updated successfully."));
+    return res.status(200).json(new ApiResponse(200, updateDesignation, "Designation updated successfully."));
 })
 
 export const deleteData = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
-    const filters = { _id: req.params.id, companyId: companyId }
+    
+    const filters = { companyId: companyId, _id: req.params.id }
 
     const designation = await Designation.findOne(filters)
 
     if (!designation) {
-        throw new ApiError(404, "Designation not found!")
+        throw new ApiError(400, "Designation not found")
     }
 
     await Designation.findOneAndDelete(req.params.id);

@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utilities/asyncHandler.js"
 import { ApiResponse } from "../utilities/ApiResponse.js"
 import { ApiError } from "../utilities/ApiError.js"
-import { objectId, ucfirst, getSegment } from "../utilities/helper.js"
+import { generateCode, objectId, ucfirst, getSegment, strSlud } from "../utilities/helper.js"
 import { uploadOnCloudinary, destroyOnCloudinary } from "../utilities/cloudinary.js"
 
 
@@ -18,7 +18,12 @@ export const createData = asyncHandler(async (req, res) => {
 
     const attachments = await Promise.all(
         req.files.map(async (file) => {
-            const uploadAvatar = await uploadOnCloudinary(file.path);
+
+            const d = new Date()
+            const time = d.getTime()
+            const fileName = time + generateCode(6) + "-" + file.originalname.split('.').slice(0, -1).join('.')
+
+            const uploadAvatar = await uploadOnCloudinary(file.path, fileName);
             return uploadAvatar?.url || '';
         })
     );
@@ -31,7 +36,7 @@ export const createData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid credentials.")
     }
 
-    return res.status(201).json(new ApiResponse(201, newTimeOff, "TimeOff created successfully."));
+    return res.status(201).json(new ApiResponse(201, newTimeOff, "Time Off created successfully."));
 })
 
 export const getAllData = asyncHandler(async (req, res) => {
@@ -45,8 +50,6 @@ export const getAllData = asyncHandler(async (req, res) => {
     if(segments?.[1]){
         filters.status = ucfirst(segments[1])
     }
-
-    console.log(filters)
 
     const timeOffs = await TimeOff.find(filters).select("-__v")
 
@@ -92,7 +95,7 @@ export const getCountData = asyncHandler(async (req, res) => {
         })
     }
 
-    return res.status(201).json(new ApiResponse(200, { pending, approved, declined }, "TimeOff retrieved successfully."))
+    return res.status(201).json(new ApiResponse(200, { pending, approved, declined }, "Time Off retrieved successfully."))
 })
 
 export const getData = asyncHandler(async (req, res) => {
@@ -101,13 +104,13 @@ export const getData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, _id: req.params.id }
 
-    const TimeOff = await TimeOff.findOne(filters).select("-__v");
+    const timeOff = await TimeOff.findOne(filters).select("-__v");
 
-    if (!TimeOff) {
-        throw new ApiError(400, "TimeOff not found")
+    if (!timeOff) {
+        throw new ApiError(400, "Time Off not found")
     }
 
-    return res.status(200).json(new ApiResponse(200, TimeOff, "TimeOff retrieved successfully"));
+    return res.status(200).json(new ApiResponse(200, timeOff, "Time Off retrieved successfully"));
 })
 
 export const updateData = asyncHandler(async (req, res) => {
@@ -116,9 +119,9 @@ export const updateData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, _id: req.params.id }
 
-    const TimeOffInfo = await TimeOff.findOne(filters)
+    const timeOffInfo = await TimeOff.findOne(filters)
 
-    if (!TimeOffInfo) {
+    if (!timeOffInfo) {
         throw new ApiError(400, "TimeOff not found")
     }
 
@@ -133,13 +136,13 @@ export const updateData = asyncHandler(async (req, res) => {
         }
     }
 
-    const TimeOff = await TimeOff.findByIdAndUpdate(
-        TimeOffInfo._id,
+    const timeOff = await TimeOff.findByIdAndUpdate(
+        timeOffInfo._id,
         data,
         { new: true }
     );
 
-    return res.status(200).json(new ApiResponse(200, TimeOff, "TimeOff updated successfully."));
+    return res.status(200).json(new ApiResponse(200, timeOff, "TimeOff updated successfully."));
 })
 
 export const deleteData = asyncHandler(async (req, res) => {
