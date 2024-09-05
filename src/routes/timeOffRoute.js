@@ -13,6 +13,9 @@ route.route("/timeoff")
     .get(getAllData)
     .post(upload.array("attachments"), createData)
 
+route.route("/timeoff/pending").get(getAllData)
+route.route("/timeoff/approved").get(getAllData)
+route.route("/timeoff/declined").get(getAllData)
 route.route("/timeoff/count").get(getCountData)
 
 route.route("/timeoff/:id")

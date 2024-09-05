@@ -29,3 +29,13 @@ export const objectId = (id) => {
         return new mongoose.Types.ObjectId(id);
     }
 }
+
+export const ucfirst = (str) => {
+    if (!str) return str
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+};
+
+export const ucwords = (str) => {
+    if (!str) return str
+    return str.split(' ').map(word => ucfirst(word)).join(' ')
+};

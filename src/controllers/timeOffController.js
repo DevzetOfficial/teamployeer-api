@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utilities/asyncHandler.js"
 import { ApiResponse } from "../utilities/ApiResponse.js"
 import { ApiError } from "../utilities/ApiError.js"
-import { generateCode, objectId } from "../utilities/helper.js"
+import { objectId, ucfirst } from "../utilities/helper.js"
 import { uploadOnCloudinary, destroyOnCloudinary } from "../utilities/cloudinary.js"
 
 
@@ -40,6 +40,12 @@ export const getAllData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId}
 
+    if(req.params?.status){
+        filters.status = ucfirst(req.params?.status)
+    }
+
+    console.log(filters)
+
     const timeOffs = await TimeOff.find(filters).select("-__v")
 
     return res.status(201).json(new ApiResponse(200, timeOffs, "TimeOff retrieved successfully."))
@@ -49,7 +55,7 @@ export const getCountData = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
-    const TimeOffs = await TimeOff.aggregate([
+    const timeOffs = await TimeOff.aggregate([
         {
             $match: {
                 companyId: { $eq: objectId(companyId) }
@@ -63,23 +69,28 @@ export const getCountData = asyncHandler(async (req, res) => {
         }
     ])
 
-    let active = 0 
-    let inactive = 0
+    let pending = 0 
+    let approved = 0 
+    let declined = 0
 
-    if (TimeOffs) {
-        TimeOffs.forEach(row => {
+    if (timeOffs) {
+        timeOffs.forEach(row => {
 
-            if (row._id === 1) {
-                active = row.count
+            if (row._id === "Pending") {
+                pending = row.count
             }
 
-            if (row._id === 0) {
-                inactive = row.count
+            if (row._id === "Approved") {
+                approved = row.count
+            }
+
+            if (row._id === "Declined") {
+                declined = row.count
             }
         })
     }
 
-    return res.status(201).json(new ApiResponse(200, { active, inactive }, "TimeOff retrieved successfully."))
+    return res.status(201).json(new ApiResponse(200, { pending, approved, declined }, "TimeOff retrieved successfully."))
 })
 
 export const getData = asyncHandler(async (req, res) => {

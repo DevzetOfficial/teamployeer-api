@@ -54,7 +54,7 @@ const timeOffSchema = new Schema(
 timeOffSchema.pre(/^find/, function (next) {
     this.populate({
         path: "employee",
-        select: "name avatar"
+        select: "name employeeId avatar"
     })
     next()
 })
