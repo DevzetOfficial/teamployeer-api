@@ -36,9 +36,12 @@ const timeOffSchema = new Schema(
             type: String,
             trim: true
         },
-        attachments: {
-            type: [String]
-        },
+        attachments: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "TimeOffAttachment"
+            }
+        ],
         status: {
             type: String,
             required: true,

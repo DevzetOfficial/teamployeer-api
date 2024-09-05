@@ -6,6 +6,7 @@ import { uploadOnCloudinary, destroyOnCloudinary } from "../utilities/cloudinary
 
 
 import { TimeOff } from "../models/timeOffModel.js"
+import { TimeOffAttachment } from "../models/timeOffAttachmentModel.js"
 
 export const createData = asyncHandler(async (req, res) => {
 
@@ -15,23 +16,43 @@ export const createData = asyncHandler(async (req, res) => {
 
     data.companyId = companyId
 
+    const timeOffCreate = await TimeOff.create(data);
+
+    if (!timeOffCreate) {
+        throw new ApiError(400, "Invalid credentials.")
+    }
 
     const attachments = await Promise.all(
         req.files.map(async (file) => {
 
-            const uploadAvatar = await uploadOnCloudinary(file.path, file.originalname);
+            const uploadAvatar = await uploadOnCloudinary(file.path);
 
-            return uploadAvatar?.url || '';
+            const attachmentData = {
+                timeoffId: timeOffCreate._id,
+                name: file.originalname,
+                attachment: uploadAvatar?.url || ''
+            }
+
+            return attachmentData;
         })
     );
 
-    data.attachments = attachments
+    const attachmentCreate = await TimeOffAttachment.create(attachments)
 
-    const newTimeOff = await TimeOff.create(data);
+    // update time off attachment
+    if(attachmentCreate){
 
-    if (!newTimeOff) {
-        throw new ApiError(400, "Invalid credentials.")
+        const timeOff = await TimeOff.findById(timeOffCreate._id)
+
+        attachmentCreate.forEach(row => {
+            timeOff.attachments.push(row._id);
+        })
+
+        await timeOff.save();
     }
+
+    const newTimeOff = await TimeOff.findById(timeOffCreate._id).populate("attachments")
+    
 
     return res.status(201).json(new ApiResponse(201, newTimeOff, "Time Off created successfully."));
 })
@@ -104,7 +125,7 @@ export const getData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, _id: req.params.id }
 
-    const timeOff = await TimeOff.findOne(filters).select("-__v");
+    const timeOff = await TimeOff.findOne(filters).populate("attachments")
 
     if (!timeOff) {
         throw new ApiError(400, "Time Off not found")
