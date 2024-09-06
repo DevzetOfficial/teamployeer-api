@@ -85,7 +85,7 @@ export const updateDocument = asyncHandler(async (req, res) => {
     data.status = req.body.status
     data.approved = Date.now()
 
-    const employeeDocument = await EmployeeDocument.findById(
+    const employeeDocument = await EmployeeDocument.findByIdAndUpdate(
         documentInfo._id,
         data,
         { new: true }
