@@ -85,13 +85,13 @@ export const updateDocument = asyncHandler(async (req, res) => {
     data.status = req.body.status
     data.approved = Date.now()
 
-    const employee = await Employee.findById(
+    const employeeDocument = await EmployeeDocument.findById(
         documentInfo._id,
         data,
         { new: true }
     );
 
-    return res.status(200).json(new ApiResponse(200, employee, "Employee updated successfully."));
+    return res.status(200).json(new ApiResponse(200, employeeDocument, "Employee document updated successfully."));
 })
 
 
