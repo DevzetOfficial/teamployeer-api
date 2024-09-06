@@ -15,6 +15,7 @@ export const createData = asyncHandler(async (req, res) => {
     const data = req.body
 
     data.companyId = companyId
+    data.attachments = []
 
     const timeOffCreate = await TimeOff.create(data);
 
@@ -22,39 +23,44 @@ export const createData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid credentials.")
     }
 
-    const attachments = await Promise.all(
-        req.files.map(async (file) => {
 
-            const uploadAvatar = await uploadOnCloudinary(file.path);
+    if(req.files.length > 0){
 
-            const attachmentData = {
-                timeoffId: timeOffCreate._id,
-                name: file.originalname,
-                attachment: uploadAvatar?.url || ''
-            }
+        const attachmentData = await Promise.all(
+            req.files.map(async (file) => {
 
-            return attachmentData;
-        })
-    );
+                const uploadAvatar = await uploadOnCloudinary(file.path);
 
-    const attachmentCreate = await TimeOffAttachment.create(attachments)
+                const attachmentData = {
+                    timeoffId: timeOffCreate._id,
+                    name: file.originalname,
+                    attachment: uploadAvatar?.url || ''
+                }
 
-    // update time off attachment
-    if(attachmentCreate){
+                return attachmentData;
+            })
+        );
 
-        const timeOff = await TimeOff.findById(timeOffCreate._id)
+        const attachmentCreate = await TimeOffAttachment.create(attachmentData)
 
-        attachmentCreate.forEach(row => {
-            timeOff.attachments.push(row._id);
-        })
 
-        await timeOff.save();
+        // update time off attachment
+        if(attachmentCreate){
+
+            const timeOff = await TimeOff.findById(timeOffCreate._id)
+
+            attachmentCreate.forEach(row => {
+                timeOff.attachments.push(row._id);
+            })
+
+            await timeOff.save();
+        }
     }
 
     const newTimeOff = await TimeOff.findById(timeOffCreate._id).populate("attachments")
     
 
-    return res.status(201).json(new ApiResponse(201, newTimeOff, "Time Off created successfully."));
+    return res.status(201).json(new ApiResponse(201, {newTimeOff}, "Time Off created successfully."));
 })
 
 export const getAllData = asyncHandler(async (req, res) => {
@@ -148,22 +154,33 @@ export const updateData = asyncHandler(async (req, res) => {
 
     const data = req.body;
 
-    if (req.file && req.file?.path) {
-        const uploadAvatar = await uploadOnCloudinary(req.file?.path)
-        data.avatar = uploadAvatar?.url || ""
-
-        if (TimeOffInfo && TimeOffInfo.avatar) {
-            await destroyOnCloudinary(TimeOffInfo.avatar);
-        }
-    }
-
-    const timeOff = await TimeOff.findByIdAndUpdate(
+    const updateTimeOff = await TimeOff.findByIdAndUpdate(
         timeOffInfo._id,
         data,
         { new: true }
     );
 
-    return res.status(200).json(new ApiResponse(200, timeOff, "TimeOff updated successfully."));
+
+    const attachments = await Promise.all(
+        req.files.map(async (file) => {
+
+            const uploadAvatar = await uploadOnCloudinary(file.path);
+
+            const attachmentData = {
+                timeoffId: timeOffInfo._id,
+                name: file.originalname,
+                attachment: uploadAvatar?.url || ''
+            }
+
+            return attachmentData;
+        })
+    );
+
+    if(attachments){
+        const attachmentCreate = await TimeOffAttachment.create(attachments)
+    }
+
+    return res.status(200).json(new ApiResponse(200, updateTimeOff, "TimeOff updated successfully."));
 })
 
 export const deleteData = asyncHandler(async (req, res) => {

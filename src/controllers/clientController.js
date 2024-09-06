@@ -4,7 +4,6 @@ import { ApiError } from "../utilities/ApiError.js"
 import { generateCode, objectId } from "../utilities/helper.js"
 import { uploadOnCloudinary, destroyOnCloudinary } from "../utilities/cloudinary.js"
 
-
 import { Client } from "../models/clientModel.js"
 
 export const createData = asyncHandler(async (req, res) => {
@@ -50,6 +49,7 @@ export const createData = asyncHandler(async (req, res) => {
     return res.status(201).json(new ApiResponse(201, newClient, "Client created successfully."));
 })
 
+
 export const getActiveData = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
@@ -72,6 +72,7 @@ export const getInactiveData = asyncHandler(async (req, res) => {
 
     return res.status(201).json(new ApiResponse(200, clients, "Client retrieved successfully."))
 })
+
 
 export const getCountData = asyncHandler(async (req, res) => {
 
@@ -110,6 +111,7 @@ export const getCountData = asyncHandler(async (req, res) => {
     return res.status(201).json(new ApiResponse(200, { active, inactive }, "Client retrieved successfully."))
 })
 
+
 export const getData = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
@@ -124,6 +126,7 @@ export const getData = asyncHandler(async (req, res) => {
 
     return res.status(200).json(new ApiResponse(200, client, "Client retrieved successfully"));
 })
+
 
 export const updateData = asyncHandler(async (req, res) => {
 
@@ -152,10 +155,11 @@ export const updateData = asyncHandler(async (req, res) => {
         clientInfo._id,
         data,
         { new: true }
-    );
+    )
 
     return res.status(200).json(new ApiResponse(200, client, "Client updated successfully."));
 })
+
 
 export const deleteData = asyncHandler(async (req, res) => {
 

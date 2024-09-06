@@ -17,17 +17,21 @@ const employeeDocumentSchema = new Schema(
         documentType: {
             type: String,
             required: [true, "Document type is required"],
-            enum: ['Joining Document', 'Others Document'],
+            enum: ['joining', 'others'],
             validate: {
                 validator: function (v) {
                     return v.length > 0;
                 },
-                message: props => 'Select Joining Document or Others Document'
+                message: props => 'Select joining or others'
             }
         },
         name: {
             type: String,
             required: [true, "Name is required"],
+            trim: true
+        },
+        fileName: {
+            type: String,
             trim: true
         },
         attachment: {

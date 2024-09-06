@@ -23,6 +23,7 @@ export const documentCreate = asyncHandler(async (req, res) => {
 
     const attachmentPath = await uploadOnCloudinary(req.file?.path)
 
+    data.fileName = req.file?.originalname || ''
     data.attachment = attachmentPath?.url || ''
 
     const newDocument = await EmployeeDocument.create(data);
