@@ -11,11 +11,17 @@ export const documentCreate = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
 
+
+    if(!req.params?.employeeId){
+        throw new ApiError(400, "Employee id is required")
+    }
+
     const data = req.body
     data.companyId = companyId
     data.employeeId = req.params?.employeeId
 
     data.submitted = Date.now()
+    data.approved = ''
 
     if(!req.file?.path){
         throw new ApiError(400, "Attachment is required")
@@ -52,7 +58,7 @@ export const updateDocument = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
 
-    const {employeeId, id} = req.body
+    const {employeeId, id} = req.params
 
     if (!employeeId) {
         throw new ApiError(404, "Employee id not found");
