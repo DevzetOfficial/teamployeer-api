@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
+
 const timeOffSchema = new Schema(
     {
         companyId: {
@@ -51,13 +52,24 @@ const timeOffSchema = new Schema(
     },
     {
         timestamps: true
+    }, 
+    {
+        toJSON: {
+            transform: function (doc, ret) {
+            ret.startDate = ret.startDate.toISOString().split('T')[0];
+            ret.endDate = ret.endDate.toISOString().split('T')[0];
+            return ret;
+            }
+        }
     }
 )
+
+timeOffSchema.set('toJSON', { getters: true });
 
 timeOffSchema.pre(/^find/, function (next) {
     this.populate({
         path: "employee",
-        select: "name employeeId avatar"
+        select: "employeeId name avatar"
     })
     next()
 })

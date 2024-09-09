@@ -24,7 +24,7 @@ const countrySchema = new Schema(
             type: String,
             trim: true
         },
-        image: {
+        avatar: {
             type: String,
             trim: true
         }

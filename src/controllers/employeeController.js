@@ -53,9 +53,10 @@ export const getActiveData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, status: 1 }
 
-    const clients = await Employee.find(filters).select("employeeId name avatar email mobile")
+    const clients = await Employee.find(filters).select("employeeId name avatar email mobile onboardingDate")
         .populate({path: "designation", select: "name"})
         .populate({path: "shift", select: "name"})
+        .populate({path: "provationPeriod", select: "name"})
         .populate({path: "supervisor", select: "name avatar"})
 
     return res.status(201).json(new ApiResponse(200, clients, "Employee retrieved successfully."))
@@ -69,9 +70,10 @@ export const getInactiveData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, status: 0 }
 
-    const clients = await Employee.find(filters).select("employeeId name avatar email mobile")
+    const clients = await Employee.find(filters).select("employeeId name avatar email mobile onboardingDate")
         .populate({path: "designation", select: "name"})
         .populate({path: "shift", select: "name"})
+        .populate({path: "provationPeriod", select: "name"})
         .populate({path: "supervisor", select: "name avatar"})
 
     return res.status(201).json(new ApiResponse(200, clients, "Employee retrieved successfully."))
