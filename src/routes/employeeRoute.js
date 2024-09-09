@@ -3,7 +3,7 @@ import authCheck from "../middlewares/authMiddleware.js"
 import { upload } from "../middlewares/multerMiddleware.js"
 import {
     getActiveData, getInactiveData, getCountData,
-    getData, createData, updateData, updateOffboarding, deleteData
+    getData, createData, updateData, updateOffboarding, deleteData, getSelectList
 } from "../controllers/employeeController.js"
 
 import {documentCreate, getAllDocument, updateDocument, deleteDocument} from "../controllers/employeeDocumentController.js"
@@ -19,6 +19,7 @@ route.route("/employee")
 
 route.route("/employee/count").get(getCountData)
 route.route("/employee/inactive").get(getInactiveData)
+route.route("/employee/select-list").get(getSelectList)
 
 route.route("/employee/:id")
     .get(getData)

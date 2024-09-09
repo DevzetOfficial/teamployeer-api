@@ -19,7 +19,7 @@ export const createData = asyncHandler(async (req, res) => {
 
     if(!data.supervisor){
         delete data.supervisor
-    }
+    } 
 
     if (req.file?.path) {
         const uploadAvatar = await uploadOnCloudinary(req.file?.path)
@@ -53,8 +53,10 @@ export const getActiveData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, status: 1 }
 
-    const clients = await Employee.find(filters)
-    .populate({path: "supervisor", select: "_id name avatar"})
+    const clients = await Employee.find(filters).select("employeeId name avatar email mobile")
+        .populate({path: "designation", select: "name"})
+        .populate({path: "shift", select: "name"})
+        .populate({path: "supervisor", select: "name avatar"})
 
     return res.status(201).json(new ApiResponse(200, clients, "Employee retrieved successfully."))
 })
@@ -67,7 +69,10 @@ export const getInactiveData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, status: 0 }
 
-    const clients = await Employee.find(filters).select("-__v")
+    const clients = await Employee.find(filters).select("employeeId name avatar email mobile")
+        .populate({path: "designation", select: "name"})
+        .populate({path: "shift", select: "name"})
+        .populate({path: "supervisor", select: "name avatar"})
 
     return res.status(201).json(new ApiResponse(200, clients, "Employee retrieved successfully."))
 })
@@ -115,7 +120,16 @@ export const getData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, _id: req.params.id }
 
-    const employee = await Employee.findOne(filters).populate({path: "supervisor", select: "_id name email mobile avatar"})
+    const employee = await Employee.findOne(filters)
+        .populate({path: "employeeType", select: "name"})
+        .populate({path: "team", select: "name"})
+        .populate({path: "provationPeriod", select: "name"})
+        .populate({path: "designation", select: "name"})
+        .populate({path: "employeeLevel", select: "name"})
+        .populate({path: "shift", select: "name"})
+        .populate({path: "offboardingType", select: "name"})
+        .populate({path: "reason", select: "name"})
+        .populate({path: "supervisor", select: "name avatar"})
 
     if (!employee) {
         throw new ApiError(400, "Employee not found")
@@ -215,5 +229,17 @@ export const deleteData = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json(new ApiResponse(200, employee, "Employee status update successfully."));
+})
+
+
+export const getSelectList = asyncHandler(async (req, res) => {
+
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+
+    const filters = { companyId: companyId, status: 1 }
+
+    const clients = await Employee.find(filters).select("name avatar")
+
+    return res.status(201).json(new ApiResponse(200, clients, "Employee retrieved successfully."))
 })
 

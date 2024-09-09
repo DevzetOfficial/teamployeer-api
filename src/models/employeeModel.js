@@ -11,7 +11,8 @@ const employeeSchema = new Schema(
         employeeId: {
             type: String,
             required: [true, "Employee ID is required"],
-            trim: true
+            trim: true,
+            index: true
         },
         name: {
             type: String,
@@ -143,71 +144,6 @@ const employeeSchema = new Schema(
         timestamps: true
     }
 )
-
-employeeSchema.pre(/^find/, function (next) {
-    this.populate({
-        path: "employeeType",
-        select: "_id name"
-    })
-    next()
-})
-
-employeeSchema.pre(/^find/, function (next) {
-    this.populate({
-        path: "team",
-        select: "_id name"
-    })
-    next()
-})
-
-employeeSchema.pre(/^find/, function (next) {
-    this.populate({
-        path: "provationPeriod",
-        select: "_id name"
-    })
-    next()
-})
-
-employeeSchema.pre(/^find/, function (next) {
-    this.populate({
-        path: "designation",
-        select: "_id name"
-    })
-    next()
-})
-
-employeeSchema.pre(/^find/, function (next) {
-    this.populate({
-        path: "employeeLevel",
-        select: "_id name"
-    })
-    next()
-})
-
-
-employeeSchema.pre(/^find/, function (next) {
-    this.populate({
-        path: "shift",
-        select: "_id name"
-    })
-    next()
-})
-
-employeeSchema.pre(/^find/, function (next) {
-    this.populate({
-        path: "offboardingType",
-        select: "_id name"
-    })
-    next()
-})
-
-employeeSchema.pre(/^find/, function (next) {
-    this.populate({
-        path: "reason",
-        select: "_id name"
-    })
-    next()
-})
 
 
 export const Employee = mongoose.model("Employee", employeeSchema)

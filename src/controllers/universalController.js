@@ -66,7 +66,7 @@ export const provationPeriodList = asyncHandler(async (req, res) => {
 // country list
 export const countryList = asyncHandler(async (req, res) => {
 
-    const countrys = await Country.find()
+    const countrys = await Country.find().select("name image")
 
     return res.status(201).json(new ApiResponse(200, countrys, "Country retrieved successfully"))
 })
