@@ -56,7 +56,7 @@ const employeeDocumentSchema = new Schema(
             type: String,
             required: [true, "Status is required"],
             default: "Pending",
-            enum: ["Pending", "Approved"]
+            enum: ["Pending", "Approved", "Rejected"]
         }
     },
     {

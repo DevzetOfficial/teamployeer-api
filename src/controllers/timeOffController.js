@@ -75,7 +75,7 @@ export const getAllData = asyncHandler(async (req, res) => {
         filters.status = ucfirst(segments[1])
     }
 
-    const timeOffs = await TimeOff.find(filters).select("-__v")
+    const timeOffs = await TimeOff.find(filters)
 
     return res.status(201).json(new ApiResponse(200, timeOffs, "TimeOff retrieved successfully."))
 })
@@ -149,58 +149,121 @@ export const updateData = asyncHandler(async (req, res) => {
     const timeOffInfo = await TimeOff.findOne(filters)
 
     if (!timeOffInfo) {
-        throw new ApiError(400, "TimeOff not found")
+        throw new ApiError(400, "Time off not found")
     }
 
     const data = req.body;
+    data.attachments = timeOffInfo.attachments;
 
-    const updateTimeOff = await TimeOff.findByIdAndUpdate(
+    await TimeOff.findByIdAndUpdate(
         timeOffInfo._id,
         data,
         { new: true }
     );
 
 
-    const attachments = await Promise.all(
-        req.files.map(async (file) => {
+    if(typeof req.files !== "undefined" && req.files.length > 0){
 
-            const uploadAvatar = await uploadOnCloudinary(file.path);
+        const attachmentData = await Promise.all(
+            req.files.map(async (file) => {
 
-            const attachmentData = {
-                timeoffId: timeOffInfo._id,
-                name: file.originalname,
-                attachment: uploadAvatar?.url || ''
-            }
+                const uploadAvatar = await uploadOnCloudinary(file.path);
 
-            return attachmentData;
-        })
-    );
+                const attachmentData = {
+                    timeoffId: timeOffInfo._id,
+                    name: file.originalname,
+                    attachment: uploadAvatar?.url || ''
+                }
 
-    if(attachments){
-        const attachmentCreate = await TimeOffAttachment.create(attachments)
+                return attachmentData;
+            })
+        )
+
+        const attachmentCreate = await TimeOffAttachment.create(attachmentData)
+
+        // update time off attachment
+        if(attachmentCreate.length > 0){
+
+            const timeOff = await TimeOff.findById(timeOffInfo._id)
+
+            attachmentCreate.forEach(row => {
+                timeOff.attachments.push(row._id);
+            })
+
+            await timeOff.save();
+        }
     }
 
-    return res.status(200).json(new ApiResponse(200, updateTimeOff, "TimeOff updated successfully."));
+    const updtaeTimeOff = await TimeOff.findById(timeOffInfo._id).populate("attachments")
+
+    return res.status(200).json(new ApiResponse(200, updtaeTimeOff, "Time Off updated successfully."));
 })
 
 export const deleteData = asyncHandler(async (req, res) => {
 
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
-    const filters = { _id: req.params.id, companyId: companyId }
+    const filters = { companyId: companyId, _id: req.params.id }
 
-    const info = await TimeOff.findOne(filters)
-
-    if (!info) {
-        throw new ApiError(404, "TimeOff not found!")
+    const timeOffInfo = await TimeOff.findOne(filters)
+   
+    if (!timeOffInfo) {
+        throw new ApiError(404, "Time Off not found!")
     }
 
-    let TimeOff
-    if (info.status === 0) {
-        TimeOff = await TimeOff.findByIdAndUpdate(info.id, { status: 1 }, { new: true });
-    } else {
-        TimeOff = await TimeOff.findByIdAndUpdate(info.id, { status: 0 }, { new: true });
+    const timeOffDocument = await TimeOffAttachment.find({ timeoffId: timeOffInfo._id })
+
+    if(timeOffDocument.length > 0){
+        await Promise.all(
+            timeOffDocument.map(async (row) => {
+                await destroyOnCloudinary(row.attachment)
+            })
+        )
+
+        await TimeOffAttachment.deleteMany({ timeoffId: timeOffInfo._id })
     }
 
-    return res.status(200).json(new ApiResponse(200, TimeOff, "TimeOff delete successfully."));
+    await TimeOff.findByIdAndDelete(timeOffInfo._id)
+
+
+    return res.status(200).json(new ApiResponse(200, {}, "Time Off delete successfully."));
+})
+
+
+export const deleteAttachment = asyncHandler(async (req, res) => {
+
+    const {timeoffId, id} = req.params
+
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+    const filters = { companyId: companyId, _id: timeoffId }
+
+    const timeOffInfo = await TimeOff.findOne(filters)
+   
+    if (!timeOffInfo) {
+        throw new ApiError(404, "Time Off not found!")
+    }
+
+    if (timeOffInfo.attachments.includes(id)) {
+
+        // Remove the attachment by id
+        timeOffInfo.attachments.pull(id)
+
+        // Save the updated document
+        await timeOffInfo.save()
+    }
+
+
+    const attachmentFilters = { timeoffId: timeoffId, _id: id }
+
+    const attachmentInfo = await TimeOffAttachment.findOne(attachmentFilters)
+   
+    if (!attachmentInfo) {
+        throw new ApiError(404, "Attachment not found!")
+    }
+
+    await destroyOnCloudinary(attachmentInfo.attachment)
+
+    await TimeOffAttachment.findByIdAndDelete(id)
+
+    return res.status(200).json(new ApiResponse(200, {}, "Time Off attachment delete successfully."));
 })
 
