@@ -40,9 +40,9 @@ const shiftSchema = new Schema(
         },
         status: {
             type: Number,
-            required: true,
             default: 1,
             enum: [0, 1],
+            required: true,
         },
     },
     {

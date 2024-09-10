@@ -21,16 +21,10 @@ const timeOffSchema = new Schema(
         startDate: {
             type: Date,
             required: [true, "Start date is required"],
-            get: (date) => {
-                return date ? date.toISOString().split("T")[0] : date;
-            },
         },
         endDate: {
             type: Date,
             required: [true, "End date is required"],
-            get: (date) => {
-                return date ? date.toISOString().split("T")[0] : date;
-            },
         },
         reason: {
             type: String,
@@ -44,22 +38,19 @@ const timeOffSchema = new Schema(
         ],
         status: {
             type: String,
-            required: true,
             default: "Pending",
             enum: ["Pending", "Approved", "Declined"],
+            required: true,
+            validate: {
+                validator: function (v) {
+                    return v.length > 0;
+                },
+                message: (props) => "Select Approved either Decliend.",
+            },
         },
     },
     {
         timestamps: true,
-    },
-    {
-        toJSON: {
-            transform: function (doc, ret) {
-                ret.startDate = ret.startDate.toISOString().split("T")[0];
-                ret.endDate = ret.endDate.toISOString().split("T")[0];
-                return ret;
-            },
-        },
     }
 );
 

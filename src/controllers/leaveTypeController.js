@@ -7,88 +7,106 @@ import { LeaveType } from "../models/leaveTypeModel.js";
 export const createData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
-    const formData = req.body;
+    const data = req.body;
+    data.companyId = companyId;
 
-    const storeData = {
-        companyId: companyId,
-        name: formData.name,
-        coordinator: coordinator,
-        startTime: formData.startTime,
-        endTime: formData.endTime,
-        workDays: formData.workDays,
-    };
+    const newLeaveType = await LeaveType.create(data);
 
-    const newData = await LeaveType.create(storeData);
-
-    if (!newData) {
-        throw new ApiError(400, "Invalid credentials.");
+    if (!newLeaveType) {
+        throw new ApiError(400, "Invalide credentials.");
     }
 
     return res
         .status(201)
-        .json(new ApiResponse(200, newData, "LeaveType created successfully."));
+        .json(
+            new ApiResponse(
+                200,
+                newLeaveType,
+                "Leave type created successfully."
+            )
+        );
 });
 
 export const getAllData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
     const filters = { companyId: companyId };
-
-    const results = await LeaveType.find(filters);
+    const leaveTypes = await LeaveType.find(filters);
 
     return res
         .status(201)
         .json(
-            new ApiResponse(200, results, "LeaveType retrieved successfully.")
+            new ApiResponse(
+                200,
+                leaveTypes,
+                "Leave type retrieved successfully."
+            )
         );
 });
 
 export const getData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
-    const filters = { _id: req.params.id, companyId: companyId };
+    const filters = { companyId: companyId, _id: req.params.id };
 
-    const info = await LeaveType.findOne(filters);
+    const leaveTypeInfo = await LeaveType.findOne(filters);
 
-    if (!info) {
-        throw new ApiError(400, "LeaveType not found");
+    if (!leaveTypeInfo) {
+        throw new ApiError(400, "Leave type not found");
     }
 
     return res
         .status(201)
-        .json(new ApiResponse(200, info, "LeaveType retrieved successfully"));
+        .json(new ApiResponse(200, info, "Leave type retrieved successfully"));
 });
 
 export const updateData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-    const filters = { _id: req.params.id, companyId: companyId };
 
-    const info = await LeaveType.findOneAndUpdate(filters, req.body, {
-        new: true,
-    });
+    const filters = { companyId: companyId, _id: req.params.id };
 
-    if (!info) {
-        throw new ApiError(404, "LeaveType not found!");
+    const leaveTypeInfo = await LeaveType.findOne(filters);
+
+    if (!leaveTypeInfo) {
+        throw new ApiError(400, "Leave type not found");
+    }
+
+    const updateLeaveType = await LeaveType.findById(
+        leaveTypeInfo._id,
+        req.body,
+        {
+            new: true,
+        }
+    );
+
+    if (!updateLeaveType) {
+        throw new ApiError(404, "Leave type not found!");
     }
 
     return res
         .status(201)
-        .json(new ApiResponse(200, info, "LeaveType update successfully."));
+        .json(
+            new ApiResponse(
+                200,
+                updateLeaveType,
+                "Leave type update successfully."
+            )
+        );
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
     const filters = { _id: req.params.id, companyId: companyId };
 
-    const LeaveType = await LeaveType.findOne(filters);
+    const leaveType = await LeaveType.findOne(filters);
 
-    if (!LeaveType) {
-        throw new ApiError(400, "LeaveType not found!");
+    if (!leaveType) {
+        throw new ApiError(400, "Leave type not found!");
     }
 
-    await LeaveType.findOneAndDelete(filters);
+    await LeaveType.findById(leaveType._id);
 
     return res
         .status(201)
-        .json(new ApiResponse(200, {}, "LeaveType delete successfully."));
+        .json(new ApiResponse(200, {}, "Leave type delete successfully."));
 });
