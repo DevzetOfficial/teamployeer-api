@@ -31,7 +31,7 @@ export const getAllData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
     const filters = { companyId: companyId };
-    const leaveTypes = await LeaveType.find(filters);
+    const leaveTypes = await LeaveType.find(filters).sort({ createdAt: 1 });
 
     return res
         .status(201)
