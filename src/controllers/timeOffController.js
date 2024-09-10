@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utilities/asyncHandler.js";
 import { ApiResponse } from "../utilities/ApiResponse.js";
 import { ApiError } from "../utilities/ApiError.js";
+import { format } from "date-fns";
 import { objectId, getSegments, ucfirst } from "../utilities/helper.js";
 import {
     uploadOnCloudinary,
@@ -86,7 +87,8 @@ export const getAllData = asyncHandler(async (req, res) => {
     const timeOffDataList = timeOffs.map((timeoff) => {
         const clasheData = pendingList.filter(
             (pRow) =>
-                pRow.startDate === timeoff.startDate &&
+                format(pRow.startDate, "yyyy-MM-dd") ===
+                    format(timeoff.startDate, "yyyy-MM-dd") &&
                 pRow.employee._id !== timeoff.employee._id
         );
 
