@@ -92,7 +92,7 @@ export const getAllData = asyncHandler(async (req, res) => {
 
         return {
             ...timeoff.toObject(),
-            cleashes: clasheData ? clasheData : [],
+            clashes: clasheData ? clasheData : [],
         };
     });
 
