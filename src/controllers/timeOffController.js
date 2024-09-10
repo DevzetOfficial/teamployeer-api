@@ -83,36 +83,27 @@ export const getAllData = asyncHandler(async (req, res) => {
 
     const pendingList = timeOffs.filter((row) => row.status === "Pending");
 
-    const updatedTimeOff = timeOffs.map((row) => {
+    const timeOffDataList = timeOffs.map((timeoff) => {
+        const clasheData = pendingList.filter(
+            (pRow) =>
+                pRow.startDate === timeoff.startDate &&
+                pRow.employee._id !== timeoff.employee._id
+        );
+
         return {
-            ...row,
-            clashes: [
-                {
-                    name: "HEllo",
-                },
-            ],
+            ...timeoff.toObject(),
+            cleashes: clasheData ? clasheData : [],
         };
     });
-
-    console.log(updatedTimeOff);
-
-    /* timeOffs.forEach(row => {
-
-        row.clashes = [];
-
-        const clasheData = pendingList.filter(pRow => pRow.startDate === row.startDate && pRow.employee._id !== row.employee._id);
-
-        row.clashes = clasheData
-
-        console.log('Row After Update:', row, clasheData);
-    })  */
-
-    //console.log(timeOffs)
 
     return res
         .status(201)
         .json(
-            new ApiResponse(200, timeOffs, "TimeOff retrieved successfully.")
+            new ApiResponse(
+                200,
+                timeOffDataList,
+                "TimeOff retrieved successfully."
+            )
         );
 });
 
