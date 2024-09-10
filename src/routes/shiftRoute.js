@@ -1,23 +1,17 @@
-import { Router } from "express"
-import authCheck from "../middlewares/authMiddleware.js"
+import { Router } from "express";
+import authCheck from "../middlewares/authMiddleware.js";
 import {
-    createData, getAllData, getData,
-    updateData, deleteData
-} from "../controllers/shiftController.js"
+    createData,
+    getAllData,
+    getData,
+    updateData,
+    deleteData,
+} from "../controllers/shiftController.js";
 
-const route = Router()
+const route = Router();
 
-route.route("/shift")
-    .get(getAllData)
-    .post(createData)
+route.route("/shift").get(getAllData).post(createData);
 
+route.route("/shift/:id").get(getData).patch(updateData).delete(deleteData);
 
-route.route("/shift/:id")
-    .get(getData)
-    .patch(updateData)
-    .delete(deleteData)
-
-export default route
-
-
-
+export default route;

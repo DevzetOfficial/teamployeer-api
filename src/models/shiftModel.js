@@ -6,7 +6,7 @@ const shiftSchema = new Schema(
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Comapny is required"],
             ref: "Company",
-            index: true
+            index: true,
         },
         name: {
             type: String,
@@ -15,7 +15,7 @@ const shiftSchema = new Schema(
         },
         coordinator: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Employee"
+            ref: "Employee",
         },
         startTime: {
             type: String,
@@ -35,27 +35,27 @@ const shiftSchema = new Schema(
                 validator: function (v) {
                     return v.length > 0;
                 },
-                message: props => "At least one work day must be selected."
-            }
+                message: (props) => "At least one work day must be selected.",
+            },
         },
         status: {
             type: Number,
             required: true,
             default: 1,
-            enum: [0, 1]
-        }
+            enum: [0, 1],
+        },
     },
     {
-        timestamps: true
+        timestamps: true,
     }
-)
+);
 
 shiftSchema.pre(/^find/, function (next) {
     this.populate({
         path: "coordinator",
-        select: "_id name email"
-    })
-    next()
-})
+        select: "_id name email",
+    });
+    next();
+});
 
-export const Shift = mongoose.model("Shift", shiftSchema)
+export const Shift = mongoose.model("Shift", shiftSchema);

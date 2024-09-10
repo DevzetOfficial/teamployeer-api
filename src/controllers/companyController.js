@@ -1,51 +1,49 @@
-import { asyncHandler } from "../utilities/asyncHandler.js"
-import { ApiResponse } from "../utilities/ApiResponse.js"
-import { ApiError } from "../utilities/ApiError.js"
+import { asyncHandler } from "../utilities/asyncHandler.js";
+import { ApiResponse } from "../utilities/ApiResponse.js";
+import { ApiError } from "../utilities/ApiError.js";
 
-import { Company } from "../models/companyModel.js"
-
+import { Company } from "../models/companyModel.js";
 
 export const getData = asyncHandler(async (req, res) => {
-
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
     const comapny = await Company.findById(companyId);
 
     if (!comapny) {
-        throw new ApiError(400, "Company not found")
+        throw new ApiError(400, "Company not found");
     }
 
-    return res.status(200).json(new ApiResponse(200, comapny, "Company retrieved successfully"));
-
-})
+    return res
+        .status(200)
+        .json(new ApiResponse(200, comapny, "Company retrieved successfully"));
+});
 
 export const updateData = asyncHandler(async (req, res) => {
-
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac"
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
     const info = Company.findById(companyId);
 
-    const data = req.body
+    const data = req.body;
 
-    let uploadlogo
+    let uploadlogo;
     if (req.file && req.file?.path) {
-        uploadlogo = await uploadOnCloudinary(req.file?.path)
-        data.logo = uploadlogo?.url || ""
+        uploadlogo = await uploadOnCloudinary(req.file?.path);
+        data.logo = uploadlogo?.url || "";
 
         if (info && info.logo) {
             await destroyOnCloudinary(info.logo);
         }
     }
 
-    const company = await Company.findByIdAndUpdate(
-        companyId,
-        data,
-        { new: true }
-    );
+    const company = await Company.findByIdAndUpdate(companyId, data, {
+        new: true,
+    });
 
     if (!company) {
         throw new ApiError(404, "Company not found");
     }
 
-    return res.status(200).json(new ApiResponse(200, company, "Company updated successfully."));
-})
+    return res
+        .status(200)
+        .json(new ApiResponse(200, company, "Company updated successfully."));
+});

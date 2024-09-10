@@ -6,7 +6,7 @@ const roleSchema = new Schema(
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Comapny is required"],
             ref: "Company",
-            index: true
+            index: true,
         },
         name: {
             type: String,
@@ -17,17 +17,17 @@ const roleSchema = new Schema(
             {
                 type: mongoose.Schema.Types.ObjectId,
                 required: [true, "Permission field is required"],
-                ref: "Permission"
-            }
-        ]
+                ref: "Permission",
+            },
+        ],
     },
     {
-        timestamps: true
+        timestamps: true,
     }
-)
+);
 
 roleSchema.pre(/^find/, async function (next) {
-    this.populate("permissions")
-})
+    this.populate("permissions");
+});
 
-export const Role = mongoose.model("Role", roleSchema)
+export const Role = mongoose.model("Role", roleSchema);

@@ -6,33 +6,33 @@ const clientSchema = new Schema(
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Comapny is required"],
             ref: "Company",
-            index: true
+            index: true,
         },
         clientId: {
             type: String,
             required: true,
-            trim: true
+            trim: true,
         },
         name: {
             type: String,
             required: [true, "Client name is required"],
-            trim: true
+            trim: true,
         },
         companyName: {
             type: String,
             required: [true, "Company name is required"],
-            trim: true
+            trim: true,
         },
         email: {
             type: String,
             required: [true, "Email is required"],
             lowecase: true,
-            trim: true
+            trim: true,
         },
         mobile: {
             type: String,
             required: [true, "Phone number is required"],
-            trim: true
+            trim: true,
         },
         address: {
             type: String,
@@ -41,43 +41,43 @@ const clientSchema = new Schema(
         country: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Country is required"],
-            ref: "Country"
+            ref: "Country",
         },
         source: {
             type: String,
             required: [true, "Source is required"],
-            trim: true
+            trim: true,
         },
         sourceLink: {
             type: String,
-            trim: true
+            trim: true,
         },
         avatar: {
             type: String,
-            trim: true
+            trim: true,
         },
         note: {
             type: String,
-            trim: true
+            trim: true,
         },
         status: {
             type: Number,
             required: true,
             default: 1,
-            enum: [0, 1]
-        }
+            enum: [0, 1],
+        },
     },
     {
-        timestamps: true
+        timestamps: true,
     }
-)
+);
 
 clientSchema.pre(/^find/, function (next) {
     this.populate({
         path: "country",
-        select: "_id code name image"
+        select: "_id code name image",
     });
-    next()
+    next();
 });
 
-export const Client = mongoose.model("Client", clientSchema)
+export const Client = mongoose.model("Client", clientSchema);

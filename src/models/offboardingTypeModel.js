@@ -9,12 +9,15 @@ const offboardingTypeSchema = new Schema(
         },
         position: {
             type: Number,
-            required: true
-        }
+            required: true,
+        },
     },
     {
-        timestamps: true
+        timestamps: true,
     }
-)
+);
 
-export const OffboardingType = mongoose.model("OffboardingType", offboardingTypeSchema)
+export const OffboardingType = mongoose.model(
+    "OffboardingType",
+    offboardingTypeSchema
+);

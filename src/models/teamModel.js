@@ -6,7 +6,7 @@ const teamSchema = new Schema(
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Comapny is required"],
             ref: "Company",
-            index: true
+            index: true,
         },
         name: {
             type: String,
@@ -16,19 +16,19 @@ const teamSchema = new Schema(
         teamHead: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Employee",
-            index: true
+            index: true,
         },
         employees: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "Employee"
-            }
-        ]
+                ref: "Employee",
+            },
+        ],
     },
     {
-        timestamps: true
+        timestamps: true,
     }
-)
+);
 
 /* teamSchema.pre(/^find/, function (next) {
     this.populate({
@@ -38,4 +38,4 @@ const teamSchema = new Schema(
     next()
 }) */
 
-export const Team = mongoose.model("Team", teamSchema)
+export const Team = mongoose.model("Team", teamSchema);

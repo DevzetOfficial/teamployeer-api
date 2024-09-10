@@ -6,24 +6,24 @@ const employeeSchema = new Schema(
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Comapny is required"],
             ref: "Company",
-            index: true
+            index: true,
         },
         employeeId: {
             type: String,
             required: [true, "Employee ID is required"],
             trim: true,
-            index: true
+            index: true,
         },
         name: {
             type: String,
             required: [true, "Name is required"],
-            trim: true
+            trim: true,
         },
         email: {
             type: String,
             required: [true, "Email is required"],
             lowecase: true,
-            trim: true
+            trim: true,
         },
         mobile: {
             type: String,
@@ -37,113 +37,112 @@ const employeeSchema = new Schema(
         },
         avatar: {
             type: String,
-            trim: true
+            trim: true,
         },
         employeeType: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Employee type is required"],
-            ref: "EmployeeType"
+            ref: "EmployeeType",
         },
         team: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Team is required"],
-            ref: "Team"
+            ref: "Team",
         },
         designation: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Designation is required"],
-            ref: "Designation"
+            ref: "Designation",
         },
         employeeLevel: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Employee level is required"],
-            ref: "EmployeeLevel"
+            ref: "EmployeeLevel",
         },
         supervisor: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Employee"
+            ref: "Employee",
         },
         shift: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Shift period is required"],
-            ref: "Shift"
+            ref: "Shift",
         },
         provationPeriod: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Provation period is required"],
-            ref: "ProvationPeriod"
+            ref: "ProvationPeriod",
         },
         onboardingDate: {
             type: Date,
             required: [true, "Onboarding date is required"],
         },
         grossSalary: {
-            type: Number
+            type: Number,
         },
         bonusPercentage: {
-            type: Number
+            type: Number,
         },
         bankName: {
             type: String,
             required: [true, "Bank name is required"],
-            trim: true
+            trim: true,
         },
         branchName: {
             type: String,
             required: [true, "Branch name is required"],
-            trim: true
+            trim: true,
         },
         branchAddress: {
             type: String,
             required: [true, "Branch address is required"],
-            trim: true
+            trim: true,
         },
         accountHolderName: {
             type: String,
             required: [true, "Account nmae is required"],
-            trim: true
+            trim: true,
         },
         accountNumber: {
             type: String,
             required: [true, "Account number is required"],
-            trim: true
+            trim: true,
         },
         routingNumber: {
             type: String,
             required: [true, "Routing number is required"],
-            trim: true
+            trim: true,
         },
         bicOrswiftNumber: {
             type: String,
             required: [true, "Bic or Swift number is required"],
-            trim: true
+            trim: true,
         },
         offboardingDate: {
-            type: Date
+            type: Date,
         },
         offboardingType: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "OffboardingType"
+            ref: "OffboardingType",
         },
         reason: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "OffboardingReason"
+            ref: "OffboardingReason",
         },
         note: {
             type: String,
-            trim: true
+            trim: true,
         },
         status: {
             type: Number,
             required: true,
             default: 1,
-            enum: [0, 1]
-        }
+            enum: [0, 1],
+        },
     },
     {
-        timestamps: true
+        timestamps: true,
     }
-)
+);
 
-
-export const Employee = mongoose.model("Employee", employeeSchema)
+export const Employee = mongoose.model("Employee", employeeSchema);

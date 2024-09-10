@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
-import jwt from "jsonwebtoken"
-import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 const userSchema = new Schema(
     {
@@ -8,12 +8,12 @@ const userSchema = new Schema(
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Comapny is required"],
             ref: "Company",
-            index: true
+            index: true,
         },
         fullName: {
             type: String,
             required: true,
-            trim: true
+            trim: true,
         },
         email: {
             type: String,
@@ -21,15 +21,15 @@ const userSchema = new Schema(
             unique: true,
             lowecase: true,
             trim: true,
-            index: true
+            index: true,
         },
         employee: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Employee"
+            ref: "Employee",
         },
         client: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Client"
+            ref: "Client",
         },
         userType: {
             type: String,
@@ -38,33 +38,34 @@ const userSchema = new Schema(
             trim: true,
             enum: {
                 values: ["owner", "employee", "client"],
-                message: "User type must be owner either: owner, employee, or client"
-            }
+                message:
+                    "User type must be owner either: owner, employee, or client",
+            },
         },
         avatar: {
-            type: String
+            type: String,
         },
         isActive: {
             type: Boolean,
-            default: false
+            default: false,
         },
         role: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Role"
+            ref: "Role",
         },
         googleId: {
             type: String,
-            index: true
+            index: true,
         },
         refreshToken: {
             type: String,
-            index: true
+            index: true,
         },
     },
     {
-        timestamps: true
+        timestamps: true,
     }
-)
+);
 
 /* userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
@@ -77,47 +78,46 @@ const userSchema = new Schema(
     return await bcrypt.compare(password, this.password)
 } */
 
-
 userSchema.pre(/^filter/, async function (next) {
     this.populate({
         path: "employee",
-        select: "_id name"
-    })
-    next()
-})
+        select: "_id name",
+    });
+    next();
+});
 
 userSchema.pre(/^filter/, async function (next) {
     this.populate({
         path: "client",
-        select: "_id clientName"
-    })
-    next()
-})
+        select: "_id clientName",
+    });
+    next();
+});
 
 userSchema.methods.generateAccessToken = function () {
     return jwt.sign(
         {
             _id: this._id,
             email: this.email,
-            fullName: this.fullName
+            fullName: this.fullName,
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
         }
-    )
-}
+    );
+};
 
 userSchema.methods.generateRefreshToken = function () {
     return jwt.sign(
         {
-            _id: this._id
+            _id: this._id,
         },
         process.env.REFRESH_TOKEN_SECRET,
         {
-            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
         }
-    )
-}
+    );
+};
 
-export const User = mongoose.model("User", userSchema)
+export const User = mongoose.model("User", userSchema);

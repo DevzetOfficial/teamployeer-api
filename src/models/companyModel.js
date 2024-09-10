@@ -5,24 +5,24 @@ const companySchema = new Schema(
         companyName: {
             type: String,
             required: true,
-            trim: true
+            trim: true,
         },
         companyType: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
-            ref: "CompanyType"
+            ref: "CompanyType",
         },
         companySize: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
-            ref: "CompanySize"
+            ref: "CompanySize",
         },
         email: {
             type: String,
             required: true,
             lowecase: true,
             trim: true,
-            index: true
+            index: true,
         },
         mobile: {
             type: String,
@@ -42,30 +42,28 @@ const companySchema = new Schema(
         },
         logo: {
             type: String,
-            trim: true
-        }
+            trim: true,
+        },
     },
     {
-        timestamps: true
+        timestamps: true,
     }
-)
+);
 
 companySchema.pre(/^find/, function (next) {
     this.populate({
         path: "companyType",
-        select: "_id name"
-    })
-    next()
+        select: "_id name",
+    });
+    next();
 });
-
-
 
 companySchema.pre(/^find/, async function (next) {
     this.populate({
         path: "companySize",
-        select: "_id name"
-    })
-    next()
-})
+        select: "_id name",
+    });
+    next();
+});
 
-export const Company = mongoose.model("Company", companySchema)
+export const Company = mongoose.model("Company", companySchema);
