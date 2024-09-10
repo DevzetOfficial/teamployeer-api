@@ -10,7 +10,6 @@ import {
     offboardingTypeList,
     offboardingReasonList,
     projectStatusList,
-    leaveTypeList,
     leaveStatusList,
 } from "../controllers/universalController.js";
 
@@ -28,7 +27,6 @@ route.route("/provation-period").get(provationPeriodList);
 route.route("/offboarding-types").get(offboardingTypeList);
 route.route("/offboarding-reasons").get(offboardingReasonList);
 route.route("/project-status").get(projectStatusList);
-route.route("/leave-types").get(leaveTypeList);
 route.route("/leave-status").get(leaveStatusList);
 
 export default route;
