@@ -13,7 +13,7 @@ export const createData = asyncHandler(async (req, res) => {
     const newLeaveType = await LeaveType.create(data);
 
     if (!newLeaveType) {
-        throw new ApiError(400, "Invalide credentials.");
+        throw new ApiError(400, "Invalide credentials");
     }
 
     return res
@@ -22,7 +22,7 @@ export const createData = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 newLeaveType,
-                "Leave type created successfully."
+                "Leave type created successfully"
             )
         );
 });
@@ -39,7 +39,7 @@ export const getAllData = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 leaveTypes,
-                "Leave type retrieved successfully."
+                "Leave type retrieved successfully"
             )
         );
 });
@@ -89,7 +89,7 @@ export const updateData = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 updateLeaveType,
-                "Leave type update successfully."
+                "Leave type update successfully"
             )
         );
 });
@@ -108,5 +108,5 @@ export const deleteData = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(200, {}, "Leave type delete successfully."));
+        .json(new ApiResponse(200, {}, "Leave type delete successfully"));
 });

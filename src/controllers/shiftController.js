@@ -26,12 +26,12 @@ export const createData = asyncHandler(async (req, res) => {
     const newData = await Shift.create(storeData);
 
     if (!newData) {
-        throw new ApiError(400, "Invalid credentials.");
+        throw new ApiError(400, "Invalid credentials");
     }
 
     return res
         .status(201)
-        .json(new ApiResponse(200, newData, "Shift created successfully."));
+        .json(new ApiResponse(200, newData, "Shift created successfully"));
 });
 
 export const getAllData = asyncHandler(async (req, res) => {
@@ -43,7 +43,7 @@ export const getAllData = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(200, results, "Shift retrieved successfully."));
+        .json(new ApiResponse(200, results, "Shift retrieved successfully"));
 });
 
 export const getData = asyncHandler(async (req, res) => {
@@ -74,7 +74,7 @@ export const updateData = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(200, info, "Shift update successfully."));
+        .json(new ApiResponse(200, info, "Shift update successfully"));
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
@@ -91,5 +91,5 @@ export const deleteData = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(200, {}, "Shift delete successfully."));
+        .json(new ApiResponse(200, {}, "Shift delete successfully"));
 });

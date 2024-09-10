@@ -30,7 +30,7 @@ export const createData = asyncHandler(async (req, res) => {
     const newEmployee = await Employee.create(data);
 
     if (!newEmployee) {
-        throw new ApiError(400, "Invalid credentials.");
+        throw new ApiError(400, "Invalid credentials");
     }
 
     // update team employees
@@ -41,13 +41,13 @@ export const createData = asyncHandler(async (req, res) => {
     ).populate("employees");
 
     if (!updateTeam) {
-        throw new ApiError(400, "Invalid team credentials.");
+        throw new ApiError(400, "Invalid team credentials");
     }
 
     return res
         .status(201)
         .json(
-            new ApiResponse(201, newEmployee, "Employee created successfully.")
+            new ApiResponse(201, newEmployee, "Employee created successfully")
         );
 });
 
@@ -65,9 +65,7 @@ export const getActiveData = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(
-            new ApiResponse(200, clients, "Employee retrieved successfully.")
-        );
+        .json(new ApiResponse(200, clients, "Employee retrieved successfully"));
 });
 
 export const getInactiveData = asyncHandler(async (req, res) => {
@@ -84,9 +82,7 @@ export const getInactiveData = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(
-            new ApiResponse(200, clients, "Employee retrieved successfully.")
-        );
+        .json(new ApiResponse(200, clients, "Employee retrieved successfully"));
 });
 
 export const getCountData = asyncHandler(async (req, res) => {
@@ -127,7 +123,7 @@ export const getCountData = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 { active, inactive },
-                "Employee retrieved successfully."
+                "Employee retrieved successfully"
             )
         );
 });
@@ -187,7 +183,7 @@ export const updateData = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, employee, "Employee updated successfully."));
+        .json(new ApiResponse(200, employee, "Employee updated successfully"));
 });
 
 export const updateOffboarding = asyncHandler(async (req, res) => {
@@ -223,7 +219,7 @@ export const updateOffboarding = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, employee, "Employee updated successfully."));
+        .json(new ApiResponse(200, employee, "Employee updated successfully"));
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
@@ -258,7 +254,7 @@ export const deleteData = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 employee,
-                "Employee status update successfully."
+                "Employee status update successfully"
             )
         );
 });
@@ -272,7 +268,5 @@ export const getSelectList = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(
-            new ApiResponse(200, clients, "Employee retrieved successfully.")
-        );
+        .json(new ApiResponse(200, clients, "Employee retrieved successfully"));
 });

@@ -61,13 +61,13 @@ export const sendOtp = asyncHandler(async (req, res) => {
 // send otp email
 export const verifyOtp = asyncHandler(async (req, res) => {
     if (!req.cookies.otpSecret) {
-        throw new ApiError(400, "Invalid credentials.");
+        throw new ApiError(400, "Invalid credentials");
     }
 
     const { email, otp, expireTime } = req.cookies.otpSecret;
 
     if ([email, otp].some((field) => field?.trim() === "")) {
-        throw new ApiError(400, "Invalid credentials.");
+        throw new ApiError(400, "Invalid credentials");
     }
 
     if (!expireTime || Date.now() > expireTime) {
@@ -81,7 +81,7 @@ export const verifyOtp = asyncHandler(async (req, res) => {
     }
 
     if (otpCode != otp) {
-        throw new ApiError(400, "Invalid credentials.");
+        throw new ApiError(400, "Invalid credentials");
     }
 
     const userInfo = await User.findOne({ $or: [{ email }] });
@@ -103,19 +103,19 @@ export const verifyOtp = asyncHandler(async (req, res) => {
         .status(201)
         .cookie("otpSecret", otpSecret, options)
         .json(
-            new ApiResponse(200, { isLogin: isLogin }, "OTP verify successful.")
+            new ApiResponse(200, { isLogin: isLogin }, "OTP verify successful")
         );
 });
 
 export const loginUser = asyncHandler(async (req, res) => {
     if (!req.cookies.otpSecret) {
-        throw new ApiError(400, "Invalid credentials.");
+        throw new ApiError(400, "Invalid credentials");
     }
 
     const { email, otp, isLogin } = req.cookies.otpSecret;
 
     if ([email, otp].some((field) => field?.trim() === "")) {
-        throw new ApiError(400, "Invalid credentials.");
+        throw new ApiError(400, "Invalid credentials");
     }
 
     if (!email) {
@@ -123,7 +123,7 @@ export const loginUser = asyncHandler(async (req, res) => {
     }
 
     if (!isLogin) {
-        throw new ApiError(400, "Invalid credentials.");
+        throw new ApiError(400, "Invalid credentials");
     }
 
     const user = await User.findOne({ email: email });
@@ -152,7 +152,7 @@ export const loginUser = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 { user: loggedInUser, accessToken, refreshToken },
-                "User logged in successfully."
+                "User logged in successfully"
             )
         );
 });
@@ -197,24 +197,24 @@ export const googleLoginUser = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 { user: loggedInUser, accessToken, refreshToken },
-                "User logged in successfully."
+                "User logged in successfully"
             )
         );
 });
 
 export const registerUser = asyncHandler(async (req, res) => {
     if (!req.cookies.otpSecret) {
-        throw new ApiError(400, "Invalid credentials.");
+        throw new ApiError(400, "Invalid credentials");
     }
 
     const { email, otp, isLogin } = req.cookies.otpSecret;
 
     if ([email, otp].some((field) => field?.trim() === "")) {
-        throw new ApiError(400, "Invalid credentials.");
+        throw new ApiError(400, "Invalid credentials");
     }
 
     if (isLogin) {
-        throw new ApiError(400, "Invalid credentials.");
+        throw new ApiError(400, "Invalid credentials");
     }
 
     const formData = req.body;

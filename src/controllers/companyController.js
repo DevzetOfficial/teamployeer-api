@@ -21,7 +21,11 @@ export const getData = asyncHandler(async (req, res) => {
 export const updateData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
-    const info = Company.findById(companyId);
+    const companyInfo = Company.findById(companyId);
+
+    if (!companyInfo) {
+        throw new ApiError(400, "Company not found");
+    }
 
     const data = req.body;
 
@@ -30,8 +34,8 @@ export const updateData = asyncHandler(async (req, res) => {
         uploadlogo = await uploadOnCloudinary(req.file?.path);
         data.logo = uploadlogo?.url || "";
 
-        if (info && info.logo) {
-            await destroyOnCloudinary(info.logo);
+        if (companyInfo && companyInfo.logo) {
+            await destroyOnCloudinary(companyInfo.logo);
         }
     }
 
@@ -45,5 +49,5 @@ export const updateData = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, company, "Company updated successfully."));
+        .json(new ApiResponse(200, company, "Company updated successfully"));
 });

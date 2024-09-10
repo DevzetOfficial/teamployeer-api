@@ -35,7 +35,7 @@ export const documentCreate = asyncHandler(async (req, res) => {
     const newDocument = await EmployeeDocument.create(data);
 
     if (!newDocument) {
-        throw new ApiError(400, "Invalid credentials.");
+        throw new ApiError(400, "Invalid credentials");
     }
 
     return res
@@ -44,7 +44,7 @@ export const documentCreate = asyncHandler(async (req, res) => {
             new ApiResponse(
                 201,
                 newDocument,
-                "Employee document add successfully."
+                "Employee document add successfully"
             )
         );
 });
@@ -62,7 +62,7 @@ export const getAllDocument = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 documents,
-                "Employee documents retrieved successfully."
+                "Employee documents retrieved successfully"
             )
         );
 });
@@ -112,7 +112,7 @@ export const updateDocument = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 employeeDocument,
-                "Employee document updated successfully."
+                "Employee document updated successfully"
             )
         );
 });
@@ -140,7 +140,5 @@ export const deleteDocument = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(
-            new ApiResponse(200, {}, "Employee docemnt delete successfully.")
-        );
+        .json(new ApiResponse(200, {}, "Employee docemnt delete successfully"));
 });

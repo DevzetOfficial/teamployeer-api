@@ -45,7 +45,7 @@ export const createData = asyncHandler(async (req, res) => {
     const newClient = await Client.create(data);
 
     if (!newClient) {
-        throw new ApiError(400, "Invalid credentials.");
+        throw new ApiError(400, "Invalid credentials");
     }
 
     return res
@@ -164,7 +164,7 @@ export const updateData = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, client, "Client updated successfully."));
+        .json(new ApiResponse(200, client, "Client updated successfully"));
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
@@ -194,5 +194,5 @@ export const deleteData = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, client, "Client delete successfully."));
+        .json(new ApiResponse(200, client, "Client delete successfully"));
 });

@@ -14,7 +14,7 @@ export const createData = asyncHandler(async (req, res) => {
     const newData = await Designation.create(data);
 
     if (!newData) {
-        throw new ApiError(400, "Invalid credentials.");
+        throw new ApiError(400, "Invalid credentials");
     }
 
     return res
@@ -107,5 +107,5 @@ export const deleteData = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, {}, "Designation delete successfully."));
+        .json(new ApiResponse(200, {}, "Designation delete successfully"));
 });

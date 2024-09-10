@@ -21,7 +21,7 @@ export const createData = asyncHandler(async (req, res) => {
     const timeOffCreate = await TimeOff.create(data);
 
     if (!timeOffCreate) {
-        throw new ApiError(400, "Invalid credentials.");
+        throw new ApiError(400, "Invalid credentials");
     }
 
     if (req.files.length > 0) {
@@ -63,7 +63,7 @@ export const createData = asyncHandler(async (req, res) => {
             new ApiResponse(
                 201,
                 { newTimeOff },
-                "Time Off created successfully."
+                "Time Off created successfully"
             )
         );
 });
@@ -102,7 +102,7 @@ export const getAllData = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 timeOffDataList,
-                "TimeOff retrieved successfully."
+                "TimeOff retrieved successfully"
             )
         );
 });
@@ -153,7 +153,7 @@ export const getCountData = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 { pending, approved, declined, total },
-                "Time Off retrieved successfully."
+                "Time Off retrieved successfully"
             )
         );
 });
@@ -226,11 +226,7 @@ export const updateData = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(
-            new ApiResponse(
-                200,
-                updtaeTimeOff,
-                "Time Off updated successfully."
-            )
+            new ApiResponse(200, updtaeTimeOff, "Time Off updated successfully")
         );
 });
 
@@ -262,7 +258,7 @@ export const deleteData = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, {}, "Time Off delete successfully."));
+        .json(new ApiResponse(200, {}, "Time Off delete successfully"));
 });
 
 export const deleteAttachment = asyncHandler(async (req, res) => {
@@ -300,6 +296,6 @@ export const deleteAttachment = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(
-            new ApiResponse(200, {}, "Time Off attachment delete successfully.")
+            new ApiResponse(200, {}, "Time Off attachment delete successfully")
         );
 });
