@@ -77,7 +77,7 @@ export const updateData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Leave type not found");
     }
 
-    const updateLeaveType = await LeaveType.findById(
+    const updateLeaveType = await LeaveType.findByIdAndUpdate(
         leaveTypeInfo._id,
         req.body,
         {
