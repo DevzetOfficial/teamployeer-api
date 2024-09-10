@@ -39,55 +39,58 @@ export const getAllData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId };
 
-    const results = await Shift.find(filters);
+    const shifts = await Shift.find(filters);
 
     return res
         .status(201)
-        .json(new ApiResponse(200, results, "Shift retrieved successfully"));
+        .json(new ApiResponse(200, shifts, "Shift retrieved successfully"));
 });
 
 export const getData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
+    const filters = { companyId: companyId, _id: req.params.id };
 
-    const filters = { _id: req.params.id, companyId: companyId };
+    const shiftInfo = await Shift.findOne(filters);
 
-    const info = await Shift.findOne(filters);
-
-    if (!info) {
-        throw new ApiError(400, "Shift not found");
+    if (!shiftInfo) {
+        throw new ApiError(400, "Shift not found!");
     }
 
     return res
         .status(201)
-        .json(new ApiResponse(200, info, "Shift retrieved successfully"));
+        .json(new ApiResponse(200, shiftInfo, "Shift retrieved successfully"));
 });
 
 export const updateData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-    const filters = { _id: req.params.id, companyId: companyId };
+    const filters = { companyId: companyId, _id: req.params.id };
 
-    const info = await Shift.findOneAndUpdate(filters, req.body, { new: true });
+    const shiftInfo = await Shift.findOne(filters);
 
-    if (!info) {
-        throw new ApiError(404, "Shift not found!");
+    if (!shiftInfo) {
+        throw new ApiError(400, "Shift not found!");
     }
+
+    const updateShift = await Shift.findByIdAndUpdate(shiftInfo._id, req.body, {
+        new: true,
+    });
 
     return res
         .status(201)
-        .json(new ApiResponse(200, info, "Shift update successfully"));
+        .json(new ApiResponse(200, updateShift, "Shift update successfully"));
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-    const filters = { _id: req.params.id, companyId: companyId };
+    const filters = { companyId: companyId, _id: req.params.id };
 
-    const shift = await Shift.findOne(filters);
+    const shiftInfo = await Shift.findOne(filters);
 
-    if (!shift) {
+    if (!shiftInfo) {
         throw new ApiError(400, "Shift not found!");
     }
 
-    await Shift.findOneAndDelete(filters);
+    await Shift.findByIdAndDelete(shiftInfo._id);
 
     return res
         .status(201)
