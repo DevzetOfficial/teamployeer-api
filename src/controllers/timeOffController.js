@@ -14,8 +14,14 @@ import { TimeOffAttachment } from "../models/timeOffAttachmentModel.js";
 export const createData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
+    const totalDay = differenceInDays(
+        new Date(req.body.endDate),
+        new Date(req.body.startDate)
+    );
+
     const data = req.body;
     data.companyId = companyId;
+    data.totalDay = totalDay + 1;
     data.attachments = [];
 
     const timeOffCreate = await TimeOff.create(data);
@@ -188,6 +194,15 @@ export const updateData = asyncHandler(async (req, res) => {
 
     const data = req.body;
     data.attachments = timeOffInfo.attachments;
+
+    if (req.body.startDate && req.body.endDate) {
+        const totalDay = differenceInDays(
+            new Date(req.body.endDate),
+            new Date(req.body.startDate)
+        );
+
+        data.totalDay = totalDay + 1;
+    }
 
     await TimeOff.findByIdAndUpdate(timeOffInfo._id, data, { new: true });
 
