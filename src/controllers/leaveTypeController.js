@@ -57,7 +57,13 @@ export const getData = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(200, info, "Leave type retrieved successfully"));
+        .json(
+            new ApiResponse(
+                200,
+                leaveTypeInfo,
+                "Leave type retrieved successfully"
+            )
+        );
 });
 
 export const updateData = asyncHandler(async (req, res) => {
@@ -104,7 +110,7 @@ export const deleteData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Leave type not found!");
     }
 
-    await LeaveType.findById(leaveType._id);
+    await LeaveType.findByIdAndDelete(leaveType._id);
 
     return res
         .status(201)

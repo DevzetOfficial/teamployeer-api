@@ -26,6 +26,10 @@ const timeOffSchema = new Schema(
             type: Date,
             required: [true, "End date is required"],
         },
+        totalDay: {
+            type: Number,
+            required: true,
+        },
         reason: {
             type: String,
             trim: true,

@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utilities/asyncHandler.js";
 import { ApiResponse } from "../utilities/ApiResponse.js";
 import { ApiError } from "../utilities/ApiError.js";
-import { format } from "date-fns";
+import { format, differenceInDays } from "date-fns";
 import { objectId, getSegments, ucfirst } from "../utilities/helper.js";
 import {
     uploadOnCloudinary,
@@ -15,7 +15,6 @@ export const createData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
     const data = req.body;
-
     data.companyId = companyId;
     data.attachments = [];
 
@@ -104,7 +103,7 @@ export const getAllData = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 timeOffDataList,
-                "TimeOff retrieved successfully"
+                "Time off retrieved successfully"
             )
         );
 });
@@ -155,7 +154,7 @@ export const getCountData = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 { pending, approved, declined, total },
-                "Time Off retrieved successfully"
+                "Time off retrieved successfully"
             )
         );
 });
