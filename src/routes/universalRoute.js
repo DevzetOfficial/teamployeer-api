@@ -2,6 +2,7 @@ import { Router } from "express";
 import authCheck from "../middlewares/authMiddleware.js";
 import {
     countryList,
+    countryInfo,
     companyTypeList,
     companySizeList,
     employeeLevelList,
@@ -17,6 +18,7 @@ const route = Router();
 
 // public routs
 route.route("/countries").get(countryList);
+route.route("/country-info/:id").get(countryInfo);
 route.route("/company-types").get(companyTypeList);
 route.route("/company-sizes").get(companySizeList);
 

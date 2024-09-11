@@ -10,6 +10,7 @@ import { OffboardingType } from "../models/offboardingTypeModel.js";
 import { OffboardingReason } from "../models/offboardingReasonModel.js";
 import { ProjectStatus } from "../models/projectStatusModel.js";
 import { LeaveStatus } from "../models/leaveStatusModel.js";
+import { ApiError } from "../utilities/ApiError.js";
 
 // Leave status list
 export const leaveStatusList = asyncHandler(async (req, res) => {
@@ -98,7 +99,30 @@ export const countryList = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(200, countrys, "Country retrieved successfully"));
+        .json(
+            new ApiResponse(
+                200,
+                countrys,
+                "Country list retrieved successfully"
+            )
+        );
+});
+
+// country info
+export const countryInfo = asyncHandler(async (req, res) => {
+    if (!req.params?.id) {
+        throw new ApiError(400, "Invalid credentials");
+    }
+
+    const country = await Country.findById(req.params.id);
+
+    if (!country) {
+        throw new ApiError(400, "Country not found");
+    }
+
+    return res
+        .status(201)
+        .json(new ApiResponse(200, country, "Country retrieved successfully"));
 });
 
 // employee level list
