@@ -75,7 +75,7 @@ const clientSchema = new Schema(
 clientSchema.pre(/^find/, function (next) {
     this.populate({
         path: "country",
-        select: "_id code name image",
+        select: "_id name avatar",
     });
     next();
 });
