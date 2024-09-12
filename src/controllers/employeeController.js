@@ -270,3 +270,301 @@ export const getSelectList = asyncHandler(async (req, res) => {
         .status(201)
         .json(new ApiResponse(200, clients, "Employee retrieved successfully"));
 });
+
+export const getEmployeeRatio = asyncHandler(async (req, res) => {
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
+
+    const currentDate = new Date();
+
+    const startDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        1
+    );
+
+    const endDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + 1,
+        0,
+        23,
+        59,
+        59,
+        999
+    );
+
+    const totalEmployee = await totalEmployeeRatio(
+        startDate,
+        endDate,
+        companyId
+    );
+
+    const totalActiveEmployee = await totalActiveEmployeeRatio(
+        startDate,
+        endDate,
+        companyId
+    );
+
+    const totalInactiveEmployee = await totalInactiveEmployeeRatio(
+        startDate,
+        endDate,
+        companyId
+    );
+
+    const totalNewEmployee = await totalNewEmployeeRatio(
+        startDate,
+        endDate,
+        companyId
+    );
+
+    return res.status(201).json(
+        new ApiResponse(
+            200,
+            {
+                totalEmployee: totalEmployee,
+                totalActiveEmployee: totalActiveEmployee,
+                totalInactiveEmployee: totalInactiveEmployee,
+                totalNewEmployee: totalNewEmployee,
+            },
+            "Employee ratio retrieved successfully"
+        )
+    );
+});
+
+async function totalEmployeeRatio(startDate, endDate, companyId) {
+    const employeeCount = await Employee.aggregate([
+        {
+            $match: {
+                companyId: { $eq: objectId(companyId) },
+            },
+        },
+        {
+            $facet: {
+                currentMonth: [
+                    {
+                        $match: {
+                            onboardingDate: {
+                                $gte: startDate,
+                                $lt: endDate,
+                            },
+                        },
+                    },
+                    { $count: "count" },
+                ],
+                previousMonth: [
+                    {
+                        $match: {
+                            onboardingDate: {
+                                $lt: startDate,
+                            },
+                        },
+                    },
+                    { $count: "count" },
+                ],
+            },
+        },
+    ]);
+
+    const currentMonthCount = employeeCount[0].currentMonth[0]?.count || 0;
+    const previousMonthCount = employeeCount[0].previousMonth[0]?.count || 0;
+
+    const totalEmployees = previousMonthCount + currentMonthCount;
+
+    let employeeRatio;
+
+    if (previousMonthCount === 0) {
+        employeeRatio = totalEmployees > 0 ? 100 : 0;
+    } else if (totalEmployees === previousMonthCount) {
+        employeeRatio = 0;
+    } else {
+        employeeRatio =
+            ((totalEmployees - previousMonthCount) / previousMonthCount) * 100;
+    }
+
+    // Restrict the ratio between -100 and 100
+    employeeRatio = Math.max(-100, Math.min(100, employeeRatio));
+
+    return {
+        count: totalEmployees,
+        ratio: employeeRatio,
+    };
+}
+
+async function totalActiveEmployeeRatio(startDate, endDate, companyId) {
+    const employeeCount = await Employee.aggregate([
+        {
+            $match: {
+                companyId: { $eq: objectId(companyId) },
+                status: 1,
+            },
+        },
+        {
+            $facet: {
+                currentMonth: [
+                    {
+                        $match: {
+                            onboardingDate: {
+                                $gte: startDate,
+                                $lt: endDate,
+                            },
+                        },
+                    },
+                    { $count: "count" },
+                ],
+                previousMonth: [
+                    {
+                        $match: {
+                            onboardingDate: {
+                                $lt: startDate,
+                            },
+                        },
+                    },
+                    { $count: "count" },
+                ],
+            },
+        },
+    ]);
+
+    const currentMonthCount = employeeCount[0].currentMonth[0]?.count || 0;
+    const previousMonthCount = employeeCount[0].previousMonth[0]?.count || 0;
+
+    const totalEmployees = previousMonthCount + currentMonthCount;
+
+    let employeeRatio;
+
+    if (previousMonthCount === 0) {
+        employeeRatio = totalEmployees > 0 ? 100 : 0;
+    } else if (totalEmployees === previousMonthCount) {
+        employeeRatio = 0;
+    } else {
+        employeeRatio =
+            ((totalEmployees - previousMonthCount) / previousMonthCount) * 100;
+    }
+
+    // Restrict the ratio between -100 and 100
+    employeeRatio = Math.max(-100, Math.min(100, employeeRatio));
+
+    return {
+        count: totalEmployees,
+        ratio: employeeRatio,
+    };
+}
+
+async function totalInactiveEmployeeRatio(startDate, endDate, companyId) {
+    const employeeCount = await Employee.aggregate([
+        {
+            $match: {
+                companyId: { $eq: objectId(companyId) },
+                status: { $eq: 0 },
+            },
+        },
+        {
+            $facet: {
+                currentMonth: [
+                    {
+                        $match: {
+                            onboardingDate: {
+                                $gte: startDate,
+                                $lt: endDate,
+                            },
+                        },
+                    },
+                    { $count: "count" },
+                ],
+                previousMonth: [
+                    {
+                        $match: {
+                            onboardingDate: {
+                                $lt: startDate,
+                            },
+                        },
+                    },
+                    { $count: "count" },
+                ],
+            },
+        },
+    ]);
+
+    const currentMonthCount = employeeCount[0].currentMonth[0]?.count || 0;
+    const previousMonthCount = employeeCount[0].previousMonth[0]?.count || 0;
+
+    const totalEmployees = previousMonthCount + currentMonthCount;
+
+    let employeeRatio;
+
+    if (previousMonthCount === 0) {
+        employeeRatio = totalEmployees > 0 ? 100 : 0;
+    } else if (totalEmployees === previousMonthCount) {
+        employeeRatio = 0;
+    } else {
+        employeeRatio =
+            ((totalEmployees - previousMonthCount) / previousMonthCount) * 100;
+    }
+
+    // Restrict the ratio between -100 and 100
+    employeeRatio = Math.max(-100, Math.min(100, employeeRatio));
+
+    return {
+        count: totalEmployees,
+        ratio: employeeRatio,
+    };
+}
+
+async function totalNewEmployeeRatio(startDate, endDate, companyId) {
+    /* const employeeCount = await Employee.aggregate([
+        {
+            $match: {
+                companyId: { $eq: objectId(companyId) },
+                status: { $eq: 0 },
+            },
+        },
+        {
+            $facet: {
+                currentMonth: [
+                    {
+                        $match: {
+                            onboardingDate: {
+                                $gte: startDate,
+                                $lt: endDate,
+                            },
+                        },
+                    },
+                    { $count: "count" },
+                ],
+                previousMonth: [
+                    {
+                        $match: {
+                            onboardingDate: {
+                                $lt: startDate,
+                            },
+                        },
+                    },
+                    { $count: "count" },
+                ],
+            },
+        },
+    ]);
+
+    const currentMonthCount = employeeCount[0].currentMonth[0]?.count || 0;
+    const previousMonthCount = employeeCount[0].previousMonth[0]?.count || 0;
+
+    const totalEmployees = previousMonthCount + currentMonthCount;
+
+    let employeeRatio;
+
+    if (previousMonthCount === 0) {
+        employeeRatio = totalEmployees > 0 ? 100 : 0;
+    } else if (totalEmployees === previousMonthCount) {
+        employeeRatio = 0;
+    } else {
+        employeeRatio =
+            ((totalEmployees - previousMonthCount) / previousMonthCount) * 100;
+    }
+
+    // Restrict the ratio between -100 and 100
+    employeeRatio = Math.max(-100, Math.min(100, employeeRatio)); */
+
+    return {
+        count: 0,
+        ratio: 0,
+    };
+}

@@ -11,6 +11,7 @@ import {
     updateOffboarding,
     deleteData,
     getSelectList,
+    getEmployeeRatio,
 } from "../controllers/employeeController.js";
 
 import {
@@ -30,6 +31,7 @@ route
 route.route("/employee/count").get(getCountData);
 route.route("/employee/inactive").get(getInactiveData);
 route.route("/employee/select-list").get(getSelectList);
+route.route("/employee/ratio").get(getEmployeeRatio);
 
 route
     .route("/employee/:id")
