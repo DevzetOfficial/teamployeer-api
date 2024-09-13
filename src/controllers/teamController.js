@@ -3,6 +3,7 @@ import { ApiResponse } from "../utilities/ApiResponse.js";
 import { ApiError } from "../utilities/ApiError.js";
 
 import { Team } from "../models/teamModel.js";
+import { Employee } from "../models/employeeModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
     const formData = req.body;
@@ -42,11 +43,26 @@ export const getAllData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId };
 
-    const teams = await Team.find(filters).select("-__v");
+    const teams = await Team.find(filters).select("name");
 
     return res
         .status(201)
         .json(new ApiResponse(200, teams, "Team retrieved successfully"));
+});
+
+export const getAllMembers = asyncHandler(async (req, res) => {
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
+    const filters = { companyId: companyId };
+
+    const members = await Employee.find(filters)
+        .select("employeeId name avatar mobile email")
+        .populate({ path: "designation", select: "name" });
+
+    return res
+        .status(201)
+        .json(
+            new ApiResponse(200, members, "Team member retrieved successfully")
+        );
 });
 
 export const getCountData = asyncHandler(async (req, res) => {
@@ -76,13 +92,11 @@ export const getData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, _id: req.params.id };
 
-    const team = await Team.findOne(filters)
-        .populate({ path: "teamHead", select: "_id, name email mobile avatar" })
-        .populate({
-            path: "employees",
-            select: "employeeId name avatar mobile email",
-            populate: { path: "designation", select: "name" },
-        });
+    const team = await Team.findOne(filters).populate({
+        path: "employees",
+        select: "employeeId name avatar mobile email",
+        populate: { path: "designation", select: "name" },
+    });
 
     if (!team) {
         throw new ApiError(400, "Team not found");

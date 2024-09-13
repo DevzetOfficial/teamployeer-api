@@ -7,6 +7,7 @@ import {
     updateData,
     deleteData,
     getCountData,
+    getAllMembers,
 } from "../controllers/teamController.js";
 
 const route = Router();
@@ -14,6 +15,7 @@ const route = Router();
 route.route("/team").get(getAllData).post(createData);
 
 route.route("/team/count").get(getCountData);
+route.route("/team/members").get(getAllMembers);
 
 route.route("/team/:id").get(getData).patch(updateData).delete(deleteData);
 
