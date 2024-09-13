@@ -60,7 +60,7 @@ export const getActiveData = asyncHandler(async (req, res) => {
         .select("employeeId name avatar email mobile onboardingDate")
         .populate({ path: "designation", select: "name" })
         .populate({ path: "shift", select: "name" })
-        .populate({ path: "provationPeriod", select: "name" })
+        .populate({ path: "provationPeriod", select: "name month" })
         .populate({ path: "supervisor", select: "name avatar" });
 
     return res
@@ -77,7 +77,7 @@ export const getInactiveData = asyncHandler(async (req, res) => {
         .select("employeeId name avatar email mobile onboardingDate")
         .populate({ path: "designation", select: "name" })
         .populate({ path: "shift", select: "name" })
-        .populate({ path: "provationPeriod", select: "name" })
+        .populate({ path: "provationPeriod", select: "name month" })
         .populate({ path: "supervisor", select: "name avatar" });
 
     return res
@@ -136,7 +136,7 @@ export const getData = asyncHandler(async (req, res) => {
     const employee = await Employee.findOne(filters)
         .populate({ path: "employeeType", select: "name" })
         .populate({ path: "team", select: "name" })
-        .populate({ path: "provationPeriod", select: "name" })
+        .populate({ path: "provationPeriod", select: "name month" })
         .populate({ path: "designation", select: "name" })
         .populate({ path: "employeeLevel", select: "name" })
         .populate({ path: "shift", select: "name" })
