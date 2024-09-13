@@ -394,7 +394,7 @@ async function totalActiveEmployeeRatio(startDate, endDate, companyId) {
         {
             $match: {
                 companyId: { $eq: objectId(companyId) },
-                status: 1,
+                status: { $eq: 1 },
             },
         },
         {
