@@ -79,7 +79,7 @@ export const offboardingTypeList = asyncHandler(async (req, res) => {
 // Provation period list
 export const provationPeriodList = asyncHandler(async (req, res) => {
     const provationPeriod = await ProvationPeriod.find()
-        .select("name")
+        .select("name, month")
         .sort({ position: "asc" });
 
     return res

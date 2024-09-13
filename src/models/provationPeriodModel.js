@@ -6,6 +6,10 @@ const provationPeriodSchema = new Schema({
         required: true,
         trim: true,
     },
+    month: {
+        type: Number,
+        default: 0,
+    },
     position: {
         type: Number,
         required: true,

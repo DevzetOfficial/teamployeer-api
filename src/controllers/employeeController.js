@@ -316,6 +316,8 @@ export const getEmployeeRatio = asyncHandler(async (req, res) => {
         companyId
     );
 
+    await calculateEmployeeRatio(req);
+
     return res.status(201).json(
         new ApiResponse(
             200,
@@ -329,6 +331,39 @@ export const getEmployeeRatio = asyncHandler(async (req, res) => {
         )
     );
 });
+
+async function calculateEmployeeRatio(req) {
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
+
+    const today = new Date();
+
+    const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endDate = new Date(
+        today.getFullYear(),
+        today.getMonth() + 1,
+        0,
+        23,
+        59,
+        59,
+        999
+    );
+
+    console.log(startDate, endDate);
+
+    const totalEmployees = await Employee.countDocuments({
+        companyId: companyId,
+    });
+    const activeEmployees = await Employee.countDocuments({
+        companyId: companyId,
+        status: 1,
+    });
+    const inactiveEmployees = await Employee.countDocuments({
+        companyId: companyId,
+        status: 0,
+    });
+
+    console.log(totalEmployees, activeEmployees, inactiveEmployees);
+}
 
 async function totalEmployeeRatio(startDate, endDate, companyId) {
     const employeeCount = await Employee.aggregate([
