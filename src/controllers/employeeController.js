@@ -10,6 +10,8 @@ import {
 
 import { Employee } from "../models/employeeModel.js";
 import { Team } from "../models/teamModel.js";
+import { LeaveType } from "../models/leaveTypeModel.js";
+import { TimeOff } from "../models/timeOffModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
@@ -272,6 +274,49 @@ export const getSelectList = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, clients, "Employee retrieved successfully"));
 });
 
+export const getTimeoff = asyncHandler(async (req, res) => {
+    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
+
+    const filters = { companyId: companyId, _id: req.params.employeeId };
+
+    const employee = await Employee.findOne(filters);
+
+    if (!employee) {
+        throw new ApiError(404, "Employee not found!");
+    }
+
+    const leaveTypes = await LeaveType.find({ companyId: companyId }).select(
+        "name amount"
+    );
+
+    delete filters._id;
+    filters.employee = req.params.employeeId;
+    filters.status = "Approved";
+    const timeoff = await TimeOff.find(filters);
+
+    const newLeaveType = leaveTypes.map((row) => {
+        const timeoffData = timeoff
+            .filter((pRow) => String(pRow.leaveType._id) === String(row._id))
+            .reduce((sum, pRow) => sum + pRow.totalDay, 0);
+
+        return {
+            ...row.toObject(),
+            taken: timeoffData,
+            remaining: row.amount - timeoffData,
+        };
+    });
+
+    return res
+        .status(201)
+        .json(
+            new ApiResponse(
+                200,
+                newLeaveType,
+                "Employee time off retrieved successfully"
+            )
+        );
+});
+
 export const getEmployeeRatio = asyncHandler(async (req, res) => {
     const data = await calculateEmployeeRatio(req);
 
@@ -345,14 +390,4 @@ async function calculateEmployeeRatio(req) {
     };
 
     return data;
-}
-
-function calculateDate(date, month) {
-    const currentDate = new Date();
-    const onboarding = new Date(date);
-    const provationPeriodDate = onboarding;
-
-    provationPeriodDate.setMonth(provationPeriodDate.getMonth() + month);
-
-    return currentDate < provationPeriodDate;
 }
