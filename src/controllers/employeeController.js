@@ -10,8 +10,6 @@ import {
 
 import { Employee } from "../models/employeeModel.js";
 import { Team } from "../models/teamModel.js";
-import { LeaveType } from "../models/leaveTypeModel.js";
-import { TimeOff } from "../models/timeOffModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
@@ -59,7 +57,7 @@ export const getActiveData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, status: 1 };
 
-    const clients = await Employee.find(filters)
+    const employees = await Employee.find(filters)
         .select("employeeId name avatar email mobile onboardingDate")
         .populate({ path: "designation", select: "name" })
         .populate({ path: "shift", select: "name" })
@@ -68,7 +66,9 @@ export const getActiveData = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(200, clients, "Employee retrieved successfully"));
+        .json(
+            new ApiResponse(200, employees, "Employee retrieved successfully")
+        );
 });
 
 export const getInactiveData = asyncHandler(async (req, res) => {
@@ -230,26 +230,17 @@ export const deleteData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, _id: req.params.id };
 
-    const info = await Employee.findOne(filters);
+    const employeeInfo = await Employee.findOne(filters);
 
-    if (!info) {
+    if (!employeeInfo) {
         throw new ApiError(404, "Employee not found!");
     }
 
-    let employee;
-    if (info.status === 0) {
-        employee = await Employee.findByIdAndUpdate(
-            info._id,
-            { status: 1 },
-            { new: true }
-        );
-    } else {
-        employee = await Employee.findByIdAndUpdate(
-            info._id,
-            { status: 0 },
-            { new: true }
-        );
-    }
+    const employee = await Employee.findByIdAndUpdate(
+        employeeInfo._id,
+        { status: employeeInfo.status === 0 ? 1 : 0 },
+        { new: true }
+    );
 
     return res
         .status(200)
@@ -267,53 +258,12 @@ export const getSelectList = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, status: 1 };
 
-    const clients = await Employee.find(filters).select("name avatar");
-
-    return res
-        .status(201)
-        .json(new ApiResponse(200, clients, "Employee retrieved successfully"));
-});
-
-export const getTimeoff = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.employeeId };
-
-    const employee = await Employee.findOne(filters);
-
-    if (!employee) {
-        throw new ApiError(404, "Employee not found!");
-    }
-
-    const leaveTypes = await LeaveType.find({ companyId: companyId }).select(
-        "name amount"
-    );
-
-    delete filters._id;
-    filters.employee = req.params.employeeId;
-    filters.status = "Approved";
-    const timeoff = await TimeOff.find(filters);
-
-    const newLeaveType = leaveTypes.map((row) => {
-        const timeoffData = timeoff
-            .filter((pRow) => String(pRow.leaveType._id) === String(row._id))
-            .reduce((sum, pRow) => sum + pRow.totalDay, 0);
-
-        return {
-            ...row.toObject(),
-            taken: timeoffData,
-            remaining: row.amount - timeoffData,
-        };
-    });
+    const employees = await Employee.find(filters).select("name avatar");
 
     return res
         .status(201)
         .json(
-            new ApiResponse(
-                200,
-                newLeaveType,
-                "Employee time off retrieved successfully"
-            )
+            new ApiResponse(200, employees, "Employee retrieved successfully")
         );
 });
 

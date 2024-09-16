@@ -11,7 +11,6 @@ import {
     updateOffboarding,
     deleteData,
     getSelectList,
-    getTimeoff,
     getEmployeeRatio,
 } from "../controllers/employeeController.js";
 
@@ -21,6 +20,11 @@ import {
     updateDocument,
     deleteDocument,
 } from "../controllers/employeeDocumentController.js";
+
+import {
+    getAllTimeoff,
+    setEmployeeTimeOff,
+} from "../controllers/employeeTimeoffController.js";
 
 const route = Router();
 
@@ -47,7 +51,10 @@ route
     .get(getAllDocument)
     .post(upload.single("attachment"), documentCreate);
 
-route.route("/employee/:employeeId/timeoff").get(getTimeoff);
+route
+    .route("/employee/:employeeId/timeoff")
+    .get(getAllTimeoff)
+    .post(setEmployeeTimeOff);
 
 route
     .route("/employee/:employeeId/document/:id")
