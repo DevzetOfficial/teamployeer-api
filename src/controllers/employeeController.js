@@ -2,6 +2,7 @@ import { asyncHandler } from "../utilities/asyncHandler.js";
 import { ApiResponse } from "../utilities/ApiResponse.js";
 import { ApiError } from "../utilities/ApiError.js";
 import { generateCode, objectId } from "../utilities/helper.js";
+import { differenceInMonths } from "date-fns";
 import {
     uploadOnCloudinary,
     destroyOnCloudinary,
@@ -9,7 +10,6 @@ import {
 
 import { Employee } from "../models/employeeModel.js";
 import { Team } from "../models/teamModel.js";
-import { ProvationPeriod } from "../models/provationPeriodModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
@@ -310,7 +310,12 @@ async function calculateEmployeeRatio(req) {
 
     const newEmployeesList = [];
     employeeList.map((row) => {
-        if (calculateDate(row.onboardingDate, row.provationPeriod.month)) {
+        const diffInMonth = differenceInMonths(
+            new Date(),
+            new Date(row.onboardingDate)
+        );
+
+        if (diffInMonth <= row.provationPeriod.month) {
             newEmployeesList.push(row);
         }
     });
@@ -343,8 +348,11 @@ async function calculateEmployeeRatio(req) {
 }
 
 function calculateDate(date, month) {
+    const currentDate = new Date();
     const onboarding = new Date(date);
-    const today = new Date();
-    const monthAge = new Date(today.setMonth(today.getMonth() - month));
-    return onboarding < monthAge;
+    const provationPeriodDate = onboarding;
+
+    provationPeriodDate.setMonth(provationPeriodDate.getMonth() + month);
+
+    return currentDate < provationPeriodDate;
 }
