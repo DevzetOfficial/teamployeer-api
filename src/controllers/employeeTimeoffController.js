@@ -34,22 +34,30 @@ export const getAllTimeoff = asyncHandler(async (req, res) => {
             .filter((pRow) => String(pRow.leaveType._id) === String(row._id))
             .reduce((sum, pRow) => sum + pRow.totalDay, 0);
 
-        const employeeleave = employeeInfo?.timeoffDate.filter(
-            (lRow) => String(lRow._id) === String(row._id)
-        );
-
-        if (employeeleave.length === 0) {
+        if (!employeeInfo?.timeoffDate) {
             item._id = row._id;
             item.name = row.name;
             item.amount = row.amount;
             item.taken = leaveTaken;
             item.remaining = row.amount - leaveTaken;
         } else {
-            item._id = row._id;
-            item.name = row.name;
-            item.amount = employeeleave[0].amount;
-            item.taken = leaveTaken;
-            item.remaining = employeeleave[0].amount - leaveTaken;
+            const employeeleave = employeeInfo?.timeoffDate.filter(
+                (lRow) => String(lRow._id) === String(row._id)
+            );
+
+            if (employeeleave.length === 0) {
+                item._id = row._id;
+                item.name = row.name;
+                item.amount = row.amount;
+                item.taken = leaveTaken;
+                item.remaining = row.amount - leaveTaken;
+            } else {
+                item._id = row._id;
+                item.name = row.name;
+                item.amount = employeeleave[0].amount;
+                item.taken = leaveTaken;
+                item.remaining = employeeleave[0].amount - leaveTaken;
+            }
         }
 
         newLeaveTypes.push(item);
