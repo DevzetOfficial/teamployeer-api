@@ -54,7 +54,7 @@ route
 route
     .route("/employee/:employeeId/timeoff")
     .get(getAllTimeoff)
-    .post(setEmployeeTimeOff);
+    .patch(setEmployeeTimeOff);
 
 route
     .route("/employee/:employeeId/document/:id")
