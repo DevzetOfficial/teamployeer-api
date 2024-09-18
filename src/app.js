@@ -49,6 +49,7 @@ import companyRoute from "./routes/companyRoute.js";
 import designationRoute from "./routes/designationRoute.js";
 import timeOffRoute from "./routes/timeOffRoute.js";
 import leaveTypeRoute from "./routes/leaveTypeRoute.js";
+import templateRoute from "./routes/templateRoute.js";
 
 // route declaration
 app.use("/api/v1", countryRoute);
@@ -61,5 +62,6 @@ app.use("/api/v1", companyRoute);
 app.use("/api/v1", designationRoute);
 app.use("/api/v1", timeOffRoute);
 app.use("/api/v1", leaveTypeRoute);
+app.use("/api/v1", templateRoute);
 
 export { app };
