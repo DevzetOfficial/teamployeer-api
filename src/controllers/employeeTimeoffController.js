@@ -17,31 +17,42 @@ export const getAllTimeoff = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Employee not found!");
     }
 
-    let leaveTypes;
-    if (employeeInfo?.timeoffDate) {
-        leaveTypes = employeeInfo.timeoffDate;
-    } else {
-        leaveTypes = await LeaveType.find({ companyId: companyId })
-            .select("name amount")
-            .sort({ createdAt: 1 });
-    }
-
     delete filters._id;
     filters.employee = req.params.employeeId;
     filters.status = "Approved";
     const timeoff = await TimeOff.find(filters);
 
-    const newLeaveTypes = leaveTypes.map((row) => {
-        const rowObject = row.toObject ? row.toObject() : row;
-        const timeoffData = timeoff
+    const defaultLeaveTypes = await LeaveType.find({ companyId: companyId })
+        .select("name amount")
+        .sort({ createdAt: 1 });
+
+    const newLeaveTypes = [];
+    defaultLeaveTypes.map((row) => {
+        const item = {};
+
+        const leaveTaken = timeoff
             .filter((pRow) => String(pRow.leaveType._id) === String(row._id))
             .reduce((sum, pRow) => sum + pRow.totalDay, 0);
 
-        return {
-            ...rowObject,
-            taken: timeoffData,
-            remaining: row.amount - timeoffData,
-        };
+        const employeeleave = employeeInfo?.timeoffDate.filter(
+            (lRow) => String(lRow._id) === String(row._id)
+        );
+
+        if (employeeleave.length === 0) {
+            item._id = row._id;
+            item.name = row.name;
+            item.amount = row.amount;
+            item.taken = leaveTaken;
+            item.remaining = row.amount - leaveTaken;
+        } else {
+            item._id = row._id;
+            item.name = row.name;
+            item.amount = employeeleave[0].amount;
+            item.taken = leaveTaken;
+            item.remaining = employeeleave[0].amount - leaveTaken;
+        }
+
+        newLeaveTypes.push(item);
     });
 
     return res
@@ -66,20 +77,13 @@ export const setEmployeeTimeOff = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Employee not found!");
     }
 
-    const timeoffDate = [];
-    for (let i = 0; i < req.body._id.length; i++) {
-        const item = {
-            _id: req.body._id[i],
-            name: req.body.name[i],
-            amount: req.body.amount[i],
-        };
-
-        timeoffDate.push(item);
+    if (!req.body?.timeoffs) {
+        throw new ApiError(404, "Time off is required");
     }
 
     const employee = await Employee.findByIdAndUpdate(
         employeeInfo._id,
-        { timeoffDate: timeoffDate },
+        { timeoffDate: req.body.timeoffs },
         { new: true }
     );
 
