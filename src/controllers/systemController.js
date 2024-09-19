@@ -7,17 +7,11 @@ import { Company } from "../models/companyModel.js";
 export const getData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
-    const companyInfo = await Company.findById(companyId);
+    const policies = await Company.findById(companyId);
 
-    if (!companyInfo) {
+    if (!policies) {
         throw new ApiError(400, "Policies not found");
     }
-
-    const policies = {
-        companyPolicy: companyInfo?.companyPolicy || "",
-        medicalBenefits: companyInfo?.medicalBenefits || "",
-        festibalBenefits: companyInfo?.festibalBenefits || "",
-    };
 
     return res
         .status(200)
@@ -35,25 +29,21 @@ export const updateData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid credentials");
     }
 
-    if (
-        !req.body?.companyPolicy &&
-        !req.body?.medicalBenefits &&
-        !req.body?.festibalBenefits
-    ) {
-        throw new ApiError(400, "Policies is required");
+    if (!req.body?.systemSettings) {
+        throw new ApiError(400, "System settings is required");
     }
 
     const company = await Company.findByIdAndUpdate(companyId, req.body, {
         new: true,
     });
 
-    const policies = {
-        companyPolicy: company?.companyPolicy || "",
-        medicalBenefits: company?.medicalBenefits || "",
-        festibalBenefits: company?.festibalBenefits || "",
-    };
+    const systemSettings = company?.systemSettings
+        ? company?.systemSettings
+        : "";
 
     return res
         .status(201)
-        .json(new ApiResponse(201, policies, "Policies update successfully"));
+        .json(
+            new ApiResponse(201, systemSettings, "Policies update successfully")
+        );
 });

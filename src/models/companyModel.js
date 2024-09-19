@@ -45,6 +45,10 @@ const companySchema = new Schema(
             type: String,
             trim: true,
         },
+        systemSettings: {
+            type: Schema.Types.Mixed,
+            trim: true,
+        },
         emailSettings: {
             type: Schema.Types.Mixed,
             trim: true,
