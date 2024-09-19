@@ -13,7 +13,9 @@ import { Company } from "../models/companyModel.js";
 export const getData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
-    const comapny = await Company.findById(companyId);
+    const comapny = await Company.findById(companyId).select(
+        "companyName email mobile address startTime endTime logo"
+    );
 
     if (!comapny) {
         throw new ApiError(400, "Company not found");
@@ -55,18 +57,24 @@ export const updateData = asyncHandler(async (req, res) => {
             await destroyOnCloudinary(companyInfo.logo);
         }
     } else {
-        delete data.logo;
+        if (!data?.logo) {
+            delete data.logo;
+        }
     }
 
-    const company = await Company.findByIdAndUpdate(companyId, data, {
+    const updateCompany = await Company.findByIdAndUpdate(companyId, data, {
         new: true,
     });
 
-    if (!company) {
+    if (!updateCompany) {
         throw new ApiError(404, "Company not found");
     }
 
+    const comapny = await Company.findById(companyId).select(
+        "companyName email mobile address startTime endTime logo"
+    );
+
     return res
         .status(201)
-        .json(new ApiResponse(200, company, "Company updated successfully"));
+        .json(new ApiResponse(200, comapny, "Company updated successfully"));
 });

@@ -71,20 +71,4 @@ const companySchema = new Schema(
     }
 );
 
-companySchema.pre(/^find/, function (next) {
-    this.populate({
-        path: "companyType",
-        select: "name",
-    });
-    next();
-});
-
-companySchema.pre(/^find/, async function (next) {
-    this.populate({
-        path: "companySize",
-        select: "name",
-    });
-    next();
-});
-
 export const Company = mongoose.model("Company", companySchema);
