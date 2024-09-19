@@ -47,7 +47,7 @@ import employeeRoute from "./routes/employeeRoute.js";
 import shiftRoute from "./routes/shiftRoute.js";
 import companyRoute from "./routes/companyRoute.js";
 import designationRoute from "./routes/designationRoute.js";
-import timeoffRoute from "./routes/timeoffRoute.js";
+//import timeoffRoute from "./routes/timeoffRoute.js";
 import timeoffTypeRoute from "./routes/timeoffTypeRoute.js";
 import templateRoute from "./routes/templateRoute.js";
 import emailSettingsRoute from "./routes/emailSettingsRoute.js";
