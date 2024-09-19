@@ -2,7 +2,7 @@ import { asyncHandler } from "../utilities/asyncHandler.js";
 import { ApiResponse } from "../utilities/ApiResponse.js";
 import { ApiError } from "../utilities/ApiError.js";
 
-import { TimeoffType } from "../models/timeoffTypeModel.js";
+import { TimeoffType } from "../models/timeofftypeModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
