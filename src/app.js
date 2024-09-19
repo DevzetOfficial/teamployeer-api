@@ -61,7 +61,7 @@ app.use("/api/v1", employeeRoute);
 app.use("/api/v1", shiftRoute);
 app.use("/api/v1", companyRoute);
 app.use("/api/v1", designationRoute);
-app.use("/api/v1", timeoffRoute);
+//app.use("/api/v1", timeoffRoute);
 app.use("/api/v1", timeoffTypeRoute);
 app.use("/api/v1", templateRoute);
 app.use("/api/v1", emailSettingsRoute);
