@@ -49,6 +49,18 @@ const companySchema = new Schema(
             type: Schema.Types.Mixed,
             trim: true,
         },
+        companyPolicy: {
+            type: String,
+            trim: true,
+        },
+        medicalBenefits: {
+            type: String,
+            trim: true,
+        },
+        festibalBenefits: {
+            type: String,
+            trim: true,
+        },
     },
     {
         timestamps: true,

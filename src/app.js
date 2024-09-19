@@ -51,6 +51,7 @@ import timeoffRoute from "./routes/timeoffRoute.js";
 import timeoffTypeRoute from "./routes/timeoffTypeRoute.js";
 import templateRoute from "./routes/templateRoute.js";
 import emailSettingsRoute from "./routes/emailSettingsRoute.js";
+import policieRoute from "./routes/policieRoute.js";
 
 // route declaration
 app.use("/api/v1", countryRoute);
@@ -65,5 +66,6 @@ app.use("/api/v1", timeoffRoute);
 app.use("/api/v1", timeoffTypeRoute);
 app.use("/api/v1", templateRoute);
 app.use("/api/v1", emailSettingsRoute);
+app.use("/api/v1", policieRoute);
 
 export { app };

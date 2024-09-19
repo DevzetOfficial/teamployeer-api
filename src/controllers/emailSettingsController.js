@@ -7,13 +7,15 @@ import { Company } from "../models/companyModel.js";
 export const getData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
-    const company = await Company.findById(companyId);
+    const companyInfo = await Company.findById(companyId);
 
-    if (!company) {
+    if (!companyInfo) {
         throw new ApiError(400, "Company not found");
     }
 
-    const emailSettings = company?.emailSettings ? company?.emailSettings : "";
+    const emailSettings = companyInfo?.emailSettings
+        ? companyInfo?.emailSettings
+        : "";
 
     return res
         .status(200)
@@ -52,8 +54,8 @@ export const updateData = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 201,
-                company?.emailConfig,
-                "Email config  update successfully"
+                company?.emailSettings,
+                "Email settings  update successfully"
             )
         );
 });
