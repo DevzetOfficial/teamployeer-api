@@ -7,26 +7,32 @@ import { Company } from "../models/companyModel.js";
 export const getData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
-    const policies = await Company.findById(companyId);
+    const companyInfo = await Company.findById(companyId);
 
-    if (!policies) {
-        throw new ApiError(400, "Policies not found");
+    if (!companyInfo) {
+        throw new ApiError(400, "System settings not found");
     }
+
+    const systemSettings = companyInfo?.systemSettings || "";
 
     return res
         .status(200)
         .json(
-            new ApiResponse(200, policies, "Policies retrieved successfully")
+            new ApiResponse(
+                200,
+                systemSettings,
+                "System settings retrieved successfully"
+            )
         );
 });
 
 export const updateData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
-    const companyInfo = await Company.findById({ _id: companyId });
+    const companyInfo = await Company.findById(companyId);
 
     if (!companyInfo) {
-        throw new ApiError(400, "Invalid credentials");
+        throw new ApiError(400, "Policies not found");
     }
 
     if (!req.body?.systemSettings) {
@@ -37,13 +43,15 @@ export const updateData = asyncHandler(async (req, res) => {
         new: true,
     });
 
-    const systemSettings = company?.systemSettings
-        ? company?.systemSettings
-        : "";
+    const systemSettings = company?.systemSettings || "";
 
     return res
         .status(201)
         .json(
-            new ApiResponse(201, systemSettings, "Policies update successfully")
+            new ApiResponse(
+                201,
+                systemSettings,
+                "System settings update successfully"
+            )
         );
 });
