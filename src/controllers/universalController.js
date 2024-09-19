@@ -1,5 +1,7 @@
 import { asyncHandler } from "../utilities/asyncHandler.js";
 import { ApiResponse } from "../utilities/ApiResponse.js";
+import { ApiError } from "../utilities/ApiError.js";
+
 import { Country } from "../models/countryModel.js";
 import { EmployeeLevel } from "../models/employeeLevelModel.js";
 import { EmployeeType } from "../models/employeeTypeModel.js";
@@ -10,7 +12,32 @@ import { OffboardingType } from "../models/offboardingTypeModel.js";
 import { OffboardingReason } from "../models/offboardingReasonModel.js";
 import { ProjectStatus } from "../models/projectStatusModel.js";
 import { LeaveStatus } from "../models/leaveStatusModel.js";
-import { ApiError } from "../utilities/ApiError.js";
+import { Permission } from "../models/permissionModel.js";
+
+// permission list
+export const permissionList = asyncHandler(async (req, res) => {
+    const permissions = await Permission.aggregate([
+        {
+            $group: {
+                _id: "$permissionType",
+                permissions: { $push: "$$ROOT" },
+            },
+        },
+        {
+            $sort: { "permissions.position": 1 },
+        },
+    ]);
+
+    return res
+        .status(201)
+        .json(
+            new ApiResponse(
+                200,
+                permissions,
+                "Permission retrieved successfully"
+            )
+        );
+});
 
 // Leave status list
 export const leaveStatusList = asyncHandler(async (req, res) => {

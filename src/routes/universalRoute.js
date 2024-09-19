@@ -12,6 +12,7 @@ import {
     offboardingReasonList,
     projectStatusList,
     leaveStatusList,
+    permissionList,
 } from "../controllers/universalController.js";
 
 const route = Router();
@@ -23,6 +24,7 @@ route.route("/company-types").get(companyTypeList);
 route.route("/company-sizes").get(companySizeList);
 
 // private routs
+route.route("/permissions").get(permissionList);
 route.route("/employee-levels").get(employeeLevelList);
 route.route("/employee-types").get(employeeTypeList);
 route.route("/provation-period").get(provationPeriodList);

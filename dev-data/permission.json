@@ -1,0 +1,38 @@
+[
+  {
+    "permissionType": "General permissions",
+    "name": "Manage Employee",
+    "description": "Allow this role to create, edit or delete employees",
+    "position": 1
+  },
+  {
+    "permissionType": "General permissions",
+    "name": "Manage Team",
+    "description": "Allow this role to create, edit or delete teams",
+    "position": 2
+  }, 
+  {
+    "permissionType": "General permissions",
+    "name": "Manage Roles",
+    "description": "Allow this role to create, edit or delete roles",
+    "position": 3
+  },
+  {
+    "permissionType": "General permissions",
+    "name": "Manage Clients",
+    "description": "Allow this role to create, edit or delete clients",
+    "position": 4
+  },
+  {
+    "permissionType": "Financial permissions",
+    "name": "Accept Payments",
+    "description": "Allow this role to accept payments from clients",
+    "position": 5
+  },
+  {
+    "permissionType": "Financial permissions",
+    "name": "Make Payments",
+    "description": "Allow this role to make client payments, disburse salary/incentive/bonus",
+    "position": 6
+  }
+]
