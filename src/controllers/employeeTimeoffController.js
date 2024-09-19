@@ -4,7 +4,7 @@ import { ApiError } from "../utilities/ApiError.js";
 
 import { Employee } from "../models/employeeModel.js";
 import { Timeoff } from "../models/timeoffModel.js";
-import { TimeoffType } from "../models/timeofftypeModel.js";
+import { TimeoffType } from "../models/timeoffTypeModel.js";
 
 export const getAllTimeoff = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
