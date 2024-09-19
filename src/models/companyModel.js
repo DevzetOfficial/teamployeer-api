@@ -21,6 +21,7 @@ const companySchema = new Schema(
             type: String,
             required: true,
             lowecase: true,
+            unique: true,
             trim: true,
             index: true,
         },
@@ -42,6 +43,10 @@ const companySchema = new Schema(
         },
         logo: {
             type: String,
+            trim: true,
+        },
+        emailSettings: {
+            type: Schema.Types.Mixed,
             trim: true,
         },
     },

@@ -233,7 +233,7 @@ export const deleteData = asyncHandler(async (req, res) => {
     const employeeInfo = await Employee.findOne(filters);
 
     if (!employeeInfo) {
-        throw new ApiError(404, "Employee not found!");
+        throw new ApiError(404, "Employee not found");
     }
 
     const employee = await Employee.findByIdAndUpdate(

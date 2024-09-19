@@ -3,8 +3,8 @@ import { ApiResponse } from "../utilities/ApiResponse.js";
 import { ApiError } from "../utilities/ApiError.js";
 
 import { Employee } from "../models/employeeModel.js";
-import { LeaveType } from "../models/leaveTypeModel.js";
-import { TimeOff } from "../models/timeOffModel.js";
+import { Timeoff } from "../models/timeoffModel.js";
+import { TimeoffType } from "../models/timeoffTypeModel.js";
 
 export const getAllTimeoff = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
@@ -14,24 +14,24 @@ export const getAllTimeoff = asyncHandler(async (req, res) => {
     const employeeInfo = await Employee.findOne(filters);
 
     if (!employeeInfo) {
-        throw new ApiError(404, "Employee not found!");
+        throw new ApiError(404, "Employee not found");
     }
 
     delete filters._id;
     filters.employee = req.params.employeeId;
     filters.status = "Approved";
-    const timeoff = await TimeOff.find(filters);
+    const timeoff = await Timeoff.find(filters);
 
-    const defaultLeaveTypes = await LeaveType.find({ companyId: companyId })
+    const defaultTimeoffTypes = await TimeoffType.find({ companyId: companyId })
         .select("name amount")
         .sort({ createdAt: 1 });
 
-    const newLeaveTypes = [];
-    defaultLeaveTypes.map((row) => {
+    const newTimeoffTypes = [];
+    defaultTimeoffTypes.map((row) => {
         const item = {};
 
         const leaveTaken = timeoff
-            .filter((pRow) => String(pRow.leaveType._id) === String(row._id))
+            .filter((pRow) => String(pRow.timeoffType._id) === String(row._id))
             .reduce((sum, pRow) => sum + pRow.totalDay, 0);
 
         if (!employeeInfo?.timeoffDate) {
@@ -60,7 +60,7 @@ export const getAllTimeoff = asyncHandler(async (req, res) => {
             }
         }
 
-        newLeaveTypes.push(item);
+        newTimeoffTypes.push(item);
     });
 
     return res
@@ -68,7 +68,7 @@ export const getAllTimeoff = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                newLeaveTypes,
+                newTimeoffTypes,
                 "Employee time off retrieved successfully"
             )
         );
@@ -82,7 +82,7 @@ export const setEmployeeTimeOff = asyncHandler(async (req, res) => {
     const employeeInfo = await Employee.findOne(filters);
 
     if (!employeeInfo) {
-        throw new ApiError(404, "Employee not found!");
+        throw new ApiError(404, "Employee not found");
     }
 
     if (!req.body?.timeoffs) {

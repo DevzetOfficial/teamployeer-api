@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const timeOffSchema = new Schema(
+const timeoffSchema = new Schema(
     {
         companyId: {
             type: mongoose.Schema.Types.ObjectId,
@@ -13,10 +13,10 @@ const timeOffSchema = new Schema(
             required: [true, "Employee ID is required"],
             ref: "Employee",
         },
-        leaveType: {
+        timeoffType: {
             type: mongoose.Schema.Types.ObjectId,
-            required: [true, "Leave type is required"],
-            ref: "LeaveType",
+            required: [true, "Time off type is required"],
+            ref: "TimeoffType",
         },
         startDate: {
             type: Date,
@@ -37,7 +37,7 @@ const timeOffSchema = new Schema(
         attachments: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "TimeOffAttachment",
+                ref: "TimeoffAttachment",
             },
         ],
         status: {
@@ -58,7 +58,7 @@ const timeOffSchema = new Schema(
     }
 );
 
-timeOffSchema.pre(/^find/, function (next) {
+timeoffSchema.pre(/^find/, function (next) {
     this.populate({
         path: "employee",
         select: "employeeId name avatar",
@@ -70,12 +70,12 @@ timeOffSchema.pre(/^find/, function (next) {
     next();
 });
 
-timeOffSchema.pre(/^find/, function (next) {
+timeoffSchema.pre(/^find/, function (next) {
     this.populate({
-        path: "leaveType",
+        path: "timeoffType",
         select: "name",
     });
     next();
 });
 
-export const TimeOff = mongoose.model("TimeOff", timeOffSchema);
+export const Timeoff = mongoose.model("Timeoff", timeoffSchema);

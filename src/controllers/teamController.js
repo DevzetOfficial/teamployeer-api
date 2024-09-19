@@ -145,7 +145,7 @@ export const deleteData = asyncHandler(async (req, res) => {
     const team = await Team.findOne(filters);
 
     if (!team) {
-        throw new ApiError(404, "Team not found!");
+        throw new ApiError(404, "Team not found");
     }
 
     await Team.findOneAndDelete(filters);

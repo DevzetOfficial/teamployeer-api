@@ -29,7 +29,9 @@ export const getAllData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId };
 
-    const allData = await Template.find(filters).sort({ createdAt: 1 });
+    const allData = await Template.find(filters)
+        .select("name template")
+        .sort({ createdAt: 1 });
 
     return res
         .status(201)

@@ -53,7 +53,7 @@ export const getData = asyncHandler(async (req, res) => {
     const shiftInfo = await Shift.findOne(filters);
 
     if (!shiftInfo) {
-        throw new ApiError(400, "Shift not found!");
+        throw new ApiError(400, "Shift not found");
     }
 
     return res
@@ -68,7 +68,7 @@ export const updateData = asyncHandler(async (req, res) => {
     const shiftInfo = await Shift.findOne(filters);
 
     if (!shiftInfo) {
-        throw new ApiError(400, "Shift not found!");
+        throw new ApiError(400, "Shift not found");
     }
 
     const updateShift = await Shift.findByIdAndUpdate(shiftInfo._id, req.body, {
@@ -87,7 +87,7 @@ export const deleteData = asyncHandler(async (req, res) => {
     const shiftInfo = await Shift.findOne(filters);
 
     if (!shiftInfo) {
-        throw new ApiError(400, "Shift not found!");
+        throw new ApiError(400, "Shift not found");
     }
 
     await Shift.findByIdAndDelete(shiftInfo._id);

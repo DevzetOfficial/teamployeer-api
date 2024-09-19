@@ -2,7 +2,7 @@ import { asyncHandler } from "../utilities/asyncHandler.js";
 import { ApiResponse } from "../utilities/ApiResponse.js";
 import { ApiError } from "../utilities/ApiError.js";
 
-import { LeaveType } from "../models/leaveTypeModel.js";
+import { TimeoffType } from "../models/timeoffTypeModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
@@ -10,9 +10,9 @@ export const createData = asyncHandler(async (req, res) => {
     const data = req.body;
     data.companyId = companyId;
 
-    const newLeaveType = await LeaveType.create(data);
+    const newTimeoffType = await TimeoffType.create(data);
 
-    if (!newLeaveType) {
+    if (!newTimeoffType) {
         throw new ApiError(400, "Invalide credentials");
     }
 
@@ -21,8 +21,8 @@ export const createData = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                newLeaveType,
-                "Leave type created successfully"
+                newTimeoffType,
+                "Time off type created successfully"
             )
         );
 });
@@ -31,15 +31,17 @@ export const getAllData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
     const filters = { companyId: companyId };
-    const leaveTypes = await LeaveType.find(filters).sort({ createdAt: 1 });
+    const timeoffTypes = await TimeoffType.find(filters)
+        .select("name amount")
+        .sort({ createdAt: 1 });
 
     return res
         .status(201)
         .json(
             new ApiResponse(
                 200,
-                leaveTypes,
-                "Leave type retrieved successfully"
+                timeoffTypes,
+                "Time off type retrieved successfully"
             )
         );
 });
@@ -49,10 +51,10 @@ export const getData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, _id: req.params.id };
 
-    const leaveTypeInfo = await LeaveType.findOne(filters);
+    const timeoffType = await TimeoffType.findOne(filters);
 
-    if (!leaveTypeInfo) {
-        throw new ApiError(400, "Leave type not found");
+    if (!timeoffType) {
+        throw new ApiError(400, "Time off type not found");
     }
 
     return res
@@ -60,8 +62,8 @@ export const getData = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                leaveTypeInfo,
-                "Leave type retrieved successfully"
+                timeoffType,
+                "Time off type retrieved successfully"
             )
         );
 });
@@ -71,22 +73,22 @@ export const updateData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, _id: req.params.id };
 
-    const leaveTypeInfo = await LeaveType.findOne(filters);
+    const timeoffType = await TimeoffType.findOne(filters);
 
-    if (!leaveTypeInfo) {
-        throw new ApiError(400, "Leave type not found");
+    if (!timeoffType) {
+        throw new ApiError(400, "Time off type not found");
     }
 
-    const updateLeaveType = await LeaveType.findByIdAndUpdate(
-        leaveTypeInfo._id,
+    const updateTimeoffType = await TimeoffType.findByIdAndUpdate(
+        timeoffType._id,
         req.body,
         {
             new: true,
         }
     );
 
-    if (!updateLeaveType) {
-        throw new ApiError(404, "Leave type not found!");
+    if (!updateTimeoffType) {
+        throw new ApiError(404, "Time off type not found");
     }
 
     return res
@@ -94,8 +96,8 @@ export const updateData = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                updateLeaveType,
-                "Leave type update successfully"
+                updateTimeoffType,
+                "Time off type update successfully"
             )
         );
 });
@@ -104,15 +106,15 @@ export const deleteData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
     const filters = { _id: req.params.id, companyId: companyId };
 
-    const leaveType = await LeaveType.findOne(filters);
+    const timeoffType = await TimeoffType.findOne(filters);
 
-    if (!leaveType) {
-        throw new ApiError(400, "Leave type not found!");
+    if (!timeoffType) {
+        throw new ApiError(400, "Time off type not found");
     }
 
-    await LeaveType.findByIdAndDelete(leaveType._id);
+    await TimeoffType.findByIdAndDelete(timeoffType._id);
 
     return res
         .status(201)
-        .json(new ApiResponse(200, {}, "Leave type delete successfully"));
+        .json(new ApiResponse(200, {}, "Time off type delete successfully"));
 });

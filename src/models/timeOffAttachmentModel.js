@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const timeOffAttachmentSchema = new Schema({
+const timeoffAttachmentSchema = new Schema({
     timeoffId: {
         type: mongoose.Schema.Types.ObjectId,
         required: [true, "Time off id is required"],
@@ -18,7 +18,7 @@ const timeOffAttachmentSchema = new Schema({
     },
 });
 
-export const TimeOffAttachment = mongoose.model(
-    "TimeOffAttachment",
-    timeOffAttachmentSchema
+export const TimeoffAttachment = mongoose.model(
+    "TimeoffAttachment",
+    timeoffAttachmentSchema
 );

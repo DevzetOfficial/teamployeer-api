@@ -47,9 +47,10 @@ import employeeRoute from "./routes/employeeRoute.js";
 import shiftRoute from "./routes/shiftRoute.js";
 import companyRoute from "./routes/companyRoute.js";
 import designationRoute from "./routes/designationRoute.js";
-import timeOffRoute from "./routes/timeOffRoute.js";
-import leaveTypeRoute from "./routes/leaveTypeRoute.js";
+import timeoffRoute from "./routes/timeoffRoute.js";
+import timeoffTypeRoute from "./routes/timeoffTypeRoute.js";
 import templateRoute from "./routes/templateRoute.js";
+import emailSettingsRoute from "./routes/emailSettingsRoute.js";
 
 // route declaration
 app.use("/api/v1", countryRoute);
@@ -60,8 +61,9 @@ app.use("/api/v1", employeeRoute);
 app.use("/api/v1", shiftRoute);
 app.use("/api/v1", companyRoute);
 app.use("/api/v1", designationRoute);
-app.use("/api/v1", timeOffRoute);
-app.use("/api/v1", leaveTypeRoute);
+app.use("/api/v1", timeoffRoute);
+app.use("/api/v1", timeoffTypeRoute);
 app.use("/api/v1", templateRoute);
+app.use("/api/v1", emailSettingsRoute);
 
 export { app };

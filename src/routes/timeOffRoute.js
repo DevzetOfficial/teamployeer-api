@@ -9,7 +9,7 @@ import {
     updateData,
     deleteData,
     deleteAttachment,
-} from "../controllers/timeOffController.js";
+} from "../controllers/timeoffController.js";
 
 const route = Router();
 

@@ -8,8 +8,8 @@ import {
     destroyOnCloudinary,
 } from "../utilities/cloudinary.js";
 
-import { TimeOff } from "../models/timeOffModel.js";
-import { TimeOffAttachment } from "../models/timeOffAttachmentModel.js";
+import { Timeoff } from "../models/timeoffModel.js";
+import { TimeoffAttachment } from "../models/timeoffAttachmentModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
@@ -24,9 +24,9 @@ export const createData = asyncHandler(async (req, res) => {
     data.totalDay = totalDay + 1;
     data.attachments = [];
 
-    const timeOffCreate = await TimeOff.create(data);
+    const newTimeoff = await Timeoff.create(data);
 
-    if (!timeOffCreate) {
+    if (!newTimeoff) {
         throw new ApiError(400, "Invalid credentials");
     }
 
@@ -36,7 +36,7 @@ export const createData = asyncHandler(async (req, res) => {
                 const uploadAvatar = await uploadOnCloudinary(file.path);
 
                 const attachmentData = {
-                    timeoffId: timeOffCreate._id,
+                    timeoffId: newTimeoff._id,
                     name: file.originalname,
                     attachment: uploadAvatar?.url || "",
                 };
@@ -45,21 +45,21 @@ export const createData = asyncHandler(async (req, res) => {
             })
         );
 
-        const attachmentCreate = await TimeOffAttachment.create(attachmentData);
+        const attachmentCreate = await TimeoffAttachment.create(attachmentData);
 
         // update time off attachment
         if (attachmentCreate) {
-            const timeOff = await TimeOff.findById(timeOffCreate._id);
+            const timeoff = await Timeoff.findById(newTimeoff._id);
 
             attachmentCreate.forEach((row) => {
-                timeOff.attachments.push(row._id);
+                timeoff.attachments.push(row._id);
             });
 
-            await timeOff.save();
+            await timeoff.save();
         }
     }
 
-    const newTimeOff = await TimeOff.findById(timeOffCreate._id).populate(
+    const newTimeOff = await Timeoff.findById(newTimeoff._id).populate(
         "attachments"
     );
 
@@ -85,7 +85,7 @@ export const getAllData = asyncHandler(async (req, res) => {
         filters.status = ucfirst(segments[1]);
     }
 
-    const timeOffs = await TimeOff.find(filters);
+    const timeOffs = await Timeoff.find(filters);
 
     const pendingList = timeOffs.filter((row) => row.status === "Pending");
 
@@ -117,7 +117,7 @@ export const getAllData = asyncHandler(async (req, res) => {
 export const getCountData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
-    const timeOffs = await TimeOff.aggregate([
+    const timeOffs = await Timeoff.aggregate([
         {
             $match: {
                 companyId: { $eq: objectId(companyId) },
@@ -170,7 +170,7 @@ export const getData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, _id: req.params.id };
 
-    const timeOff = await TimeOff.findOne(filters).populate("attachments");
+    const timeOff = await Timeoff.findOne(filters).populate("attachments");
 
     if (!timeOff) {
         throw new ApiError(400, "Time Off not found");
@@ -186,7 +186,7 @@ export const updateData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, _id: req.params.id };
 
-    const timeOffInfo = await TimeOff.findOne(filters);
+    const timeOffInfo = await Timeoff.findOne(filters);
 
     if (!timeOffInfo) {
         throw new ApiError(400, "Time off not found");
@@ -204,7 +204,7 @@ export const updateData = asyncHandler(async (req, res) => {
         data.totalDay = totalDay + 1;
     }
 
-    await TimeOff.findByIdAndUpdate(timeOffInfo._id, data, { new: true });
+    await Timeoff.findByIdAndUpdate(timeOffInfo._id, data, { new: true });
 
     if (typeof req.files !== "undefined" && req.files.length > 0) {
         const attachmentData = await Promise.all(
@@ -221,11 +221,11 @@ export const updateData = asyncHandler(async (req, res) => {
             })
         );
 
-        const attachmentCreate = await TimeOffAttachment.create(attachmentData);
+        const attachmentCreate = await TimeoffAttachment.create(attachmentData);
 
         // update time off attachment
         if (attachmentCreate.length > 0) {
-            const timeOff = await TimeOff.findById(timeOffInfo._id);
+            const timeOff = await Timeoff.findById(timeOffInfo._id);
 
             attachmentCreate.forEach((row) => {
                 timeOff.attachments.push(row._id);
@@ -235,7 +235,7 @@ export const updateData = asyncHandler(async (req, res) => {
         }
     }
 
-    const updtaeTimeOff = await TimeOff.findById(timeOffInfo._id).populate(
+    const updtaeTimeOff = await Timeoff.findById(timeOffInfo._id).populate(
         "attachments"
     );
 
@@ -250,13 +250,13 @@ export const deleteData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
     const filters = { companyId: companyId, _id: req.params.id };
 
-    const timeOffInfo = await TimeOff.findOne(filters);
+    const timeOffInfo = await Timeoff.findOne(filters);
 
     if (!timeOffInfo) {
-        throw new ApiError(404, "Time Off not found!");
+        throw new ApiError(404, "Time Off not found");
     }
 
-    const timeOffDocument = await TimeOffAttachment.find({
+    const timeOffDocument = await TimeoffAttachment.find({
         timeoffId: timeOffInfo._id,
     });
 
@@ -267,10 +267,10 @@ export const deleteData = asyncHandler(async (req, res) => {
             })
         );
 
-        await TimeOffAttachment.deleteMany({ timeoffId: timeOffInfo._id });
+        await TimeoffAttachment.deleteMany({ timeoffId: timeOffInfo._id });
     }
 
-    await TimeOff.findByIdAndDelete(timeOffInfo._id);
+    await Timeoff.findByIdAndDelete(timeOffInfo._id);
 
     return res
         .status(200)
@@ -283,10 +283,10 @@ export const deleteAttachment = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
     const filters = { companyId: companyId, _id: timeoffId };
 
-    const timeOffInfo = await TimeOff.findOne(filters);
+    const timeOffInfo = await Timeoff.findOne(filters);
 
     if (!timeOffInfo) {
-        throw new ApiError(404, "Time Off not found!");
+        throw new ApiError(404, "Time Off not found");
     }
 
     if (timeOffInfo.attachments.includes(id)) {
@@ -299,15 +299,15 @@ export const deleteAttachment = asyncHandler(async (req, res) => {
 
     const attachmentFilters = { timeoffId: timeoffId, _id: id };
 
-    const attachmentInfo = await TimeOffAttachment.findOne(attachmentFilters);
+    const attachmentInfo = await TimeoffAttachment.findOne(attachmentFilters);
 
     if (!attachmentInfo) {
-        throw new ApiError(404, "Attachment not found!");
+        throw new ApiError(404, "Attachment not found");
     }
 
     await destroyOnCloudinary(attachmentInfo.attachment);
 
-    await TimeOffAttachment.findByIdAndDelete(id);
+    await TimeoffAttachment.findByIdAndDelete(id);
 
     return res
         .status(200)

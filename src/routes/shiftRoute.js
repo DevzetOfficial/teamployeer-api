@@ -10,8 +10,12 @@ import {
 
 const route = Router();
 
-route.route("/shift").get(getAllData).post(createData);
+route.route("/settings/shift").get(getAllData).post(createData);
 
-route.route("/shift/:id").get(getData).patch(updateData).delete(deleteData);
+route
+    .route("/settings/shift/:id")
+    .get(getData)
+    .patch(updateData)
+    .delete(deleteData);
 
 export default route;

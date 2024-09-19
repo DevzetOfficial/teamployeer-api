@@ -174,7 +174,7 @@ export const deleteData = asyncHandler(async (req, res) => {
     const info = await Client.findOne(filters);
 
     if (!info) {
-        throw new ApiError(404, "Client not found!");
+        throw new ApiError(404, "Client not found");
     }
 
     let client;

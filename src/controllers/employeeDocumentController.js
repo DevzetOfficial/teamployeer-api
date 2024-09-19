@@ -129,7 +129,7 @@ export const deleteDocument = asyncHandler(async (req, res) => {
     const documentInfo = await EmployeeDocument.findOne(filters);
 
     if (!documentInfo) {
-        throw new ApiError(404, "Employee document not found!");
+        throw new ApiError(404, "Employee document not found");
     }
 
     if (documentInfo.attachment) {

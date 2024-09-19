@@ -1,6 +1,8 @@
 import { asyncHandler } from "../utilities/asyncHandler.js";
 import { ApiResponse } from "../utilities/ApiResponse.js";
 import { ApiError } from "../utilities/ApiError.js";
+import { objectId } from "../utilities/helper.js";
+
 import {
     uploadOnCloudinary,
     destroyOnCloudinary,
@@ -25,6 +27,17 @@ export const getData = asyncHandler(async (req, res) => {
 export const updateData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
 
+    if (req.body?.email) {
+        const existEmail = await Company.findOne({
+            email: req.body.email,
+            _id: { $ne: objectId(companyId) },
+        });
+
+        if (existEmail) {
+            throw new ApiError(400, "Email already exists for another company");
+        }
+    }
+
     const companyInfo = Company.findById(companyId);
 
     if (!companyInfo) {
@@ -41,6 +54,8 @@ export const updateData = asyncHandler(async (req, res) => {
         if (companyInfo && companyInfo.logo) {
             await destroyOnCloudinary(companyInfo.logo);
         }
+    } else {
+        delete data.logo;
     }
 
     const company = await Company.findByIdAndUpdate(companyId, data, {
@@ -54,26 +69,4 @@ export const updateData = asyncHandler(async (req, res) => {
     return res
         .status(201)
         .json(new ApiResponse(200, company, "Company updated successfully"));
-});
-
-export const deleteImage = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const comapny = await Company.findById(companyId);
-
-    if (!comapny) {
-        throw new ApiError(400, "Company not found");
-    }
-
-    if (comapny.logo) {
-        await destroyOnCloudinary(comapny.logo);
-    }
-
-    await Company.findByIdAndUpdate(companyId, { logo: "" }, { new: true });
-
-    return res
-        .status(201)
-        .json(
-            new ApiResponse(200, Company, "Company image delete successfully")
-        );
 });

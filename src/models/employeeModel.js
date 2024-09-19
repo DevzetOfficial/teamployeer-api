@@ -144,6 +144,7 @@ const employeeSchema = new Schema(
         },
         timeoffDate: {
             type: Schema.Types.Mixed,
+            trim: true,
         },
     },
     {

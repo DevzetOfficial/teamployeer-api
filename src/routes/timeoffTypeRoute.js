@@ -6,14 +6,14 @@ import {
     getData,
     updateData,
     deleteData,
-} from "../controllers/leaveTypeController.js";
+} from "../controllers/timeoffTypeController.js";
 
 const route = Router();
 
-route.route("/leave-type").get(getAllData).post(createData);
+route.route("/settings/timeoff").get(getAllData).post(createData);
 
 route
-    .route("/leave-type/:id")
+    .route("/settings/timeoff/:id")
     .get(getData)
     .patch(updateData)
     .delete(deleteData);

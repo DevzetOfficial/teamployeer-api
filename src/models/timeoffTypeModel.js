@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const leaveTypeSchema = new Schema(
+const timeoffTypeSchema = new Schema(
     {
         companyId: {
             type: mongoose.Schema.Types.ObjectId,
@@ -23,4 +23,4 @@ const leaveTypeSchema = new Schema(
     }
 );
 
-export const LeaveType = mongoose.model("LeaveType", leaveTypeSchema);
+export const TimeoffType = mongoose.model("TimeoffType", timeoffTypeSchema);

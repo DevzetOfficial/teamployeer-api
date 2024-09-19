@@ -18,8 +18,8 @@ const userSchema = new Schema(
         email: {
             type: String,
             required: [true, "Email is required"],
-            unique: true,
             lowecase: true,
+            unique: true,
             trim: true,
             index: true,
         },

@@ -10,8 +10,12 @@ import {
 
 const route = Router();
 
-route.route("/template").get(getAllData).post(createData);
+route.route("/settings/template").get(getAllData).post(createData);
 
-route.route("/template/:id").get(getData).patch(updateData).delete(deleteData);
+route
+    .route("/settings/template/:id")
+    .get(getData)
+    .patch(updateData)
+    .delete(deleteData);
 
 export default route;
