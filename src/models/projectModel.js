@@ -28,7 +28,7 @@ const projectSchema = new Schema(
             required: [true, "Submission date is required"],
             trim: true,
         },
-        assign: [
+        assignMembers: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 required: [true, "Assign member is required"],
@@ -44,22 +44,15 @@ const projectSchema = new Schema(
             trim: true,
         },
         status: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: true,
-            ref: "ProjectStatus",
+            type: String,
+            default: "Ongoing",
+            trim: true,
+            index: true,
         },
     },
     {
         timestamps: true,
     }
 );
-
-projectSchema.pre(/^find/, function (next) {
-    this.populate({
-        path: "status",
-        select: "_id name",
-    });
-    next();
-});
 
 export const Project = mongoose.model("Project", projectSchema);
