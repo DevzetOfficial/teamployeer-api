@@ -66,6 +66,8 @@ export const getAllData = asyncHandler(async (req, res) => {
         .lean();
 
     const newProjects = projects.map((row) => {
+        console.log(row);
+
         return {
             ...row,
             progress: 0,
@@ -135,7 +137,19 @@ export const getData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, _id: req.params.id };
 
-    const project = await Project.findOne(filters);
+    const project = await Project.findOne(filters)
+        .populate({ path: "client", select: "name source avatar" })
+        .populate({ path: "projectManager", select: "name avatar" })
+        .populate({
+            path: "assignMembers",
+            select: "name avatar",
+            populate: {
+                path: "designation",
+                model: "Designation",
+                select: "name",
+            },
+        })
+        .lean();
 
     if (!project) {
         throw new ApiError(400, "Project not found");
