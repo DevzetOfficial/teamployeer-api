@@ -28,7 +28,7 @@ export const createData = asyncHandler(async (req, res) => {
         description: req.body?.description || "",
     };
 
-    console.log(data);
+    console.log(data, req.body);
 
     const newProject = await Project.create(data);
 
