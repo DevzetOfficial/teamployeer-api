@@ -23,10 +23,12 @@ export const createData = asyncHandler(async (req, res) => {
         client: req.body.client,
         projectManager: req.body.projectManager,
         submissionDate: req.body.submissionDate,
-        assignMembers: req.body?.assignMembers || "",
+        assignMembers: req.body?.assignMembers || [],
         projectImage: projectImage?.url || "",
         description: req.body?.description || "",
     };
+
+    console.log(data);
 
     const newProject = await Project.create(data);
 
