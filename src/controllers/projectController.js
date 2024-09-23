@@ -167,29 +167,22 @@ export const updateData = asyncHandler(async (req, res) => {
 
     const projectInfo = await Project.findOne(filters);
 
-    console.log(filters);
-
     if (!projectInfo) {
         throw new ApiError(400, "Project not found");
     }
 
-    console.log(projectInfo);
-
-    const data = {
-        name: req.body.name,
-        client: req.body.client,
-        projectManager: req.body.projectManager,
-        submissionDate: req.body.submissionDate,
-        assignMembers: req.body?.assignMembers || "",
-        description: req.body?.description || "",
-    };
+    const data = req.body;
 
     if (req.file?.path) {
-        uploadProjectImage = await uploadOnCloudinary(req.file?.path);
+        const uploadProjectImage = await uploadOnCloudinary(req.file?.path);
         data.projectImage = uploadProjectImage?.url || "";
 
         if (projectInfo.projectImage) {
             await destroyOnCloudinary(projectInfo.projectImage);
+        }
+    } else {
+        if (req.body?.projectImage) {
+            delete req.body.projectImage;
         }
     }
 
