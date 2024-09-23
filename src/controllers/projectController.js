@@ -65,9 +65,18 @@ export const getAllData = asyncHandler(async (req, res) => {
         })
         .lean();
 
+    const newProjects = projects.map((row) => {
+        return {
+            ...row,
+            progress: 0,
+        };
+    });
+
     return res
         .status(201)
-        .json(new ApiResponse(200, projects, "Project retrieved successfully"));
+        .json(
+            new ApiResponse(200, newProjects, "Project retrieved successfully")
+        );
 });
 
 export const getCountData = asyncHandler(async (req, res) => {
