@@ -132,9 +132,13 @@ export const updateData = asyncHandler(async (req, res) => {
 
     const projectInfo = await Project.findOne(filters);
 
+    console.log(filters);
+
     if (!projectInfo) {
         throw new ApiError(400, "Project not found");
     }
+
+    console.log(projectInfo);
 
     const data = {
         name: req.body.name,
@@ -154,9 +158,13 @@ export const updateData = asyncHandler(async (req, res) => {
         }
     }
 
-    const updateProject = await Project.findById(projectInfo._id, data, {
-        new: true,
-    });
+    const updateProject = await Project.findByIdAndUpdate(
+        projectInfo._id,
+        data,
+        {
+            new: true,
+        }
+    );
 
     return res
         .status(200)
