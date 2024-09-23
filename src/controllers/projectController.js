@@ -28,8 +28,6 @@ export const createData = asyncHandler(async (req, res) => {
         description: req.body?.description || "",
     };
 
-    console.log(data);
-
     const newProject = await Project.create(data);
 
     if (!newProject) {
@@ -129,31 +127,42 @@ export const getData = asyncHandler(async (req, res) => {
 
 export const updateData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
+
     const filters = { companyId: companyId, _id: req.params.id };
 
-    const formData = req.body;
+    const projectInfo = await Project.findOne(filters);
+
+    if (!projectInfo) {
+        throw new ApiError(400, "Project not found");
+    }
 
     const data = {
-        name: formData.name,
+        name: req.body.name,
+        client: req.body.client,
+        projectManager: req.body.projectManager,
+        submissionDate: req.body.submissionDate,
+        assignMembers: req.body?.assignMembers || "",
+        description: req.body?.description || "",
     };
 
-    if (formData.teamHead) {
-        data.teamHead = formData.teamHead;
+    if (req.file?.path) {
+        uploadProjectImage = await uploadOnCloudinary(req.file?.path);
+        data.projectImage = uploadProjectImage?.url || "";
+
+        if (projectInfo.projectImage) {
+            await destroyOnCloudinary(projectInfo.projectImage);
+        }
     }
 
-    if (formData.employees && Array.isArray(formData.employees)) {
-        data.employees = formData.employees;
-    }
-
-    const team = await Project.findOneAndUpdate(filters, data, { new: true });
-
-    if (!team) {
-        throw new ApiError(404, "Project not found");
-    }
+    const updateProject = await Project.findById(projectInfo._id, data, {
+        new: true,
+    });
 
     return res
         .status(200)
-        .json(new ApiResponse(200, team, "Project updated successfully"));
+        .json(
+            new ApiResponse(200, updateProject, "Project updated successfully")
+        );
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
