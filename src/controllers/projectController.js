@@ -181,7 +181,7 @@ export const updateData = asyncHandler(async (req, res) => {
             await destroyOnCloudinary(projectInfo.projectImage);
         }
     } else {
-        if (req.body?.projectImage) {
+        if (req.body?.projectImage === "") {
             delete req.body.projectImage;
         }
     }
