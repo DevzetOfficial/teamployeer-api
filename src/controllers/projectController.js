@@ -28,8 +28,6 @@ export const createData = asyncHandler(async (req, res) => {
         description: req.body?.description || "",
     };
 
-    console.log(data, req.body);
-
     const newProject = await Project.create(data);
 
     if (!newProject) {
@@ -53,7 +51,19 @@ export const getAllData = asyncHandler(async (req, res) => {
             segments[1] === "onhold" ? "On Hold" : ucfirst(segments[1]);
     }
 
-    const projects = await Project.find(filters);
+    const projects = await Project.find(filters)
+        .populate({ path: "client", select: "name avatar" })
+        .populate({ path: "projectManager", select: "name avatar" })
+        .populate({
+            path: "assignMembers",
+            select: "name avatar",
+            populate: {
+                path: "designation",
+                model: "Designation",
+                select: "name",
+            },
+        })
+        .lean();
 
     return res
         .status(201)

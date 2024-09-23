@@ -58,7 +58,10 @@ export const getActiveData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, status: 1 };
 
-    const clients = await Client.find(filters).select("-__v");
+    const clients = await Client.find(filters).populate({
+        path: "country",
+        select: "name avatar",
+    });
 
     return res
         .status(201)
@@ -70,7 +73,10 @@ export const getInactiveData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, status: 0 };
 
-    const clients = await Client.find(filters).select("-__v");
+    const clients = await Client.find(filters).populate({
+        path: "country",
+        select: "name avatar",
+    });
 
     return res
         .status(201)
@@ -125,7 +131,10 @@ export const getData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, _id: req.params.id };
 
-    const client = await Client.findOne(filters).select("-__v");
+    const client = await Client.findOne(filters).populate({
+        path: "country",
+        select: "name avatar",
+    });
 
     if (!client) {
         throw new ApiError(400, "Client not found");

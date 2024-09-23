@@ -72,12 +72,4 @@ const clientSchema = new Schema(
     }
 );
 
-clientSchema.pre(/^find/, function (next) {
-    this.populate({
-        path: "country",
-        select: "_id name avatar",
-    });
-    next();
-});
-
 export const Client = mongoose.model("Client", clientSchema);
