@@ -17,7 +17,7 @@ app.set("trust proxy", 1);
 app.use(cors());
 
 app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "https://localhost:3000");
+    res.header("Access-Control-Allow-Origin", "http://localhost:3000/");
     res.header("Access-Control-Allow-Methods", "DELETE, PUT, GET, POST");
     res.header(
         "Access-Control-Allow-Headers",
