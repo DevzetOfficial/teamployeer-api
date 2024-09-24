@@ -99,7 +99,7 @@ export const verifyOtp = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "None",
+        sameSite: "Lax",
     };
 
     return res
@@ -143,7 +143,7 @@ export const loginUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "None",
+        sameSite: "Lax",
     };
 
     return res
@@ -188,7 +188,7 @@ export const googleLoginUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "None",
+        sameSite: "Lax",
     };
 
     return res
@@ -272,7 +272,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "None",
+        sameSite: "Lax",
     };
 
     return res
@@ -297,7 +297,7 @@ export const logoutUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "None",
+        sameSite: "Lax",
     };
 
     return res
@@ -334,7 +334,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
         const options = {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "None",
+            sameSite: "Lax",
         };
 
         const { newAccessToken, newRefreshToken } =
@@ -381,56 +381,4 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(new ApiResponse(200, req.user, "User fatched successfully"));
-});
-
-export const updateAccountDetails = asyncHandler(async (req, res) => {
-    const { fullName, email } = req.body;
-
-    if (!fullName || !email) {
-        throw new ApiError(400, "All fields are required");
-    }
-
-    const user = await User.findByIdAndUpdate(
-        req.user?._id,
-        {
-            $set: {
-                fullName,
-                email: email,
-            },
-        },
-        { new: true }
-    ).select("-password");
-
-    return req
-        .status(200)
-        .json(
-            new ApiResponse(200, user, "Account details update successfully")
-        );
-});
-
-export const updateUserAvatar = asyncHandler(async (req, res) => {
-    const avatarLocalPath = req.file?.path;
-    if (!avatarLocalPath) {
-        throw new ApiError(400, "Avatar file is mission");
-    }
-
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
-
-    if (!avatar) {
-        throw new ApiError(400, "Error while uploading on avatar");
-    }
-
-    const user = await User.findByIdAndUpdate(
-        req.user?._id,
-        {
-            $set: {
-                avatar: avatar.url,
-            },
-        },
-        { new: true }
-    ).select("-password");
-
-    return res
-        .status(2000)
-        .json(new ApiResponse(200, user, "Avatar update successfully"));
 });

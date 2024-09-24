@@ -78,22 +78,6 @@ const userSchema = new Schema(
     return await bcrypt.compare(password, this.password)
 } */
 
-userSchema.pre(/^filter/, async function (next) {
-    this.populate({
-        path: "employee",
-        select: "_id name",
-    });
-    next();
-});
-
-userSchema.pre(/^filter/, async function (next) {
-    this.populate({
-        path: "client",
-        select: "_id clientName",
-    });
-    next();
-});
-
 userSchema.methods.generateAccessToken = function () {
     return jwt.sign(
         {
