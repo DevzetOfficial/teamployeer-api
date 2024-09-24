@@ -62,7 +62,7 @@ export const sendOtp = asyncHandler(async (req, res) => {
 // send otp email
 export const verifyOtp = asyncHandler(async (req, res) => {
     if (!req?.cookies?.otpSecret) {
-        throw new ApiError(400, "Coolies not found");
+        throw new ApiError(400, "Cookies not found");
     }
 
     const { email, otp, expireTime } = req.cookies.otpSecret;
