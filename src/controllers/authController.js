@@ -38,6 +38,7 @@ export const sendOtp = asyncHandler(async (req, res) => {
         };
 
         const options = {
+            maxAge: 86400000,
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "Lax",
