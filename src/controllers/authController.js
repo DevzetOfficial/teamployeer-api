@@ -3,6 +3,7 @@ import { ApiResponse } from "../utilities/ApiResponse.js";
 import { ApiError } from "../utilities/ApiError.js";
 
 import { User } from "../models/userModel.js";
+import { Usertoken } from "../models/usertokenModel.js";
 import { Company } from "../models/companyModel.js";
 import sendMail from "../utilities/mailer.js";
 import { generateCode } from "../utilities/helper.js";
@@ -16,37 +17,29 @@ export const sendOtp = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Email is required");
     }
 
-    const otpCode = generateCode(6);
+    const tokenExists = await Usertoken.findOne({ email: email });
+    if (tokenExists) {
+        await Usertoken.deleteMany({ email: email });
+    }
 
-    const mailData = {
-        otp: otpCode,
-        email: email,
-    };
+    const otpCode = generateCode(6);
 
     try {
         await sendMail(
             email,
             "Your One-Time (OTP) for Teamployeer",
-            mailData,
+            {
+                otp: otpCode,
+                email: email,
+            },
             "sendOtp"
         );
 
-        const otpSecret = {
-            otp: otpCode,
-            email: email,
-            expireTime: Date.now() + 60 * 1000,
-        };
-
-        const options = {
-            maxAge: 86400000,
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "Lax",
-        };
+        // store user token
+        await Usertoken.create({ email: email, token: otpCode });
 
         return res
             .status(201)
-            .cookie("otpSecret", otpSecret, options)
             .json(
                 new ApiResponse(
                     200,
@@ -59,72 +52,57 @@ export const sendOtp = asyncHandler(async (req, res) => {
     }
 });
 
-// send otp email
+// verify otp email
 export const verifyOtp = asyncHandler(async (req, res) => {
-    if (!req?.cookies?.otpSecret) {
-        throw new ApiError(400, "Cookies not found");
+    const { email, otp } = req.body;
+
+    if (!email) {
+        throw new ApiError(400, "Email is required");
     }
 
-    const { email, otp, expireTime } = req.cookies.otpSecret;
-
-    if ([email, otp].some((field) => field?.trim() === "")) {
-        throw new ApiError(400, "Invalid credentials");
-    }
-
-    if (!expireTime || Date.now() > expireTime) {
-        throw new ApiError(400, "OTP has expired");
-    }
-
-    const { otpCode } = req.body;
-
-    if (!otpCode) {
+    if (!otp) {
         throw new ApiError(400, "OTP is required");
     }
 
-    if (otpCode != otp) {
-        throw new ApiError(400, "Invalid credentials");
+    const tokenVerify = await Usertoken.findOne({ email: email, token: otp });
+    if (!tokenVerify) {
+        throw new ApiError(400, "Invalid OTP");
     }
 
-    const userInfo = await User.findOne({ $or: [{ email }] });
+    const currentTime = new Date();
+    if (currentTime > tokenVerify.expireAt) {
+        throw new ApiError(400, "OTP is expired");
+    }
+
+    const userInfo = await User.findOne({ email });
     const isLogin = userInfo ? true : false;
-
-    const otpSecret = {
-        email: email,
-        otp: otp,
-        isLogin: isLogin,
-    };
-
-    const options = {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Lax",
-    };
 
     return res
         .status(201)
-        .cookie("otpSecret", otpSecret, options)
         .json(
             new ApiResponse(200, { isLogin: isLogin }, "OTP verify successful")
         );
 });
 
 export const loginUser = asyncHandler(async (req, res) => {
-    if (!req.cookies.otpSecret) {
-        throw new ApiError(400, "Invalid credentials");
-    }
-
-    const { email, otp, isLogin } = req.cookies.otpSecret;
-
-    if ([email, otp].some((field) => field?.trim() === "")) {
-        throw new ApiError(400, "Invalid credentials");
-    }
+    const { email, otp } = req.body;
 
     if (!email) {
         throw new ApiError(400, "Email is required");
     }
 
-    if (!isLogin) {
-        throw new ApiError(400, "Invalid credentials");
+    if (!otp) {
+        throw new ApiError(400, "OTP is required");
+    }
+
+    const tokenVerify = await Usertoken.findOne({ email: email, token: otp });
+    if (!tokenVerify) {
+        throw new ApiError(400, "Invalid OTP");
+    }
+
+    const currentTime = new Date();
+    if (tokenVerify.length > 0 && currentTime > tokenVerify.expireAt) {
+        throw new ApiError(400, "OTP is expired");
     }
 
     const user = await User.findOne({ email: email });
@@ -132,11 +110,18 @@ export const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(404, "User does not exists");
     }
 
+    // delete user token
+    Usertoken.findByIdAndDelete(tokenVerify._id);
+
+    // generate access and refresh token
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
         user._id
     );
 
-    const loggedInUser = await User.findById(user._id).select("-refreshToken");
+    // get login user info
+    const loggedInUser = await User.findById(user._id).select(
+        "-googleId -refreshToken"
+    );
 
     const options = {
         httpOnly: true,
@@ -146,7 +131,6 @@ export const loginUser = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .clearCookie("otpSecret", options)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToekn", refreshToken, options)
         .json(
@@ -191,7 +175,6 @@ export const googleLoginUser = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .clearCookie("otpSecret", options)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToekn", refreshToken, options)
         .json(
@@ -204,27 +187,22 @@ export const googleLoginUser = asyncHandler(async (req, res) => {
 });
 
 export const registerUser = asyncHandler(async (req, res) => {
-    if (!req.cookies.otpSecret) {
-        throw new ApiError(400, "Invalid credentials");
+    const { otp, email, fullName, companyName, companyType, companySize } =
+        req.body;
+
+    if (!otp) {
+        throw new ApiError(400, "OTP is required");
     }
 
-    const { email, otp, isLogin } = req.cookies.otpSecret;
-
-    if ([email, otp].some((field) => field?.trim() === "")) {
-        throw new ApiError(400, "Invalid credentials");
+    if (!email) {
+        throw new ApiError(400, "Email is required");
     }
-
-    if (isLogin) {
-        throw new ApiError(400, "Invalid credentials");
-    }
-
-    const formData = req.body;
 
     const company = await Company.create({
-        companyName: formData.companyName,
-        companyType: formData.companyType,
-        companySize: formData.companySize,
-        email: formData.email,
+        companyName: companyName,
+        companyType: companyType,
+        companySize: companySize,
+        email: email,
         mobile: "",
         address: "",
         startTime: "",
@@ -243,8 +221,8 @@ export const registerUser = asyncHandler(async (req, res) => {
 
     const user = await User.create({
         companyId: company._id,
-        fullName: formData.fullName,
-        email: formData.email,
+        fullName: fullName,
+        email: email,
         avatar: "",
         userType: "owner",
         googleId: "",
@@ -252,7 +230,9 @@ export const registerUser = asyncHandler(async (req, res) => {
         refreshToken: "",
     });
 
-    const userInfo = await User.findById(user._id).select("-__v -refreshToken");
+    const userInfo = await User.findById(user._id).select(
+        "-googleId -refreshToken"
+    );
 
     if (!userInfo) {
         throw new ApiError(
@@ -261,21 +241,8 @@ export const registerUser = asyncHandler(async (req, res) => {
         );
     }
 
-    const otpSecret = {
-        email: email,
-        otp: otp,
-        isLogin: true,
-    };
-
-    const options = {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Lax",
-    };
-
     return res
         .status(201)
-        .cookie("otpSecret", otpSecret, options)
         .json(
             new ApiResponse(
                 200,
