@@ -44,8 +44,6 @@ export const sendOtp = asyncHandler(async (req, res) => {
             sameSite: "Lax",
         };
 
-        console.log(options);
-
         return res
             .status(201)
             .cookie("otpSecret", otpSecret, options)
@@ -63,7 +61,9 @@ export const sendOtp = asyncHandler(async (req, res) => {
 
 // send otp email
 export const verifyOtp = asyncHandler(async (req, res) => {
-    if (!req.cookies.otpSecret) {
+    console.log(req.cookies);
+
+    if (!req.cookies?.otpSecret) {
         throw new ApiError(400, "Invalid credentials");
     }
 
