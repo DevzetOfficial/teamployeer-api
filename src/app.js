@@ -13,6 +13,8 @@ app.use(favicon(path.resolve("./public/favicon.ico")));
 
 app.set("trust proxy", 1);
 
+console.log(process.env.CORS_ORIGIN);
+
 // Set Access Origin
 app.use(
     cors({
