@@ -40,8 +40,10 @@ export const sendOtp = asyncHandler(async (req, res) => {
         const options = {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "None",
+            sameSite: "Lax",
         };
+
+        console.log(options);
 
         return res
             .status(201)
