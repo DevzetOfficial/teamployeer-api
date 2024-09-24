@@ -14,12 +14,14 @@ app.use(favicon(path.resolve("./public/favicon.ico")));
 app.set("trust proxy", 1);
 
 // Set Access Origin
-app.use(
+/* app.use(
     cors({
         origin: process.env.CORS_ORIGIN,
         credentials: true,
     })
-);
+); */
+
+app.use(cors());
 
 // Set security HTTP headers
 app.use(helmet());

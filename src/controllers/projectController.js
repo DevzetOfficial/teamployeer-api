@@ -66,8 +66,6 @@ export const getAllData = asyncHandler(async (req, res) => {
         .lean();
 
     const newProjects = projects.map((row) => {
-        console.log(row);
-
         return {
             ...row,
             progress: 0,
@@ -165,7 +163,7 @@ export const updateData = asyncHandler(async (req, res) => {
 
     const filters = { companyId: companyId, _id: req.params.id };
 
-    const projectInfo = await Project.findOne(filters);
+    const projectInfo = await Project.findOne(filters).lean();
 
     if (!projectInfo) {
         throw new ApiError(400, "Project not found");
@@ -205,13 +203,13 @@ export const deleteData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
     const filters = { companyId: companyId, _id: req.params.id };
 
-    const team = await Project.findOne(filters);
+    const project = await Project.findOne(filters);
 
-    if (!team) {
+    if (!project) {
         throw new ApiError(404, "Project not found");
     }
 
-    await Project.findOneAndDelete(filters);
+    await Project.findByIdAndDelete(project._id);
 
     return res
         .status(200)
