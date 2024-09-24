@@ -2,10 +2,10 @@ import mongoose, { Schema } from "mongoose";
 
 const subtaskSchema = new Schema(
     {
-        companyId: {
+        taskId: {
             type: mongoose.Schema.Types.ObjectId,
-            required: [true, "Comapny is required"],
-            ref: "Company",
+            required: [true, "Task is required"],
+            ref: "Task",
             index: true,
         },
         name: {
@@ -13,12 +13,14 @@ const subtaskSchema = new Schema(
             required: [true, "Team name is required"],
             trim: true,
         },
-        employees: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Employee",
-            },
-        ],
+        description: {
+            type: String,
+            trim: true,
+        },
+        status: {
+            type: String,
+            trim: true,
+        },
     },
     {
         timestamps: true,

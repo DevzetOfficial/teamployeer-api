@@ -8,15 +8,26 @@ const scrumboardSchema = new Schema(
             ref: "Company",
             index: true,
         },
+        projectId: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: [true, "Project is required"],
+            ref: "Project",
+            index: true,
+        },
         name: {
             type: String,
-            required: [true, "Team name is required"],
+            required: [true, "Name is required"],
             trim: true,
         },
-        employees: [
+        color: {
+            type: String,
+            required: [true, "Color is required"],
+            trim: true,
+        },
+        tasks: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "Employee",
+                ref: "Task",
             },
         ],
     },
