@@ -22,11 +22,7 @@ app.use(
 );
 
 // Define the allowed origins
-const allowedOrigins = [
-    "http://localhost:3000",
-    "http://localhost:3050",
-    "https://app.teamployeer.com",
-];
+const allowedOrigins = ["http://localhost:3000", "https://app.teamployeer.com"];
 
 // Set up CORS middleware with dynamic origin
 app.use(
