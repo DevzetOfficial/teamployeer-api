@@ -14,11 +14,20 @@ app.use(favicon(path.resolve("./public/favicon.ico")));
 app.set("trust proxy", 1);
 
 // Set Access Origin
-const allowedOrigins = ["http://localhost:3000", "https://app.teamployeer.com"];
 
+const allowedOrigins = ["http://localhost:3000", "https://app.teamployeer.com"];
 app.use(
     cors({
+        origin: allowedOrigins,
+        credentials: true,
+    })
+);
+
+// Set up CORS middleware with dynamic origin
+/* app.use(
+    cors({
         origin: function (origin, callback) {
+
             if (!origin) return callback(null, true);
             if (allowedOrigins.indexOf(origin) !== -1) {
                 callback(null, true);
@@ -29,7 +38,7 @@ app.use(
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
         credentials: true,
     })
-);
+); */
 
 // Set security HTTP headers
 app.use(helmet());
