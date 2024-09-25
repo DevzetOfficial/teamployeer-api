@@ -12,7 +12,7 @@ import {
 
 const route = Router();
 
-route.route("/team").get(getAllData).post(createData);
+route.route("/team").get(authCheck, getAllData).post(authCheck, createData);
 
 route.route("/team/count").get(authCheck, getCountData);
 route.route("/team/members").get(authCheck, getAllMembers);
