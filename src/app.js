@@ -16,29 +16,28 @@ app.set("trust proxy", 1);
 // Set Access Origin
 
 const allowedOrigins = ["http://localhost:3000", "https://app.teamployeer.com"];
-app.use(
+/* app.use(
     cors({
         origin: allowedOrigins,
         credentials: true,
     })
-);
+); */
 
 // Set up CORS middleware with dynamic origin
-/* app.use(
+app.use(
     cors({
         origin: function (origin, callback) {
-            // Allow requests with no origin (like mobile apps, curl requests)
             if (!origin) return callback(null, true);
-
-            // Check if the origin is in the allowed list
             if (allowedOrigins.indexOf(origin) !== -1) {
                 callback(null, true);
             } else {
                 callback(new Error("Not allowed by CORS"));
             }
         },
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+        credentials: true,
     })
-); */
+);
 
 // Set security HTTP headers
 app.use(helmet());
