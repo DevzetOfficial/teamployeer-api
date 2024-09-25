@@ -24,13 +24,13 @@ route.route("/company-types").get(companyTypeList);
 route.route("/company-sizes").get(companySizeList);
 
 // private routs
-route.route("/permissions").get(permissionList);
-route.route("/employee-levels").get(employeeLevelList);
-route.route("/employee-types").get(employeeTypeList);
-route.route("/provation-period").get(provationPeriodList);
-route.route("/offboarding-types").get(offboardingTypeList);
-route.route("/offboarding-reasons").get(offboardingReasonList);
-route.route("/project-status").get(projectStatusList);
-route.route("/leave-status").get(leaveStatusList);
+route.route("/permissions").get(authCheck, permissionList);
+route.route("/employee-levels").get(authCheck, employeeLevelList);
+route.route("/employee-types").get(authCheck, employeeTypeList);
+route.route("/provation-period").get(authCheck, provationPeriodList);
+route.route("/offboarding-types").get(authCheck, offboardingTypeList);
+route.route("/offboarding-reasons").get(authCheck, offboardingReasonList);
+route.route("/project-status").get(authCheck, projectStatusList);
+route.route("/leave-status").get(authCheck, leaveStatusList);
 
 export default route;

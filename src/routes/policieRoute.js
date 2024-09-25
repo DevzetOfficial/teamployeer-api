@@ -4,6 +4,9 @@ import { getData, updateData } from "../controllers/policieController.js";
 
 const route = Router();
 
-route.route("/settings/policies").get(getData).patch(updateData);
+route
+    .route("/settings/policies")
+    .get(authCheck, getData)
+    .patch(authCheck, updateData);
 
 export default route;

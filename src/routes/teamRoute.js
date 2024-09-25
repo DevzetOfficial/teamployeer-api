@@ -14,9 +14,13 @@ const route = Router();
 
 route.route("/team").get(getAllData).post(createData);
 
-route.route("/team/count").get(getCountData);
-route.route("/team/members").get(getAllMembers);
+route.route("/team/count").get(authCheck, getCountData);
+route.route("/team/members").get(authCheck, getAllMembers);
 
-route.route("/team/:id").get(getData).patch(updateData).delete(deleteData);
+route
+    .route("/team/:id")
+    .get(authCheck, getData)
+    .patch(authCheck, updateData)
+    .delete(authCheck, deleteData);
 
 export default route;

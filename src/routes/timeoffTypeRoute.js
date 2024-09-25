@@ -10,12 +10,15 @@ import {
 
 const route = Router();
 
-route.route("/settings/timeoff").get(getAllData).post(createData);
+route
+    .route("/settings/timeoff")
+    .get(authCheck, getAllData)
+    .post(authCheck, createData);
 
 route
     .route("/settings/timeoff/:id")
-    .get(getData)
-    .patch(updateData)
-    .delete(deleteData);
+    .get(authCheck, getData)
+    .patch(authCheck, updateData)
+    .delete(authCheck, deleteData);
 
 export default route;

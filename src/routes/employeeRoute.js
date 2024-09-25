@@ -30,35 +30,35 @@ const route = Router();
 
 route
     .route("/employee")
-    .get(getActiveData)
-    .post(upload.single("avatar"), createData);
+    .get(authCheck, getActiveData)
+    .post(authCheck, upload.single("avatar"), createData);
 
-route.route("/employee/count").get(getCountData);
-route.route("/employee/inactive").get(getInactiveData);
-route.route("/employee/select-list").get(getSelectList);
-route.route("/employee/ratio").get(getEmployeeRatio);
+route.route("/employee/count").get(authCheck, getCountData);
+route.route("/employee/inactive").get(authCheck, getInactiveData);
+route.route("/employee/select-list").get(authCheck, getSelectList);
+route.route("/employee/ratio").get(authCheck, getEmployeeRatio);
 
 route
     .route("/employee/:id")
-    .get(getData)
-    .patch(upload.single("avatar"), updateData)
-    .delete(deleteData);
+    .get(authCheck, getData)
+    .patch(authCheck, upload.single("avatar"), updateData)
+    .delete(authCheck, deleteData);
 
-route.route("/employee/offboarding/:id").patch(updateOffboarding);
+route.route("/employee/offboarding/:id").patch(authCheck, updateOffboarding);
 
 route
     .route("/employee/:employeeId/document")
-    .get(getAllDocument)
-    .post(upload.single("attachment"), documentCreate);
+    .get(authCheck, getAllDocument)
+    .post(authCheck, upload.single("attachment"), documentCreate);
 
 route
     .route("/employee/:employeeId/timeoff")
-    .get(getAllTimeoff)
-    .patch(setEmployeeTimeOff);
+    .get(authCheck, getAllTimeoff)
+    .patch(authCheck, setEmployeeTimeOff);
 
 route
     .route("/employee/:employeeId/document/:id")
-    .patch(updateDocument)
-    .delete(deleteDocument);
+    .patch(authCheck, updateDocument)
+    .delete(authCheck, deleteDocument);
 
 export default route;

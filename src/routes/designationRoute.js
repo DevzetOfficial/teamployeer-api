@@ -14,8 +14,8 @@ route.route("/designation").get(getAllData).post(createData);
 
 route
     .route("/designation/:id")
-    .get(getData)
-    .patch(updateData)
-    .delete(deleteData);
+    .get(authCheck, getData)
+    .patch(authCheck, updateData)
+    .delete(authCheck, deleteData);
 
 export default route;

@@ -15,19 +15,21 @@ const route = Router();
 
 route
     .route("/timeoff")
-    .get(getAllData)
-    .post(upload.array("attachments"), createData);
+    .get(authCheck, getAllData)
+    .post(authCheck, upload.array("attachments"), createData);
 
-route.route("/timeoff/pending").get(getAllData);
-route.route("/timeoff/approved").get(getAllData);
-route.route("/timeoff/declined").get(getAllData);
-route.route("/timeoff/count").get(getCountData);
-route.route("/timeoff/:timeoffId/attachment/:id").delete(deleteAttachment);
+route.route("/timeoff/pending").get(authCheck, getAllData);
+route.route("/timeoff/approved").get(authCheck, getAllData);
+route.route("/timeoff/declined").get(authCheck, getAllData);
+route.route("/timeoff/count").get(authCheck, getCountData);
+route
+    .route("/timeoff/:timeoffId/attachment/:id")
+    .delete(authCheck, deleteAttachment);
 
 route
     .route("/timeoff/:id")
-    .get(getData)
-    .patch(upload.array("attachments"), updateData)
-    .delete(deleteData);
+    .get(authCheck, getData)
+    .patch(authCheck, upload.array("attachments"), updateData)
+    .delete(authCheck, deleteData);
 
 export default route;

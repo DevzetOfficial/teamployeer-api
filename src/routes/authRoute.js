@@ -19,6 +19,6 @@ route.route("/auth/register").post(upload.single("avatar"), registerUser);
 route.route("/auth/login").post(loginUser);
 route.route("/auth/glogin").post(googleLoginUser);
 route.route("/auth/logout").post(authCheck, logoutUser);
-route.route("/auth/refresh-token").post(authCheck, refreshAccessToken);
+route.route("/auth/refresh-token").post(refreshAccessToken);
 
 export default route;

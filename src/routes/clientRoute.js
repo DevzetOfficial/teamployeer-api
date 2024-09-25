@@ -15,16 +15,16 @@ const route = Router();
 
 route
     .route("/client")
-    .get(getActiveData)
-    .post(upload.single("avatar"), createData);
+    .get(authCheck, getActiveData)
+    .post(authCheck, upload.single("avatar"), createData);
 
-route.route("/client/inactive").get(getInactiveData);
-route.route("/client/count").get(getCountData);
+route.route("/client/inactive").get(authCheck, getInactiveData);
+route.route("/client/count").getauthCheck, getCountData;
 
 route
     .route("/client/:id")
-    .get(getData)
-    .patch(upload.single("avatar"), updateData)
-    .delete(deleteData);
+    .get(authCheck, getData)
+    .patch(authCheck, upload.single("avatar"), updateData)
+    .delete(authCheck, deleteData);
 
 export default route;

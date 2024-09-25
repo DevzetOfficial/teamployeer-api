@@ -4,6 +4,9 @@ import { getData, updateData } from "../controllers/systemController.js";
 
 const route = Router();
 
-route.route("/settings/system").get(getData).patch(updateData);
+route
+    .route("/settings/system")
+    .get(authCheck, getData)
+    .patch(authCheck, updateData);
 
 export default route;
