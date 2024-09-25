@@ -100,17 +100,21 @@ export const getCountData = asyncHandler(async (req, res) => {
         },
     ]);
 
-    let active = 0;
-    let inactive = 0;
+    const dataCount = {
+        active: 0,
+        inactive: 0,
+    };
 
-    if (clients) {
+    if (clients.lenth > 0) {
         clients.forEach((row) => {
+            console.log(row);
+
             if (row._id === 1) {
-                active = row.count;
+                dataCount.active = row.count;
             }
 
             if (row._id === 0) {
-                inactive = row.count;
+                dataCount.inactive = row.count;
             }
         });
     }
@@ -118,11 +122,7 @@ export const getCountData = asyncHandler(async (req, res) => {
     return res
         .status(201)
         .json(
-            new ApiResponse(
-                200,
-                { active, inactive },
-                "Client retrieved successfully."
-            )
+            new ApiResponse(200, dataCount, "Client retrieved successfully.")
         );
 });
 

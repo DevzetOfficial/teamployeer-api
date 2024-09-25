@@ -19,7 +19,7 @@ route
     .post(authCheck, upload.single("avatar"), createData);
 
 route.route("/client/inactive").get(authCheck, getInactiveData);
-route.route("/client/count").getauthCheck, getCountData;
+route.route("/client/count").get(authCheck, getCountData);
 
 route
     .route("/client/:id")
