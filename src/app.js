@@ -21,7 +21,8 @@ const allowedOrigins = ["http://localhost:3000", "https://app.teamployeer.com"];
 app.use(
     cors({
         origin: function (origin, callback) {
-            // Allow requests with no origin (like mobile apps, curl requests)
+            console.log(origin);
+
             if (!origin) return callback(null, true);
 
             // Check if the origin is in the allowed list
