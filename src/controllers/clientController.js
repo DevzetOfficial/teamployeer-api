@@ -25,10 +25,8 @@ export const createData = asyncHandler(async (req, res) => {
         uploadAvatar = await uploadOnCloudinary(req.file?.path);
     }
 
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
     const data = {
-        companyId: companyId,
+        companyId: req.user?.companyId,
         clientId: generateCode(7),
         name: formData.name,
         companyName: formData.companyName,
@@ -54,9 +52,7 @@ export const createData = asyncHandler(async (req, res) => {
 });
 
 export const getActiveData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, status: 1 };
+    const filters = { companyId: req.user?.companyId, status: 1 };
 
     const clients = await Client.find(filters).populate({
         path: "country",
@@ -69,9 +65,7 @@ export const getActiveData = asyncHandler(async (req, res) => {
 });
 
 export const getInactiveData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, status: 0 };
+    const filters = { companyId: req.user?.companyId, status: 0 };
 
     const clients = await Client.find(filters).populate({
         path: "country",
@@ -84,12 +78,10 @@ export const getInactiveData = asyncHandler(async (req, res) => {
 });
 
 export const getCountData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
     const clients = await Client.aggregate([
         {
             $match: {
-                companyId: { $eq: objectId(companyId) },
+                companyId: { $eq: req.user?.companyId },
             },
         },
         {
@@ -127,9 +119,7 @@ export const getCountData = asyncHandler(async (req, res) => {
 });
 
 export const getData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const client = await Client.findOne(filters).populate({
         path: "country",
@@ -146,9 +136,7 @@ export const getData = asyncHandler(async (req, res) => {
 });
 
 export const updateData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const clientInfo = await Client.findOne(filters);
 
@@ -177,29 +165,21 @@ export const updateData = asyncHandler(async (req, res) => {
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-    const filters = { _id: req.params.id, companyId: companyId };
+    const filters = { _id: req.params.id, companyId: req.user?.companyId };
 
-    const info = await Client.findOne(filters);
+    const clientInfo = await Client.findOne(filters);
 
-    if (!info) {
+    if (!clientInfo) {
         throw new ApiError(404, "Client not found");
     }
 
-    let client;
-    if (info.status === 0) {
-        client = await Client.findByIdAndUpdate(
-            info.id,
-            { status: 1 },
-            { new: true }
-        );
-    } else {
-        client = await Client.findByIdAndUpdate(
-            info.id,
-            { status: 0 },
-            { new: true }
-        );
-    }
+    const client = await Client.findByIdAndUpdate(
+        clientInfo._id,
+        {
+            status: clientInfo.status === 0 ? 1 : 0,
+        },
+        { new: true }
+    );
 
     return res
         .status(200)

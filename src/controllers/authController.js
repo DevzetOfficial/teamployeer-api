@@ -97,7 +97,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 
     const tokenVerify = await Usertoken.findOne({ email: email, token: otp });
     if (!tokenVerify) {
-        throw new ApiError(400, "Invalid OTP");
+        throw new ApiError(400, "Invalid credentials");
     }
 
     const currentTime = new Date();
@@ -107,7 +107,10 @@ export const loginUser = asyncHandler(async (req, res) => {
 
     const user = await User.findOne({ email: email });
     if (!user) {
-        throw new ApiError(404, "User does not exists");
+        throw new ApiError(
+            404,
+            "The specified user does not exist in our records"
+        );
     }
 
     // delete user token

@@ -12,10 +12,8 @@ export const createData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Team name is required");
     }
 
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
     const data = {
-        companyId: companyId,
+        companyId: req.user?.companyId,
         name: formData.name,
     };
 
@@ -39,9 +37,7 @@ export const createData = asyncHandler(async (req, res) => {
 });
 
 export const getAllData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId };
+    const filters = { companyId: req.user?.companyId };
 
     const teams = await Team.find(filters).select("name");
 
@@ -51,8 +47,7 @@ export const getAllData = asyncHandler(async (req, res) => {
 });
 
 export const getAllMembers = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-    const filters = { companyId: companyId };
+    const filters = { companyId: req.user?.companyId };
 
     const members = await Employee.find(filters)
         .select("employeeId name avatar mobile email")
@@ -66,9 +61,7 @@ export const getAllMembers = asyncHandler(async (req, res) => {
 });
 
 export const getCountData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const teamList = await Team.find({ companyId }).select(
+    const teamList = await Team.find({ companyId: req.user?.companyId }).select(
         "_id name employees"
     );
 
@@ -88,9 +81,7 @@ export const getCountData = asyncHandler(async (req, res) => {
 });
 
 export const getData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const team = await Team.findOne(filters)
         .select("name")
@@ -110,8 +101,7 @@ export const getData = asyncHandler(async (req, res) => {
 });
 
 export const updateData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const formData = req.body;
 
@@ -139,8 +129,7 @@ export const updateData = asyncHandler(async (req, res) => {
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const team = await Team.findOne(filters);
 
