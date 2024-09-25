@@ -14,14 +14,7 @@ app.use(favicon(path.resolve("./public/favicon.ico")));
 app.set("trust proxy", 1);
 
 // Set Access Origin
-app.use(
-    cors({
-        origin: process.env.CORS_ORIGIN,
-        credentials: true,
-    })
-);
 
-// Define the allowed origins
 const allowedOrigins = ["http://localhost:3000", "https://app.teamployeer.com"];
 
 // Set up CORS middleware with dynamic origin
