@@ -11,7 +11,11 @@ import {
 import { Company } from "../models/companyModel.js";
 
 export const getData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
+    if (!req.user?.companyId) {
+        throw new ApiError(400, "Company is required");
+    }
+
+    const companyId = req.user?.companyId;
 
     const comapny = await Company.findById(companyId).select(
         "companyName email mobile address startTime endTime logo"
@@ -27,7 +31,11 @@ export const getData = asyncHandler(async (req, res) => {
 });
 
 export const updateData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
+    if (!req.user?.companyId) {
+        throw new ApiError(400, "Company is required");
+    }
+
+    const companyId = req.user?.companyId;
 
     if (req.body?.email) {
         const existEmail = await Company.findOne({

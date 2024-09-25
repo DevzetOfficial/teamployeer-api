@@ -128,8 +128,8 @@ export const loginUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        //secure: process.env.NODE_ENV === "production",
-        //sameSite: "Lax",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Lax",
     };
 
     return res

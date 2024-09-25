@@ -5,11 +5,9 @@ import { ApiError } from "../utilities/ApiError.js";
 import { Template } from "../models/templateModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
     const data = req.body;
 
-    data.companyId = companyId;
+    data.companyId = req.user?.companyId;
 
     const newTemplate = await Template.create(data);
 
@@ -25,9 +23,7 @@ export const createData = asyncHandler(async (req, res) => {
 });
 
 export const getAllData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId };
+    const filters = { companyId: req.user?.companyId };
 
     const allData = await Template.find(filters)
         .select("name template")
@@ -39,9 +35,7 @@ export const getAllData = asyncHandler(async (req, res) => {
 });
 
 export const getData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const template = await Template.findOne(filters);
 
@@ -57,9 +51,7 @@ export const getData = asyncHandler(async (req, res) => {
 });
 
 export const updateData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const designation = await Template.findOne(filters);
 
@@ -89,9 +81,7 @@ export const updateData = asyncHandler(async (req, res) => {
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const designation = await Template.findOne(filters);
 

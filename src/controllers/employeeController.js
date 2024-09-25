@@ -12,11 +12,9 @@ import { Employee } from "../models/employeeModel.js";
 import { Team } from "../models/teamModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
     const data = req.body;
 
-    data.companyId = companyId;
+    data.companyId = req.user?.companyId;
     data.employeeId = generateCode(5);
 
     if (!data.supervisor) {
@@ -53,9 +51,7 @@ export const createData = asyncHandler(async (req, res) => {
 });
 
 export const getActiveData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, status: 1 };
+    const filters = { companyId: req.user?.companyId, status: 1 };
 
     const employees = await Employee.find(filters)
         .select("employeeId name avatar email mobile onboardingDate")
@@ -72,9 +68,7 @@ export const getActiveData = asyncHandler(async (req, res) => {
 });
 
 export const getInactiveData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, status: 0 };
+    const filters = { companyId: req.user?.companyId, status: 0 };
 
     const clients = await Employee.find(filters)
         .select("employeeId name avatar email mobile onboardingDate")
@@ -132,9 +126,7 @@ export const getCountData = asyncHandler(async (req, res) => {
 });
 
 export const getData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const employee = await Employee.findOne(filters)
         .populate({ path: "employeeType", select: "name" })
@@ -159,9 +151,7 @@ export const getData = asyncHandler(async (req, res) => {
 });
 
 export const updateData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const employeeInfo = await Employee.findOne(filters);
 
@@ -190,9 +180,7 @@ export const updateData = asyncHandler(async (req, res) => {
 });
 
 export const updateOffboarding = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const employeeInfo = await Employee.findOne(filters);
 
@@ -226,9 +214,7 @@ export const updateOffboarding = asyncHandler(async (req, res) => {
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const employeeInfo = await Employee.findOne(filters);
 
@@ -254,9 +240,7 @@ export const deleteData = asyncHandler(async (req, res) => {
 });
 
 export const getSelectList = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, status: 1 };
+    const filters = { companyId: req.user?.companyId, status: 1 };
 
     const employees = await Employee.find(filters)
         .select("name avatar")
@@ -280,13 +264,11 @@ export const getEmployeeRatio = asyncHandler(async (req, res) => {
 });
 
 async function calculateEmployeeRatio(req) {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
     const today = new Date();
 
     const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
 
-    const employeeList = await Employee.find({ companyId: companyId })
+    const employeeList = await Employee.find({ companyId: req.user?.companyId })
         .select("name onboardingDate offboardingDate status")
         .populate({ path: "provationPeriod", select: "name month" });
 

@@ -10,15 +10,13 @@ import {
 import { Project } from "../models/projectModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
     let projectImage;
     if (req.file?.path) {
         projectImage = await uploadOnCloudinary(req.file?.path);
     }
 
     const data = {
-        companyId: companyId,
+        companyId: req.user?.companyId,
         name: req.body.name,
         client: req.body.client,
         projectManager: req.body.projectManager,
@@ -40,9 +38,7 @@ export const createData = asyncHandler(async (req, res) => {
 });
 
 export const getAllData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId };
+    const filters = { companyId: req.user?.companyId };
 
     const segments = getSegments(req.url);
 
@@ -80,12 +76,10 @@ export const getAllData = asyncHandler(async (req, res) => {
 });
 
 export const getCountData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
     const projects = await Project.aggregate([
         {
             $match: {
-                companyId: { $eq: objectId(companyId) },
+                companyId: { $eq: objectId(req.user?.companyId) },
             },
         },
         {
@@ -131,9 +125,7 @@ export const getCountData = asyncHandler(async (req, res) => {
 });
 
 export const getData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const project = await Project.findOne(filters)
         .populate({ path: "client", select: "name source avatar" })
@@ -159,9 +151,7 @@ export const getData = asyncHandler(async (req, res) => {
 });
 
 export const updateData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const projectInfo = await Project.findOne(filters).lean();
 
@@ -200,8 +190,7 @@ export const updateData = asyncHandler(async (req, res) => {
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const project = await Project.findOne(filters);
 

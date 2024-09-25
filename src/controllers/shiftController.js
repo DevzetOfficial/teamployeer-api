@@ -5,8 +5,6 @@ import { ApiError } from "../utilities/ApiError.js";
 import { Shift } from "../models/shiftModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
     const formData = req.body;
 
     let coordinator;
@@ -15,7 +13,7 @@ export const createData = asyncHandler(async (req, res) => {
     }
 
     const storeData = {
-        companyId: companyId,
+        companyId: req.user?.companyId,
         name: formData.name,
         coordinator: coordinator,
         startTime: formData.startTime,
@@ -35,9 +33,7 @@ export const createData = asyncHandler(async (req, res) => {
 });
 
 export const getAllData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId };
+    const filters = { companyId: req.user?.companyId };
 
     const shifts = await Shift.find(filters);
 
@@ -47,8 +43,7 @@ export const getAllData = asyncHandler(async (req, res) => {
 });
 
 export const getData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const shiftInfo = await Shift.findOne(filters);
 
@@ -62,8 +57,7 @@ export const getData = asyncHandler(async (req, res) => {
 });
 
 export const updateData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const shiftInfo = await Shift.findOne(filters);
 
@@ -81,8 +75,7 @@ export const updateData = asyncHandler(async (req, res) => {
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const shiftInfo = await Shift.findOne(filters);
 

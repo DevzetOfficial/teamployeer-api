@@ -5,7 +5,7 @@ import { ApiError } from "../utilities/ApiError.js";
 import { Company } from "../models/companyModel.js";
 
 export const getData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
+    const companyId = req.user?.companyId;
 
     const companyInfo = await Company.findById(companyId);
 
@@ -27,7 +27,7 @@ export const getData = asyncHandler(async (req, res) => {
 });
 
 export const updateData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
+    const companyId = req.user?.companyId;
 
     const companyInfo = await Company.findById({ _id: companyId });
 

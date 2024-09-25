@@ -10,14 +10,12 @@ import { EmployeeDocument } from "../models/employeeDecumentModel.js";
 import { Employee } from "../models/employeeModel.js";
 
 export const documentCreate = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
     if (!req.params?.employeeId) {
         throw new ApiError(400, "Employee id is required");
     }
 
     const data = req.body;
-    data.companyId = companyId;
+    data.companyId = req.user?.companyId;
     data.employeeId = req.params?.employeeId;
 
     data.submitted = Date.now();
@@ -50,9 +48,10 @@ export const documentCreate = asyncHandler(async (req, res) => {
 });
 
 export const getAllDocument = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, employeeId: req.params.employeeId };
+    const filters = {
+        companyId: req.user?.companyId,
+        employeeId: req.params.employeeId,
+    };
 
     const documents = await EmployeeDocument.find(filters);
 
@@ -68,8 +67,6 @@ export const getAllDocument = asyncHandler(async (req, res) => {
 });
 
 export const updateDocument = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
     const { employeeId, id } = req.params;
 
     if (!employeeId) {
@@ -80,7 +77,11 @@ export const updateDocument = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Document id not found");
     }
 
-    const filters = { companyId: companyId, employeeId: employeeId, _id: id };
+    const filters = {
+        companyId: req.user?.companyId,
+        employeeId: employeeId,
+        _id: id,
+    };
 
     const documentInfo = await EmployeeDocument.findOne(filters);
 
@@ -118,10 +119,8 @@ export const updateDocument = asyncHandler(async (req, res) => {
 });
 
 export const deleteDocument = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
     const filters = {
-        companyId: companyId,
+        companyId: req.user?.companyId,
         employeeId: req.params?.employeeId,
         _id: req.params?.id,
     };

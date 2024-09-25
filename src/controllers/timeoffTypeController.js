@@ -5,10 +5,8 @@ import { ApiError } from "../utilities/ApiError.js";
 import { TimeoffType } from "../models/timeoffTypeModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
     const data = req.body;
-    data.companyId = companyId;
+    data.companyId = req.user?.companyId;
 
     const newTimeoffType = await TimeoffType.create(data);
 
@@ -28,9 +26,7 @@ export const createData = asyncHandler(async (req, res) => {
 });
 
 export const getAllData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId };
+    const filters = { companyId: req.user?.companyId };
     const timeoffTypes = await TimeoffType.find(filters)
         .select("name amount")
         .sort({ createdAt: 1 });
@@ -47,9 +43,7 @@ export const getAllData = asyncHandler(async (req, res) => {
 });
 
 export const getData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const timeoffType = await TimeoffType.findOne(filters);
 
@@ -69,9 +63,7 @@ export const getData = asyncHandler(async (req, res) => {
 });
 
 export const updateData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const timeoffType = await TimeoffType.findOne(filters);
 
@@ -103,8 +95,7 @@ export const updateData = asyncHandler(async (req, res) => {
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-    const filters = { _id: req.params.id, companyId: companyId };
+    const filters = { _id: req.params.id, companyId: req.user?.companyId };
 
     const timeoffType = await TimeoffType.findOne(filters);
 

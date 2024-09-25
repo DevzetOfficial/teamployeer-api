@@ -12,15 +12,13 @@ import { Timeoff } from "../models/timeoffModel.js";
 import { TimeoffAttachment } from "../models/timeoffAttachmentModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
     const totalDay = differenceInDays(
         new Date(req.body.endDate),
         new Date(req.body.startDate)
     );
 
     const data = req.body;
-    data.companyId = companyId;
+    data.companyId = req.user?.companyId;
     data.totalDay = totalDay + 1;
     data.attachments = [];
 
@@ -75,9 +73,7 @@ export const createData = asyncHandler(async (req, res) => {
 });
 
 export const getAllData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId };
+    const filters = { companyId: req.user?.companyId };
 
     const segments = getSegments(req.url);
 
@@ -115,12 +111,10 @@ export const getAllData = asyncHandler(async (req, res) => {
 });
 
 export const getCountData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
     const timeOffs = await Timeoff.aggregate([
         {
             $match: {
-                companyId: { $eq: objectId(companyId) },
+                companyId: { $eq: req.user?.companyId },
             },
         },
         {
@@ -166,9 +160,7 @@ export const getCountData = asyncHandler(async (req, res) => {
 });
 
 export const getData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const timeOff = await Timeoff.findOne(filters).populate("attachments");
 
@@ -182,9 +174,7 @@ export const getData = asyncHandler(async (req, res) => {
 });
 
 export const updateData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const timeOffInfo = await Timeoff.findOne(filters);
 
@@ -247,8 +237,7 @@ export const updateData = asyncHandler(async (req, res) => {
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-    const filters = { companyId: companyId, _id: req.params.id };
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
     const timeOffInfo = await Timeoff.findOne(filters);
 
@@ -280,8 +269,7 @@ export const deleteData = asyncHandler(async (req, res) => {
 export const deleteAttachment = asyncHandler(async (req, res) => {
     const { timeoffId, id } = req.params;
 
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-    const filters = { companyId: companyId, _id: timeoffId };
+    const filters = { companyId: req.user?.companyId, _id: timeoffId };
 
     const timeOffInfo = await Timeoff.findOne(filters);
 

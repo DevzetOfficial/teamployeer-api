@@ -7,9 +7,12 @@ import { Timeoff } from "../models/timeoffModel.js";
 import { TimeoffType } from "../models/timeoffTypeModel.js";
 
 export const getAllTimeoff = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
+    const companyId = req.user?.companyId;
 
-    const filters = { companyId: companyId, _id: req.params.employeeId };
+    const filters = {
+        companyId: companyId,
+        _id: req.params.employeeId,
+    };
 
     const employeeInfo = await Employee.findOne(filters);
 
@@ -75,9 +78,10 @@ export const getAllTimeoff = asyncHandler(async (req, res) => {
 });
 
 export const setEmployeeTimeOff = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
-
-    const filters = { companyId: companyId, _id: req.params.employeeId };
+    const filters = {
+        companyId: req.user?.companyId,
+        _id: req.params.employeeId,
+    };
 
     const employeeInfo = await Employee.findOne(filters);
 
