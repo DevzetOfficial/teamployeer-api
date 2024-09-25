@@ -21,7 +21,7 @@ route.route("/project/ongoing").get(authCheck, getAllData);
 route.route("/project/onhold").get(authCheck, getAllData);
 route.route("/project/completed").get(authCheck, getAllData);
 route.route("/project/canceled").get(authCheck, getAllData);
-route.route("/project/count").get(getCountData);
+route.route("/project/count").get(authCheck, getCountData);
 
 route
     .route("/project/:id")
