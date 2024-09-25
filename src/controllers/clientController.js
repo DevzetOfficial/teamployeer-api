@@ -97,10 +97,10 @@ export const getCountData = asyncHandler(async (req, res) => {
         inactive: 0,
     };
 
-    if (clients.lenth > 0) {
-        clients.forEach((row) => {
-            console.log(row);
+    console.log(clients.length);
 
+    if (clients.length > 0) {
+        clients.forEach((row) => {
             if (row._id === 1) {
                 dataCount.active = row.count;
             }
