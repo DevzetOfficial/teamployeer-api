@@ -145,7 +145,73 @@ export const loginUser = asyncHandler(async (req, res) => {
         );
 });
 
-export const googleLoginUser = asyncHandler(async (req, res) => {
+export const registerUser = asyncHandler(async (req, res) => {
+    const { otp, email, fullName, companyName, companyType, companySize } =
+        req.body;
+
+    if (!otp) {
+        throw new ApiError(400, "OTP is required");
+    }
+
+    if (!email) {
+        throw new ApiError(400, "Email is required");
+    }
+
+    const company = await Company.create({
+        companyName: companyName,
+        companyType: companyType,
+        companySize: companySize,
+        email: email,
+        mobile: "",
+        address: "",
+        startTime: "",
+        endTime: "",
+        logo: "",
+    });
+
+    const companyInfo = await Company.findById(company._id).select("-__v");
+
+    if (!companyInfo) {
+        throw new ApiError(
+            500,
+            "Something went wrong while registering the user!"
+        );
+    }
+
+    const user = await User.create({
+        companyId: company._id,
+        fullName: fullName,
+        email: email,
+        avatar: "",
+        userType: "owner",
+        googleId: "",
+        isActive: true,
+        refreshToken: "",
+    });
+
+    const userInfo = await User.findById(user._id).select(
+        "-googleId -refreshToken"
+    );
+
+    if (!userInfo) {
+        throw new ApiError(
+            500,
+            "Something went wrong while registering the user!"
+        );
+    }
+
+    return res
+        .status(201)
+        .json(
+            new ApiResponse(
+                200,
+                { companyInfo, userInfo },
+                "User registered successful."
+            )
+        );
+});
+
+export const googleLogin = asyncHandler(async (req, res) => {
     const { email, googleId } = req.body;
 
     if (!email) {
@@ -189,12 +255,12 @@ export const googleLoginUser = asyncHandler(async (req, res) => {
         );
 });
 
-export const registerUser = asyncHandler(async (req, res) => {
-    const { otp, email, fullName, companyName, companyType, companySize } =
+export const googleReginter = asyncHandler(async (req, res) => {
+    const { googleId, email, fullName, companyName, companyType, companySize } =
         req.body;
 
-    if (!otp) {
-        throw new ApiError(400, "OTP is required");
+    if (!googleId) {
+        throw new ApiError(400, "Google id is required");
     }
 
     if (!email) {
@@ -228,7 +294,7 @@ export const registerUser = asyncHandler(async (req, res) => {
         email: email,
         avatar: "",
         userType: "owner",
-        googleId: "",
+        googleId: googleId,
         isActive: true,
         refreshToken: "",
     });
