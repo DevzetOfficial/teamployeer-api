@@ -7,7 +7,7 @@ import {
     registerUser,
     loginUser,
     googleLogin,
-    googleReginter,
+    googleRegister,
     logoutUser,
     refreshAccessToken,
 } from "../controllers/authController.js";
@@ -19,7 +19,7 @@ route.route("/auth/verify-otp").post(verifyOtp);
 route.route("/auth/register").post(upload.single("avatar"), registerUser);
 route.route("/auth/login").post(loginUser);
 route.route("/auth/glogin").post(googleLogin);
-route.route("/auth/gregister").post(googleReginter);
+route.route("/auth/gregister").post(googleRegister);
 route.route("/auth/logout").post(authCheck, logoutUser);
 route.route("/auth/refresh-token").post(refreshAccessToken);
 

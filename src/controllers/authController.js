@@ -255,7 +255,7 @@ export const googleLogin = asyncHandler(async (req, res) => {
         );
 });
 
-export const googleReginter = asyncHandler(async (req, res) => {
+export const googleRegister = asyncHandler(async (req, res) => {
     const { googleId, email, fullName, companyName, companyType, companySize } =
         req.body;
 
