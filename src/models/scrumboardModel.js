@@ -30,6 +30,9 @@ const scrumboardSchema = new Schema(
                 ref: "Task",
             },
         ],
+        position: {
+            type: Number,
+        },
     },
     {
         timestamps: true,

@@ -8,6 +8,12 @@ const taskSchema = new Schema(
             ref: "Scrumboard",
             index: true,
         },
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: [true, "User id is required"],
+            ref: "User",
+            index: true,
+        },
         name: {
             type: String,
             required: [true, "Task name is required"],
@@ -17,16 +23,36 @@ const taskSchema = new Schema(
             type: String,
             trim: true,
         },
+        priority: {
+            type: String,
+            trim: true,
+        },
         status: {
             type: String,
             trim: true,
         },
+        assignMembers: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Employee",
+            },
+        ],
         subtasks: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Subtask",
             },
         ],
+        dueDate: {
+            type: Date,
+        },
+        isComplete: {
+            type: Boolean,
+            default: false,
+        },
+        position: {
+            type: Number,
+        },
     },
     {
         timestamps: true,

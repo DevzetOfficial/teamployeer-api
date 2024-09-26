@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const subtaskSchema = new Schema(
+const taskAttachmentSchema = new Schema(
     {
         taskId: {
             type: mongoose.Schema.Types.ObjectId,
@@ -16,28 +16,13 @@ const subtaskSchema = new Schema(
         },
         name: {
             type: String,
-            required: [true, "Subtask name is required"],
+            required: [true, "File name is required"],
             trim: true,
         },
-        assignMembers: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Employee",
-            },
-        ],
-        priority: {
+        path: {
             type: String,
+            required: [true, "File path is required"],
             trim: true,
-        },
-        dueDate: {
-            type: Date,
-        },
-        isComplete: {
-            type: Boolean,
-            default: false,
-        },
-        position: {
-            type: Number,
         },
     },
     {
@@ -45,4 +30,7 @@ const subtaskSchema = new Schema(
     }
 );
 
-export const Subtask = mongoose.model("Subtask", subtaskSchema);
+export const TaskAttachment = mongoose.model(
+    "TaskAttachment",
+    taskAttachmentSchema
+);

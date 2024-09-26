@@ -84,7 +84,7 @@ export const verifyOtp = asyncHandler(async (req, res) => {
         );
 });
 
-export const loginUser = asyncHandler(async (req, res) => {
+export const login = asyncHandler(async (req, res) => {
     const { email, otp } = req.body;
 
     if (!email) {
@@ -114,7 +114,7 @@ export const loginUser = asyncHandler(async (req, res) => {
     }
 
     // delete user token
-    Usertoken.findByIdAndDelete(tokenVerify._id);
+    await Usertoken.findByIdAndDelete(tokenVerify._id);
 
     // generate access and refresh token
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
@@ -145,7 +145,7 @@ export const loginUser = asyncHandler(async (req, res) => {
         );
 });
 
-export const registerUser = asyncHandler(async (req, res) => {
+export const register = asyncHandler(async (req, res) => {
     const { otp, email, fullName, companyName, companyType, companySize } =
         req.body;
 
