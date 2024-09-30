@@ -25,6 +25,8 @@ export const createData = asyncHandler(async (req, res) => {
 export const getAllData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId };
 
+    console.log(req.user);
+
     const allData = await Designation.find(filters);
 
     return res

@@ -10,10 +10,13 @@ import {
 
 const route = Router();
 
-route.route("/designation").get(getAllData).post(createData);
+route
+    .route("/settings/designation")
+    .get(authCheck, getAllData)
+    .post(authCheck, createData);
 
 route
-    .route("/designation/:id")
+    .route("/settings/designation/:id")
     .get(authCheck, getData)
     .patch(authCheck, updateData)
     .delete(authCheck, deleteData);

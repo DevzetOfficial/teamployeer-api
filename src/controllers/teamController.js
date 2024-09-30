@@ -83,6 +83,8 @@ export const getCountData = asyncHandler(async (req, res) => {
 export const getData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
+    console.log(filters);
+
     const team = await Team.findOne(filters)
         .select("name")
         .populate({
