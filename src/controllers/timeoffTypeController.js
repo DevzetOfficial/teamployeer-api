@@ -29,7 +29,8 @@ export const getAllData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId };
     const timeoffTypes = await TimeoffType.find(filters)
         .select("name amount")
-        .sort({ createdAt: 1 });
+        .sort({ createdAt: 1 })
+        .lean();
 
     return res
         .status(201)

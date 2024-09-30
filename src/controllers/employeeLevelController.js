@@ -2,14 +2,14 @@ import { asyncHandler } from "../utilities/asyncHandler.js";
 import { ApiResponse } from "../utilities/ApiResponse.js";
 import { ApiError } from "../utilities/ApiError.js";
 
-import { Designation } from "../models/designationModel.js";
+import { EmployeeLevel } from "../models/employeeLevelModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
     const data = req.body;
 
     data.companyId = req.user?.companyId;
 
-    const newData = await Designation.create(data);
+    const newData = await EmployeeLevel.create(data);
 
     if (!newData) {
         throw new ApiError(400, "Invalid credentials");
@@ -18,31 +18,33 @@ export const createData = asyncHandler(async (req, res) => {
     return res
         .status(201)
         .json(
-            new ApiResponse(201, newData, "Designation created successfully")
+            new ApiResponse(201, newData, "Employee Level created successfully")
         );
 });
 
 export const getAllData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId };
 
-    console.log(req.user);
-
-    const allData = await Designation.find(filters).lean();
+    const allData = await EmployeeLevel.find(filters).lean();
 
     return res
         .status(201)
         .json(
-            new ApiResponse(200, allData, "Designation retrieved successfully")
+            new ApiResponse(
+                200,
+                allData,
+                "Employee Level retrieved successfully"
+            )
         );
 });
 
 export const getData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    const designation = await Designation.findOne(filters);
+    const designation = await EmployeeLevel.findOne(filters);
 
     if (!designation) {
-        throw new ApiError(400, "Designation not found");
+        throw new ApiError(400, "Employee Level not found");
     }
 
     return res
@@ -51,7 +53,7 @@ export const getData = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 designation,
-                "Designation retrieved successfully"
+                "Employee Level retrieved successfully"
             )
         );
 });
@@ -59,20 +61,20 @@ export const getData = asyncHandler(async (req, res) => {
 export const updateData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    const designation = await Designation.findOne(filters);
+    const designation = await EmployeeLevel.findOne(filters);
 
     if (!designation) {
-        throw new ApiError(400, "Designation not found");
+        throw new ApiError(400, "Employee Level not found");
     }
 
-    const updateDesignation = await Designation.findByIdAndUpdate(
+    const updateEmployeeLevel = await EmployeeLevel.findByIdAndUpdate(
         designation._id,
         req.body,
         { new: true }
     );
 
-    if (!updateDesignation) {
-        throw new ApiError(404, "Designation not found");
+    if (!updateEmployeeLevel) {
+        throw new ApiError(404, "Employee Level not found");
     }
 
     return res
@@ -80,8 +82,8 @@ export const updateData = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                updateDesignation,
-                "Designation updated successfully."
+                updateEmployeeLevel,
+                "Employee Level updated successfully."
             )
         );
 });
@@ -89,15 +91,15 @@ export const updateData = asyncHandler(async (req, res) => {
 export const deleteData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    const designation = await Designation.findOne(filters);
+    const employeeLevel = await EmployeeLevel.findOne(filters);
 
-    if (!designation) {
-        throw new ApiError(400, "Designation not found");
+    if (!employeeLevel) {
+        throw new ApiError(400, "Employee Level not found");
     }
 
-    await Designation.findOneAndDelete(req.params.id);
+    await EmployeeLevel.findByIdAndDelete(employeeLevel._id);
 
     return res
         .status(200)
-        .json(new ApiResponse(200, {}, "Designation delete successfully"));
+        .json(new ApiResponse(200, {}, "Employee Level delete successfully"));
 });

@@ -81,7 +81,7 @@ export const getAllData = asyncHandler(async (req, res) => {
         filters.status = ucfirst(segments[1]);
     }
 
-    const timeOffs = await Timeoff.find(filters);
+    const timeOffs = await Timeoff.find(filters).lean();
 
     const pendingList = timeOffs.filter((row) => row.status === "Pending");
 

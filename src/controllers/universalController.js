@@ -26,7 +26,7 @@ export const permissionList = asyncHandler(async (req, res) => {
         {
             $sort: { "permissions.position": 1 },
         },
-    ]);
+    ]).lean();
 
     return res
         .status(201)
@@ -43,7 +43,8 @@ export const permissionList = asyncHandler(async (req, res) => {
 export const leaveStatusList = asyncHandler(async (req, res) => {
     const results = await LeaveStatus.find()
         .select("name")
-        .sort({ position: "asc" });
+        .sort({ position: "asc" })
+        .lean();
 
     return res
         .status(201)
@@ -56,7 +57,8 @@ export const leaveStatusList = asyncHandler(async (req, res) => {
 export const projectStatusList = asyncHandler(async (req, res) => {
     const results = await ProjectStatus.find()
         .select("name")
-        .sort({ position: "asc" });
+        .sort({ position: "asc" })
+        .lean();
 
     return res
         .status(201)
@@ -73,7 +75,8 @@ export const projectStatusList = asyncHandler(async (req, res) => {
 export const offboardingReasonList = asyncHandler(async (req, res) => {
     const results = await OffboardingReason.find()
         .select("name")
-        .sort({ position: "asc" });
+        .sort({ position: "asc" })
+        .lean();
 
     return res
         .status(201)
@@ -90,7 +93,8 @@ export const offboardingReasonList = asyncHandler(async (req, res) => {
 export const offboardingTypeList = asyncHandler(async (req, res) => {
     const results = await OffboardingType.find()
         .select("name")
-        .sort({ position: "asc" });
+        .sort({ position: "asc" })
+        .lean();
 
     return res
         .status(201)
@@ -107,7 +111,8 @@ export const offboardingTypeList = asyncHandler(async (req, res) => {
 export const provationPeriodList = asyncHandler(async (req, res) => {
     const provationPeriod = await ProvationPeriod.find()
         .select("name month")
-        .sort({ position: "asc" });
+        .sort({ position: "asc" })
+        .lean();
 
     return res
         .status(201)
@@ -122,7 +127,7 @@ export const provationPeriodList = asyncHandler(async (req, res) => {
 
 // country list
 export const countryList = asyncHandler(async (req, res) => {
-    const countrys = await Country.find().select("name avatar");
+    const countrys = await Country.find().select("name avatar").lean();
 
     return res
         .status(201)
@@ -141,7 +146,7 @@ export const countryInfo = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid credentials");
     }
 
-    const country = await Country.findById(req.params.id);
+    const country = await Country.findById(req.params.id).lean();
 
     if (!country) {
         throw new ApiError(400, "Country not found");
@@ -156,7 +161,8 @@ export const countryInfo = asyncHandler(async (req, res) => {
 export const employeeLevelList = asyncHandler(async (req, res) => {
     const employeeLevel = await EmployeeLevel.find()
         .select("name")
-        .sort({ position: "asc" });
+        .sort({ position: "asc" })
+        .lean();
 
     return res
         .status(201)
@@ -173,7 +179,8 @@ export const employeeLevelList = asyncHandler(async (req, res) => {
 export const employeeTypeList = asyncHandler(async (req, res) => {
     const employeeType = await EmployeeType.find()
         .select("name")
-        .sort({ position: "asc" });
+        .sort({ position: "asc" })
+        .lean();
 
     return res
         .status(201)
@@ -188,7 +195,7 @@ export const employeeTypeList = asyncHandler(async (req, res) => {
 
 // company type list
 export const companyTypeList = asyncHandler(async (req, res) => {
-    const companyType = await CompanyType.find();
+    const companyType = await CompanyType.find().lean();
 
     return res
         .status(201)
@@ -205,7 +212,8 @@ export const companyTypeList = asyncHandler(async (req, res) => {
 export const companySizeList = asyncHandler(async (req, res) => {
     const companySize = await CompanySize.find()
         .select("name")
-        .sort({ position: "asc" });
+        .sort({ position: "asc" })
+        .lean();
 
     return res
         .status(201)

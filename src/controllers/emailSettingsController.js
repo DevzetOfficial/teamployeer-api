@@ -7,7 +7,7 @@ import { Company } from "../models/companyModel.js";
 export const getData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId;
 
-    const companyInfo = await Company.findById(companyId);
+    const companyInfo = await Company.findById(companyId).lean();
 
     if (!companyInfo) {
         throw new ApiError(400, "Company not found");

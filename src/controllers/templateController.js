@@ -27,7 +27,8 @@ export const getAllData = asyncHandler(async (req, res) => {
 
     const allData = await Template.find(filters)
         .select("name template")
-        .sort({ createdAt: 1 });
+        .sort({ createdAt: 1 })
+        .lean();
 
     return res
         .status(201)
@@ -37,7 +38,7 @@ export const getAllData = asyncHandler(async (req, res) => {
 export const getData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    const template = await Template.findOne(filters);
+    const template = await Template.findOne(filters).lean();
 
     if (!template) {
         throw new ApiError(400, "Template not found");
@@ -53,7 +54,7 @@ export const getData = asyncHandler(async (req, res) => {
 export const updateData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    const designation = await Template.findOne(filters);
+    const designation = await Template.findOne(filters).lean();
 
     if (!designation) {
         throw new ApiError(400, "Template not found");
@@ -83,7 +84,7 @@ export const updateData = asyncHandler(async (req, res) => {
 export const deleteData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    const designation = await Template.findOne(filters);
+    const designation = await Template.findOne(filters).lean();
 
     if (!designation) {
         throw new ApiError(400, "Template not found");

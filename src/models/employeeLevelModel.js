@@ -1,14 +1,16 @@
 import mongoose, { Schema } from "mongoose";
 
 const employeeLevelSchema = new Schema({
+    companyId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: [true, "Comapny is required"],
+        ref: "Company",
+        index: true,
+    },
     name: {
         type: String,
-        required: true,
+        required: [true, "Name is required"],
         trim: true,
-    },
-    position: {
-        type: Number,
-        required: true,
     },
 });
 
