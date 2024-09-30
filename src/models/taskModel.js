@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const taskSchema = new Schema(
     {
-        scrumboardId: {
+        scrumboard: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Scrumboard is required"],
             ref: "Scrumboard",
@@ -27,10 +27,6 @@ const taskSchema = new Schema(
             type: String,
             trim: true,
         },
-        status: {
-            type: String,
-            trim: true,
-        },
         assignMembers: [
             {
                 type: mongoose.Schema.Types.ObjectId,
@@ -46,9 +42,9 @@ const taskSchema = new Schema(
         dueDate: {
             type: Date,
         },
-        isComplete: {
-            type: Boolean,
-            default: false,
+        status: {
+            type: String,
+            trim: true,
         },
         position: {
             type: Number,

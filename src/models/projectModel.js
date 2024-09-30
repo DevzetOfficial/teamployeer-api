@@ -49,6 +49,12 @@ const projectSchema = new Schema(
             trim: true,
             index: true,
         },
+        scrumboards: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Scrumboard",
+            },
+        ],
     },
     {
         timestamps: true,

@@ -2,13 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const scrumboardSchema = new Schema(
     {
-        companyId: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: [true, "Comapny is required"],
-            ref: "Company",
-            index: true,
-        },
-        projectId: {
+        project: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Project is required"],
             ref: "Project",
