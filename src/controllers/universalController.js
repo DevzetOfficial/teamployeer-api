@@ -3,7 +3,6 @@ import { ApiResponse } from "../utilities/ApiResponse.js";
 import { ApiError } from "../utilities/ApiError.js";
 
 import { Country } from "../models/countryModel.js";
-import { EmployeeLevel } from "../models/employeeLevelModel.js";
 import { EmployeeType } from "../models/employeeTypeModel.js";
 import { CompanyType } from "../models/companyTypeModel.js";
 import { CompanySize } from "../models/companySizeModel.js";
@@ -155,24 +154,6 @@ export const countryInfo = asyncHandler(async (req, res) => {
     return res
         .status(201)
         .json(new ApiResponse(200, country, "Country retrieved successfully"));
-});
-
-// employee level list
-export const employeeLevelList = asyncHandler(async (req, res) => {
-    const employeeLevel = await EmployeeLevel.find()
-        .select("name")
-        .sort({ position: "asc" })
-        .lean();
-
-    return res
-        .status(201)
-        .json(
-            new ApiResponse(
-                200,
-                employeeLevel,
-                "Employee level retrieved successfully"
-            )
-        );
 });
 
 // employee type list

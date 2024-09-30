@@ -70,16 +70,19 @@ export const getActiveData = asyncHandler(async (req, res) => {
 export const getInactiveData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, status: 0 };
 
-    const clients = await Employee.find(filters)
+    const employees = await Employee.find(filters)
         .select("employeeId name avatar email mobile onboardingDate")
         .populate({ path: "designation", select: "name" })
         .populate({ path: "shift", select: "name" })
         .populate({ path: "provationPeriod", select: "name month" })
-        .populate({ path: "supervisor", select: "name avatar" });
+        .populate({ path: "supervisor", select: "name avatar" })
+        .lean();
 
     return res
         .status(201)
-        .json(new ApiResponse(200, clients, "Employee retrieved successfully"));
+        .json(
+            new ApiResponse(200, employees, "Employee retrieved successfully")
+        );
 });
 
 export const getCountData = asyncHandler(async (req, res) => {
@@ -137,7 +140,8 @@ export const getData = asyncHandler(async (req, res) => {
         .populate({ path: "shift", select: "name" })
         .populate({ path: "offboardingType", select: "name" })
         .populate({ path: "reason", select: "name" })
-        .populate({ path: "supervisor", select: "name avatar" });
+        .populate({ path: "supervisor", select: "name avatar" })
+        .lean();
 
     if (!employee) {
         throw new ApiError(400, "Employee not found");
@@ -153,7 +157,7 @@ export const getData = asyncHandler(async (req, res) => {
 export const updateData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    const employeeInfo = await Employee.findOne(filters);
+    const employeeInfo = await Employee.findOne(filters).lean();
 
     if (!employeeInfo) {
         throw new ApiError(404, "Employee not found");
@@ -182,7 +186,7 @@ export const updateData = asyncHandler(async (req, res) => {
 export const updateOffboarding = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    const employeeInfo = await Employee.findOne(filters);
+    const employeeInfo = await Employee.findOne(filters).lean();
 
     if (!employeeInfo) {
         throw new ApiError(404, "Employee not found");
@@ -204,7 +208,7 @@ export const updateOffboarding = asyncHandler(async (req, res) => {
 
     data.status = 0;
 
-    const employee = await Employee.findOneAndUpdate(filters, data, {
+    const employee = await Employee.findByIdAndUpdate(employeeInfo._id, data, {
         new: true,
     });
 

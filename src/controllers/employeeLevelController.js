@@ -25,7 +25,7 @@ export const createData = asyncHandler(async (req, res) => {
 export const getAllData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId };
 
-    const allData = await EmployeeLevel.find(filters).lean();
+    const allData = await EmployeeLevel.find(filters).select("name").lean();
 
     return res
         .status(201)
@@ -41,7 +41,9 @@ export const getAllData = asyncHandler(async (req, res) => {
 export const getData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    const designation = await EmployeeLevel.findOne(filters);
+    const designation = await EmployeeLevel.findOne(filters)
+        .select("name")
+        .lean();
 
     if (!designation) {
         throw new ApiError(400, "Employee Level not found");

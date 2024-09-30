@@ -5,7 +5,6 @@ import {
     countryInfo,
     companyTypeList,
     companySizeList,
-    employeeLevelList,
     employeeTypeList,
     provationPeriodList,
     offboardingTypeList,
@@ -25,7 +24,6 @@ route.route("/company-sizes").get(companySizeList);
 
 // private routs
 route.route("/permissions").get(authCheck, permissionList);
-route.route("/employee-levels").get(authCheck, employeeLevelList);
 route.route("/employee-types").get(authCheck, employeeTypeList);
 route.route("/provation-period").get(authCheck, provationPeriodList);
 route.route("/offboarding-types").get(authCheck, offboardingTypeList);

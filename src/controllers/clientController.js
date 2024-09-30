@@ -40,7 +40,7 @@ export const createData = asyncHandler(async (req, res) => {
         note: formData.note,
     };
 
-    const newClient = await Client.create(data);
+    const newClient = await Client.create(data).lean();
 
     if (!newClient) {
         throw new ApiError(400, "Invalid credentials");
@@ -54,10 +54,12 @@ export const createData = asyncHandler(async (req, res) => {
 export const getActiveData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, status: 1 };
 
-    const clients = await Client.find(filters).populate({
-        path: "country",
-        select: "name avatar",
-    });
+    const clients = await Client.find(filters)
+        .populate({
+            path: "country",
+            select: "name avatar",
+        })
+        .lean();
 
     return res
         .status(201)
@@ -67,10 +69,12 @@ export const getActiveData = asyncHandler(async (req, res) => {
 export const getInactiveData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, status: 0 };
 
-    const clients = await Client.find(filters).populate({
-        path: "country",
-        select: "name avatar",
-    });
+    const clients = await Client.find(filters)
+        .populate({
+            path: "country",
+            select: "name avatar",
+        })
+        .lean();
 
     return res
         .status(201)
