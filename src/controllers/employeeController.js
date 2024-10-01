@@ -61,8 +61,6 @@ export const getActiveData = asyncHandler(async (req, res) => {
         .populate({ path: "supervisor", select: "name avatar" })
         .lean();
 
-    console.log(employees, filters);
-
     return res
         .status(201)
         .json(
