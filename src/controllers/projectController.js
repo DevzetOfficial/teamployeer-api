@@ -8,6 +8,7 @@ import {
 } from "../utilities/cloudinary.js";
 
 import { Project } from "../models/projectModel.js";
+import { Scrumboard } from "../models/scrumboardModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
     let projectImage;
@@ -125,7 +126,10 @@ export const getCountData = asyncHandler(async (req, res) => {
 });
 
 export const getData = asyncHandler(async (req, res) => {
-    const filters = { companyId: req.user?.companyId, _id: req.params.id };
+    const companyId = req.user?.companyId;
+    const projectId = req.params.id;
+
+    const filters = { companyId: companyId, _id: projectId };
 
     const project = await Project.findOne(filters)
         .populate({ path: "client", select: "name source avatar" })
@@ -143,6 +147,12 @@ export const getData = asyncHandler(async (req, res) => {
 
     if (!project) {
         throw new ApiError(400, "Project not found");
+    }
+
+    const scrumboards = Scrumboard.find({ project: project._id });
+
+    if (!scrumboards) {
+        console.log(scrumboards);
     }
 
     return res

@@ -58,7 +58,10 @@ export const getActiveData = asyncHandler(async (req, res) => {
         .populate({ path: "designation", select: "name" })
         .populate({ path: "shift", select: "name" })
         .populate({ path: "provationPeriod", select: "name month" })
-        .populate({ path: "supervisor", select: "name avatar" });
+        .populate({ path: "supervisor", select: "name avatar" })
+        .lean();
+
+    console.log(employees, filters);
 
     return res
         .status(201)
