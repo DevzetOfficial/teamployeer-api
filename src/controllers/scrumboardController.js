@@ -2,151 +2,97 @@ import { asyncHandler } from "../utilities/asyncHandler.js";
 import { ApiResponse } from "../utilities/ApiResponse.js";
 import { ApiError } from "../utilities/ApiError.js";
 
-import { Scrumboard } from "../models/scrumboardModel.js";
 import { Project } from "../models/projectModel.js";
+import { Scrumboard } from "../models/scrumboardModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
-    const { projectId, name, color } = req.body;
-
     const companyId = req.user?.companyId;
+    const projectId = req.params?.projectId;
 
-    const projectInfo = await Project.findOne({
+    const project = await Project.findOne({
         _id: projectId,
         companyId: companyId,
     });
 
-    if (!projectInfo) {
-        throw new ApiError(400, "Project not found");
+    if (!project) {
+        throw new ApiError(404, "Project not found");
     }
 
-    const scrumboardCount = await Scrumboard.countDocuments({
-        companyId: companyId,
-        projectId: projectId,
-    });
+    const scrumboardData = req.body;
 
-    const data = {
-        companyId: companyId,
-        projectId: projectId,
-        name: name,
-        color: color,
-        position: scrumboardCount + 1,
-        tasks: [],
-    };
+    scrumboardData.project = projectId;
 
-    const newScrumboard = await Scrumboard.create(data);
-
-    if (!newScrumboard) {
-        throw new ApiError(400, "Invalid credentials");
-    }
+    const scrumboar = await Scrumboard.create(scrumboardData);
 
     return res
         .status(201)
+        .json(new ApiResponse(201, scrumboar, "Task created successfully"));
+});
+
+export const updateData = asyncHandler(async (req, res) => {
+    const scrumboardId = req.body?.scrumboardId;
+    const projectId = req.params?.projectId;
+
+    const scrumboar = await Scrumboard.findOne({
+        _id: scrumboardId,
+        project: projectId,
+    });
+
+    if (!scrumboar) {
+        throw new ApiError(404, "Scrumboard not found");
+    }
+
+    delete req.body.scrumboardId;
+
+    const updateScrumboard = await Scrumboard.findByIdAndUpdate(
+        scrumboardId,
+        req.body,
+        {
+            new: true,
+        }
+    );
+
+    return res
+        .status(200)
         .json(
             new ApiResponse(
-                201,
-                newScrumboard,
-                "Scrumboard create successfully."
+                200,
+                updateScrumboard,
+                "Scrumboard updated successfully"
             )
         );
 });
 
-export const getAllData = asyncHandler(async (req, res) => {
-    const filters = { companyId: req.user?.companyId, status: 1 };
-
-    const clients = await Client.find(filters).populate({
-        path: "country",
-        select: "name avatar",
-    });
-
-    return res
-        .status(201)
-        .json(new ApiResponse(200, clients, "Client retrieved successfully."));
-});
-
-export const getCountData = asyncHandler(async (req, res) => {
-    const clients = await Client.aggregate([
-        {
-            $match: {
-                companyId: { $eq: req.user?.companyId },
-            },
-        },
-        {
-            $group: {
-                _id: "$status",
-                count: { $sum: 1 },
-            },
-        },
-    ]);
-
-    const clientCount = {
-        active: 0,
-        inactive: 0,
-    };
-
-    if (clients.length > 0) {
-        clients.forEach((row) => {
-            if (row._id === 1) {
-                clientCount.active = row.count;
-            }
-
-            if (row._id === 0) {
-                clientCount.inactive = row.count;
-            }
-        });
-    }
-
-    return res
-        .status(201)
-        .json(
-            new ApiResponse(200, clientCount, "Client retrieved successfully.")
-        );
-});
-
-export const updateData = asyncHandler(async (req, res) => {
-    const filters = { companyId: req.user?.companyId, _id: req.params.id };
-
-    const clientInfo = await Client.findOne(filters);
-
-    if (!clientInfo) {
-        throw new ApiError(400, "Client not found");
-    }
-
-    const data = req.body;
-
-    if (req.file && req.file?.path) {
-        const uploadAvatar = await uploadOnCloudinary(req.file?.path);
-        data.avatar = uploadAvatar?.url || "";
-
-        if (clientInfo && clientInfo.avatar) {
-            await destroyOnCloudinary(clientInfo.avatar);
-        }
-    }
-
-    const client = await Client.findByIdAndUpdate(clientInfo._id, data, {
-        new: true,
-    });
-
-    return res
-        .status(200)
-        .json(new ApiResponse(200, client, "Client updated successfully"));
-});
-
 export const deleteData = asyncHandler(async (req, res) => {
-    const filters = { _id: req.params.id, companyId: req.user?.companyId };
+    const scrumboardId = req.body?.scrumboardId;
+    const projectId = req.params?.projectId;
 
-    const clientInfo = await Client.findOne(filters);
+    const scrumboar = await Scrumboard.findOne({
+        _id: scrumboardId,
+        project: projectId,
+    });
 
-    if (!clientInfo) {
-        throw new ApiError(404, "Client not found");
+    if (!scrumboar) {
+        throw new ApiError(404, "Scrumboard not found");
     }
 
-    const client = await Client.findByIdAndUpdate(
-        clientInfo._id,
-        {
-            status: clientInfo.status === 0 ? 1 : 0,
-        },
-        { new: true }
-    );
+    // task ids
+    const taskItes = await Task.find({
+        scrumboard: { $in: scrumboardId },
+    })
+        .select("_id")
+        .lean()
+        .then((tasks) => tasks.map((task) => task._id));
+
+    // delete task, taskComment, taskAttachment
+    if (taskItes.length > 0) {
+        await Task.deleteMany({ _id: { $in: taskItes } });
+        await TaskComment.deleteMany({ task: { $in: taskItes } });
+        await TaskAttachment.deleteMany({ task: { $in: taskItes } });
+    }
+
+    // delete scrumboard
+    await Scrumboard.findByIdAndDelete(scrumboardId);
 
     return res
         .status(200)

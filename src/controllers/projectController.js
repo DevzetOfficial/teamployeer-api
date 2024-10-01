@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utilities/asyncHandler.js";
 import { ApiResponse } from "../utilities/ApiResponse.js";
 import { ApiError } from "../utilities/ApiError.js";
-import { objectId, getSegments, ucfirst } from "../utilities/helper.js";
+import { getSegments, ucfirst } from "../utilities/helper.js";
 import {
     uploadOnCloudinary,
     destroyOnCloudinary,
@@ -9,6 +9,9 @@ import {
 
 import { Project } from "../models/projectModel.js";
 import { Scrumboard } from "../models/scrumboardModel.js";
+import { Task } from "../models/taskModel.js";
+import { TaskAttachment } from "../models/taskAttachmentModel.js";
+import { TaskComment } from "../models/taskCommentModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
     let projectImage;
@@ -23,6 +26,7 @@ export const createData = asyncHandler(async (req, res) => {
         projectManager: req.body.projectManager,
         submissionDate: req.body.submissionDate,
         assignMembers: req.body?.assignMembers || [],
+        scrumboards: [],
         projectImage: projectImage?.url || "",
         description: req.body?.description || "",
     };
@@ -80,7 +84,7 @@ export const getCountData = asyncHandler(async (req, res) => {
     const projects = await Project.aggregate([
         {
             $match: {
-                companyId: { $eq: objectId(req.user?.companyId) },
+                companyId: { $eq: req.user?.companyId },
             },
         },
         {
@@ -128,7 +132,6 @@ export const getCountData = asyncHandler(async (req, res) => {
 export const getData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId;
     const projectId = req.params.id;
-
     const filters = { companyId: companyId, _id: projectId };
 
     const project = await Project.findOne(filters)
@@ -149,15 +152,86 @@ export const getData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Project not found");
     }
 
-    const scrumboards = Scrumboard.find({ project: project._id });
+    const scrumboardExist = await Scrumboard.find({ project: project._id });
 
-    if (!scrumboards) {
-        console.log(scrumboards);
+    //if not exists scrumboard then create default scrumboard
+    if (scrumboardExist.length === 0) {
+        const defaultScrumboards = [
+            {
+                project: project._id,
+                name: "To Do",
+                color: "#E9EAEC",
+                tasks: [],
+                position: 1,
+            },
+            {
+                project: project._id,
+                name: "In Progress",
+                color: "#CCE0FF",
+                tasks: [],
+                position: 2,
+            },
+            {
+                project: project._id,
+                name: "In Review",
+                color: "#FFDEB8",
+                tasks: [],
+                position: 3,
+            },
+            {
+                project: project._id,
+                name: "Complete",
+                color: "#CCE7DE",
+                tasks: [],
+                position: 4,
+            },
+        ];
+
+        await Scrumboard.create(defaultScrumboards);
     }
+
+    const scrumboards = await Scrumboard.find({
+        project: project._id,
+    })
+        .select("name color tasks")
+        .sort({ position: 1 })
+        .populate({
+            path: "tasks",
+            populate: [
+                {
+                    path: "user",
+                    model: "User",
+                    select: "fullName avatar",
+                },
+                {
+                    path: "assignMembers",
+                    model: "Employee",
+                    select: "name avatar",
+                },
+                {
+                    path: "subtasks",
+                    model: "Subtask",
+                },
+                {
+                    path: "attachments",
+                    model: "TaskAttachment",
+                },
+                {
+                    path: "comments",
+                    model: "TaskComment",
+                },
+            ],
+        });
 
     return res
         .status(200)
-        .json(new ApiResponse(200, project, "Project retrieved successfully"));
+        .json(
+            new ApiResponse(
+                200,
+                { project, scrumboards },
+                "Project retrieved successfully"
+            )
+        );
 });
 
 export const updateData = asyncHandler(async (req, res) => {
@@ -206,6 +280,31 @@ export const deleteData = asyncHandler(async (req, res) => {
 
     if (!project) {
         throw new ApiError(404, "Project not found");
+    }
+
+    // scrumboard ids
+    const scrumboardIds = await Scrumboard.find({ project: project._id })
+        .select("_id")
+        .lean()
+        .then((scrumboards) => scrumboards.map((scrumboard) => scrumboard._id));
+
+    // task ids
+    const taskItes = await Task.find({
+        scrumboard: { $in: scrumboardIds },
+    })
+        .select("_id")
+        .lean()
+        .then((tasks) => tasks.map((task) => task._id));
+
+    // delete task, taskComment, taskAttachment
+    if (taskItes.length > 0) {
+        await Task.deleteMany({ _id: { $in: taskItes } });
+        await TaskComment.deleteMany({ task: { $in: taskItes } });
+        await TaskAttachment.deleteMany({ task: { $in: taskItes } });
+    }
+
+    if (scrumboardIds.length > 0) {
+        await Scrumboard.deleteMany({ _id: { $in: scrumboardIds } });
     }
 
     await Project.findByIdAndDelete(project._id);

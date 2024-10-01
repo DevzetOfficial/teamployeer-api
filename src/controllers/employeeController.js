@@ -248,7 +248,7 @@ export const getSelectList = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, status: 1 };
 
     const employees = await Employee.find(filters)
-        .select("name avatar")
+        .select("name email avatar")
         .populate({ path: "team", select: "name" });
 
     return res

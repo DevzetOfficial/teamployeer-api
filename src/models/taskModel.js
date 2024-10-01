@@ -39,6 +39,18 @@ const taskSchema = new Schema(
                 ref: "Subtask",
             },
         ],
+        attachments: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "TaskAttachment",
+            },
+        ],
+        comments: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "TaskComment",
+            },
+        ],
         dueDate: {
             type: Date,
         },
