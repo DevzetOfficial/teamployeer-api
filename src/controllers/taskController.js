@@ -50,7 +50,6 @@ export const createTask = asyncHandler(async (req, res) => {
         assignMembers: req.body?.assignMembers || [],
         subtasks: req.body?.subtasks || [],
         dueDate: req.body?.dueDate || "",
-        status: req.body?.status || "",
     };
 
     const newTask = await Task.create(taskData);
@@ -94,56 +93,9 @@ export const getData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Project not found");
     }
 
-    const scrumboardExist = await Scrumboard.find({ project: project._id });
-
-    if (scrumboardExist.length === 0) {
-        const defaultScrumboards = [
-            {
-                project: project._id,
-                name: "To Do",
-                color: "#E9EAEC",
-                tasks: [],
-                position: 1,
-            },
-            {
-                project: project._id,
-                name: "In Progress",
-                color: "#CCE0FF",
-                tasks: [],
-                position: 2,
-            },
-            {
-                project: project._id,
-                name: "In Review",
-                color: "#FFDEB8",
-                tasks: [],
-                position: 3,
-            },
-            {
-                project: project._id,
-                name: "Complete",
-                color: "#CCE7DE",
-                tasks: [],
-                position: 4,
-            },
-        ];
-
-        await Scrumboard.create(defaultScrumboards);
-    }
-
-    const scrumboards = await Scrumboard.find({
-        project: project._id,
-    }).select("name color tasks");
-
     return res
         .status(200)
-        .json(
-            new ApiResponse(
-                200,
-                { project, scrumboards },
-                "Project retrieved successfully"
-            )
-        );
+        .json(new ApiResponse(200, project, "Project retrieved successfully"));
 });
 
 export const updateTask = asyncHandler(async (req, res) => {

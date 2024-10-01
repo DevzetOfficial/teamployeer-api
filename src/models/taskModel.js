@@ -56,7 +56,13 @@ const taskSchema = new Schema(
         },
         status: {
             type: String,
-            trim: true,
+            required: [true, "Status is required"],
+            enum: {
+                values: ["Low", "Medium", "High", "Urgent"],
+                message: "{VALUE} is not a valid status",
+            },
+            default: "Low",
+            index: true,
         },
         position: {
             type: Number,
