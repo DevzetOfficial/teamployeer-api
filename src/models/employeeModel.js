@@ -139,9 +139,6 @@ const employeeSchema = new Schema(
             default: 1,
             enum: [0, 1],
         },
-        status: {
-            type: Number,
-        },
         timeoffDate: {
             type: Schema.Types.Mixed,
             trim: true,
