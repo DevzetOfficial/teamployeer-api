@@ -4,7 +4,7 @@ import { upload } from "../middlewares/multerMiddleware.js";
 import {
     createData,
     getData,
-    updateTask,
+    updateData,
     deleteData,
 } from "../controllers/taskController.js";
 
@@ -17,15 +17,14 @@ route.route("/project/:projectId/task").post(authCheck, createData);
     .post(authCheck, createTask); */
 
 route
-    .route("/project/:projectId/task/:id")
+    .route("/project/:projectId/scrumboard/:scrumboardId/task/:id")
     .get(authCheck, getData)
-    .put(authCheck, updateTask)
+    .put(authCheck, updateData)
     .delete(authCheck, deleteData);
 
-route
+/* route
     .route("/project/:projectId/task")
     .get(authCheck, getData)
-    .put(authCheck, updateTask)
-    .delete(authCheck, deleteData);
+    .delete(authCheck, deleteData); */
 
 export default route;

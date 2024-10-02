@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const subtaskSchema = new Schema(
     {
-        task: {
+        taskId: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Task is required"],
             ref: "Task",
@@ -44,5 +44,16 @@ const subtaskSchema = new Schema(
         timestamps: true,
     }
 );
+
+subtaskSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: "user",
+        select: "fullName avatar",
+    }).populate({
+        path: "members",
+        select: "name avatar",
+    });
+    next();
+});
 
 export const Subtask = mongoose.model("Subtask", subtaskSchema);

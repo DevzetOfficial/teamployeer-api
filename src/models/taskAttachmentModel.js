@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const taskAttachmentSchema = new Schema(
     {
-        task: {
+        taskId: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Task is required"],
             ref: "Task",
@@ -29,6 +29,14 @@ const taskAttachmentSchema = new Schema(
         timestamps: true,
     }
 );
+
+taskAttachmentSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: "user",
+        select: "fullName avatar",
+    });
+    next();
+});
 
 export const TaskAttachment = mongoose.model(
     "TaskAttachment",

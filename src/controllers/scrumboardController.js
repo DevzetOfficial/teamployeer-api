@@ -138,9 +138,9 @@ export const deleteData = asyncHandler(async (req, res) => {
     // delete task, taskComment, taskAttachment
     if (taskIdes.length > 0) {
         await Task.deleteMany({ _id: { $in: taskIdes } });
-        await Subtask.deleteMany({ task: { $in: taskIdes } });
-        await TaskComment.deleteMany({ task: { $in: taskIdes } });
-        await TaskAttachment.deleteMany({ task: { $in: taskIdes } });
+        await Subtask.deleteMany({ taskId: { $in: taskIdes } });
+        await TaskComment.deleteMany({ taskId: { $in: taskIdes } });
+        await TaskAttachment.deleteMany({ taskId: { $in: taskIdes } });
     }
 
     // delete scrumboard

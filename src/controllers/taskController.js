@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utilities/asyncHandler.js";
 import { ApiResponse } from "../utilities/ApiResponse.js";
 import { ApiError } from "../utilities/ApiError.js";
-import { objectId, getSegments, ucfirst } from "../utilities/helper.js";
+
 import {
     uploadOnCloudinary,
     destroyOnCloudinary,
@@ -13,6 +13,7 @@ import { Task } from "../models/taskModel.js";
 import { Subtask } from "../models/subtaskModel.js";
 import { TaskAttachment } from "../models/taskAttachmentModel.js";
 import { TaskComment } from "../models/taskCommentModel.js";
+import { populate } from "dotenv";
 
 export const createData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId;
@@ -65,11 +66,7 @@ export const createData = asyncHandler(async (req, res) => {
     }
 
     // task push in scrumboard
-    await Scrumboard.findByIdAndUpdate(
-        scrumboardId,
-        { $push: { tasks: newTask._id } },
-        { new: true }
-    );
+    await addTaskToScrumboard(scrumboardId, newTask._id);
 
     return res
         .status(201)
@@ -77,36 +74,38 @@ export const createData = asyncHandler(async (req, res) => {
 });
 
 export const getData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId;
-    const projectId = req.params.id;
-    const filters = { companyId: companyId, _id: projectId };
+    const taskId = req.params.id;
+    const scrumboardId = req.params?.scrumboardId;
 
-    const project = await Project.findOne(filters)
-        .populate({ path: "client", select: "title source avatar" })
-        .populate({ path: "projectManager", select: "title avatar" })
+    const filters = { scrumboard: scrumboardId, _id: taskId };
+
+    const task = await Task.findOne(filters)
+        .populate({ path: "scrumboard", select: "project name color" })
+        .populate({ path: "user", select: "fullName avatar" })
+        .populate({ path: "members", select: "name avatar" })
+        .populate("subtasks")
+        .populate("attachments")
         .populate({
-            path: "assignMembers",
-            select: "title avatar",
+            path: "comments",
             populate: {
-                path: "designation",
-                model: "Designation",
-                select: "title",
+                path: "replies",
+                populate: { path: "user", select: "fullName avatar" },
             },
         })
         .lean();
 
-    if (!project) {
-        throw new ApiError(400, "Project not found");
+    if (!task) {
+        throw new ApiError(404, "Task not found");
     }
 
     return res
         .status(200)
-        .json(new ApiResponse(200, project, "Project retrieved successfully"));
+        .json(new ApiResponse(200, task, "Project retrieved successfully"));
 });
 
-export const updateTask = asyncHandler(async (req, res) => {
-    const taskId = req.body?.taskId;
-    const scrumboardId = req.body?.scrumboardId;
+export const updateData = asyncHandler(async (req, res) => {
+    const taskId = req.params?.id;
+    const scrumboardId = req.params?.scrumboardId;
 
     const taskInfo = await Task.findOne({
         _id: taskId,
@@ -116,9 +115,6 @@ export const updateTask = asyncHandler(async (req, res) => {
     if (!taskInfo) {
         throw new ApiError(404, "Task not found");
     }
-
-    delete req.body.scrumboardId;
-    delete req.body.taskId;
 
     const updateTask = await Task.findByIdAndUpdate(taskId, req.body, {
         new: true,
@@ -134,21 +130,28 @@ export const updateTask = asyncHandler(async (req, res) => {
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
-    const taskId = req.body?.taskId;
-    const scrumboardId = req.body?.scrumboardId;
+    const taskId = req.params?.id;
+    const scrumboardId = req.params?.scrumboardId;
 
     const taskInfo = await Task.findOne({
         _id: taskId,
         scrumboard: scrumboardId,
-    });
+    }).populate({ path: "attachments", select: "name path" });
 
     if (!taskInfo) {
         throw new ApiError(404, "Task not found");
     }
 
+    // delete attachment
+    if (taskInfo.attachments.length > 0) {
+        for (const row of taskInfo.attachments) {
+            await destroyOnCloudinary(row.path);
+        }
+
+        await TaskAttachment.deleteMany({ taskId: taskId });
+    }
     // Delete the subtask, attachment, comment associated with the task
     await Subtask.deleteMany({ taskId: taskId });
-    await TaskAttachment.deleteMany({ taskId: taskId });
     await TaskComment.deleteMany({ taskId: taskId });
 
     // Delete task
@@ -158,3 +161,41 @@ export const deleteData = asyncHandler(async (req, res) => {
         .status(200)
         .json(new ApiResponse(200, {}, "Task delete successfully"));
 });
+
+export const addTaskToScrumboard = async (scrumboardId, taskId) => {
+    try {
+        const updatedScrumboard = await Scrumboard.findByIdAndUpdate(
+            scrumboardId,
+            { $push: { tasks: taskId } },
+            { new: true }
+        );
+
+        if (!updatedScrumboard) {
+            console.log("Scrumboard not found.");
+            return;
+        }
+
+        console.log("Successfully adding task to scrumboard");
+    } catch (error) {
+        console.error("Error adding task to scrumboard:", error);
+    }
+};
+
+export const removeTaskFromScrumboard = async (scrumboardId, taskId) => {
+    try {
+        const updatedScrumboard = await Scrumboard.findByIdAndUpdate(
+            scrumboardId,
+            { $pull: { tasks: taskId } },
+            { new: true }
+        );
+
+        if (!updatedScrumboard) {
+            console.log("Scrumboard not found.");
+            return;
+        }
+
+        console.log("Successfully remove task from scrumboard");
+    } catch (error) {
+        console.error("Error remove task from scrumboard:", error);
+    }
+};

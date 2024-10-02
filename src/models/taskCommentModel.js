@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const taskCommentSchema = new Schema(
     {
-        task: {
+        taskId: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Task is required"],
             ref: "Task",
@@ -19,10 +19,29 @@ const taskCommentSchema = new Schema(
             required: [true, "File path is required"],
             trim: true,
         },
+        parentCommentId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "TaskComment",
+            default: null,
+        },
+        replies: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "TaskComment",
+            },
+        ],
     },
     {
         timestamps: true,
     }
 );
+
+taskCommentSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: "user",
+        select: "fullName avatar",
+    });
+    next();
+});
 
 export const TaskComment = mongoose.model("TaskComment", taskCommentSchema);

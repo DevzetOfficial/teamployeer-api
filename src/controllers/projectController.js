@@ -37,39 +37,8 @@ export const createData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid credentials");
     }
 
-    // default scrumboard list
-    const defaultScrumboards = [
-        {
-            project: newProject._id,
-            name: "To Do",
-            color: "#E9EAEC",
-            tasks: [],
-            position: 1,
-        },
-        {
-            project: newProject._id,
-            name: "In Progress",
-            color: "#CCE0FF",
-            tasks: [],
-            position: 2,
-        },
-        {
-            project: newProject._id,
-            name: "In Review",
-            color: "#FFDEB8",
-            tasks: [],
-            position: 3,
-        },
-        {
-            project: newProject._id,
-            name: "Complete",
-            color: "#CCE7DE",
-            tasks: [],
-            position: 4,
-        },
-    ];
-
-    await Scrumboard.create(defaultScrumboards);
+    // set default scrumboards
+    await createDefaultScrumboards(newProject._id);
 
     return res
         .status(201)
@@ -183,7 +152,7 @@ export const getData = asyncHandler(async (req, res) => {
         .lean();
 
     if (!project) {
-        throw new ApiError(400, "Project not found");
+        throw new ApiError(404, "Project not found");
     }
 
     const scrumboards = await Scrumboard.find({
@@ -285,7 +254,7 @@ export const deleteData = asyncHandler(async (req, res) => {
         .then((scrumboards) => scrumboards.map((scrumboard) => scrumboard._id));
 
     // task ids
-    const taskItes = await Task.find({
+    const taskIds = await Task.find({
         scrumboard: { $in: scrumboardIds },
     })
         .select("_id")
@@ -293,11 +262,11 @@ export const deleteData = asyncHandler(async (req, res) => {
         .then((tasks) => tasks.map((task) => task._id));
 
     // delete task, taskComment, taskAttachment
-    if (taskItes.length > 0) {
-        await Task.deleteMany({ _id: { $in: taskItes } });
-        await Subtask.deleteMany({ task: { $in: taskItes } });
-        await TaskComment.deleteMany({ task: { $in: taskItes } });
-        await TaskAttachment.deleteMany({ task: { $in: taskItes } });
+    if (taskIds.length > 0) {
+        await Task.deleteMany({ _id: { $in: taskIds } });
+        await Subtask.deleteMany({ taskId: { $in: taskIds } });
+        await TaskComment.deleteMany({ taskId: { $in: taskIds } });
+        await TaskAttachment.deleteMany({ taskId: { $in: taskIds } });
     }
 
     if (scrumboardIds.length > 0) {
@@ -310,3 +279,39 @@ export const deleteData = asyncHandler(async (req, res) => {
         .status(200)
         .json(new ApiResponse(200, {}, "Project delete successfully"));
 });
+
+// default scrumboard list
+export const createDefaultScrumboards = async (projectId) => {
+    const defaultScrumboards = [
+        {
+            project: projectId,
+            name: "To Do",
+            color: "#E9EAEC",
+            tasks: [],
+            position: 1,
+        },
+        {
+            project: projectId,
+            name: "In Progress",
+            color: "#CCE0FF",
+            tasks: [],
+            position: 2,
+        },
+        {
+            project: projectId,
+            name: "In Review",
+            color: "#FFDEB8",
+            tasks: [],
+            position: 3,
+        },
+        {
+            project: projectId,
+            name: "Complete",
+            color: "#CCE7DE",
+            tasks: [],
+            position: 4,
+        },
+    ];
+
+    await Scrumboard.create(defaultScrumboards);
+};
