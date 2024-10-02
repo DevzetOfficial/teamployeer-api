@@ -193,7 +193,7 @@ export const getData = asyncHandler(async (req, res) => {
     const scrumboards = await Scrumboard.find({
         project: project._id,
     })
-        .select("name color tasks")
+        .select("name color tasks position")
         .sort({ position: 1 })
         .populate({
             path: "tasks",
