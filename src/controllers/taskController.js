@@ -129,6 +129,35 @@ export const updateData = asyncHandler(async (req, res) => {
         .json(new ApiResponse(201, updateTask, "Task update successfully"));
 });
 
+export const moveTask = asyncHandler(async (req, res) => {
+    const taskId = req.params?.id;
+    const scrumboardId = req.params?.scrumboardId;
+    const toScrumboardId = req.body?.toScrumboardId;
+
+    if (!toScrumboardId) {
+        throw new ApiError(400, "To scrumboard is required");
+    }
+
+    const taskInfo = await Task.findOne({
+        _id: taskId,
+        scrumboard: scrumboardId,
+    });
+
+    if (!taskInfo) {
+        throw new ApiError(404, "Task not found");
+    }
+
+    // remove scrumboard
+    await removeTaskFromScrumboard(scrumboardId, taskId);
+
+    // add task to scrumboard
+    await addTaskToScrumboard(toScrumboardId, taskId);
+
+    return res
+        .status(201)
+        .json(new ApiResponse(201, updateTask, "Task move successfully"));
+});
+
 export const deleteData = asyncHandler(async (req, res) => {
     const taskId = req.params?.id;
     const scrumboardId = req.params?.scrumboardId;
