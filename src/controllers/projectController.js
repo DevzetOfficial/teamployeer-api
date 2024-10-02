@@ -200,7 +200,7 @@ export const getData = asyncHandler(async (req, res) => {
                     select: "fullName avatar",
                 },
                 {
-                    path: "assignMembers",
+                    path: "members",
                     model: "Employee",
                     select: "name avatar",
                 },

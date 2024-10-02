@@ -14,7 +14,7 @@ import { Subtask } from "../models/subtaskModel.js";
 import { TaskAttachment } from "../models/taskAttachmentModel.js";
 import { TaskComment } from "../models/taskCommentModel.js";
 
-export const createTask = asyncHandler(async (req, res) => {
+export const createData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId;
     const projectId = req.params.projectId;
     const scrumboardId = req.body?.scrumboardId;
@@ -41,15 +41,21 @@ export const createTask = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Title is required");
     }
 
+    const taskPosition = await Task.findOne({ scrumboard: scrumboardId })
+        .sort({ position: -1 })
+        .select("position");
+
     const taskData = {
         scrumboard: scrumboardId,
         user: req.user?._id,
         title: req.body.title,
         description: req.body?.description || "",
-        priority: req.body?.priority || "",
-        assignMembers: req.body?.assignMembers || [],
-        subtasks: req.body?.subtasks || [],
-        dueDate: req.body?.dueDate || "",
+        members: [],
+        subtasks: [],
+        attachments: [],
+        comments: [],
+        dueDate: "",
+        position: taskPosition ? taskPosition.position + 1 : 1,
     };
 
     const newTask = await Task.create(taskData);

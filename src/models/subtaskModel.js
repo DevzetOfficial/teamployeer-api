@@ -19,7 +19,7 @@ const subtaskSchema = new Schema(
             required: [true, "Subtask name is required"],
             trim: true,
         },
-        assignMembers: [
+        members: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Employee",
