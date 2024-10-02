@@ -6,6 +6,8 @@ import {
     getData,
     updateData,
     deleteData,
+    sortTask,
+    moveTask,
 } from "../controllers/taskController.js";
 
 const route = Router();
@@ -15,6 +17,13 @@ route.route("/project/:projectId/task").post(authCheck, createData);
 /* route
     .route("/project/:projectId/task/:id/update-position")
     .post(authCheck, createTask); */
+
+route
+    .route("/project/:projectId/scrumboard/:scrumboardId/sort-task")
+    .put(authCheck, sortTask);
+route
+    .route("/project/:projectId/scrumboard/:scrumboardId/task/:id/move")
+    .put(authCheck, moveTask);
 
 route
     .route("/project/:projectId/scrumboard/:scrumboardId/task/:id")

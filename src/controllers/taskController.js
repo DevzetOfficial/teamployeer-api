@@ -13,7 +13,6 @@ import { Task } from "../models/taskModel.js";
 import { Subtask } from "../models/subtaskModel.js";
 import { TaskAttachment } from "../models/taskAttachmentModel.js";
 import { TaskComment } from "../models/taskCommentModel.js";
-import { populate } from "dotenv";
 
 export const createData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId;
@@ -92,6 +91,7 @@ export const getData = asyncHandler(async (req, res) => {
                 populate: { path: "user", select: "fullName avatar" },
             },
         })
+        .sort({ position: 1 })
         .lean();
 
     if (!task) {
@@ -129,35 +129,6 @@ export const updateData = asyncHandler(async (req, res) => {
         .json(new ApiResponse(201, updateTask, "Task update successfully"));
 });
 
-export const moveTask = asyncHandler(async (req, res) => {
-    const taskId = req.params?.id;
-    const scrumboardId = req.params?.scrumboardId;
-    const toScrumboardId = req.body?.toScrumboardId;
-
-    if (!toScrumboardId) {
-        throw new ApiError(400, "To scrumboard is required");
-    }
-
-    const taskInfo = await Task.findOne({
-        _id: taskId,
-        scrumboard: scrumboardId,
-    });
-
-    if (!taskInfo) {
-        throw new ApiError(404, "Task not found");
-    }
-
-    // remove scrumboard
-    await removeTaskFromScrumboard(scrumboardId, taskId);
-
-    // add task to scrumboard
-    await addTaskToScrumboard(toScrumboardId, taskId);
-
-    return res
-        .status(201)
-        .json(new ApiResponse(201, updateTask, "Task move successfully"));
-});
-
 export const deleteData = asyncHandler(async (req, res) => {
     const taskId = req.params?.id;
     const scrumboardId = req.params?.scrumboardId;
@@ -189,6 +160,59 @@ export const deleteData = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(new ApiResponse(200, {}, "Task delete successfully"));
+});
+
+export const moveTask = asyncHandler(async (req, res) => {
+    const taskId = req.params?.id;
+    const scrumboardId = req.params?.scrumboardId;
+    const toScrumboardId = req.body?.toScrumboardId;
+
+    if (!toScrumboardId) {
+        throw new ApiError(400, "To scrumboard is required");
+    }
+
+    const taskInfo = await Task.findOne({
+        _id: taskId,
+        scrumboard: scrumboardId,
+    });
+
+    if (!taskInfo) {
+        throw new ApiError(404, "Task not found");
+    }
+
+    // remove scrumboard
+    await removeTaskFromScrumboard(scrumboardId, taskId);
+
+    // add task to scrumboard
+    await addTaskToScrumboard(toScrumboardId, taskId);
+
+    return res
+        .status(201)
+        .json(new ApiResponse(201, updateTask, "Task move successfully"));
+});
+
+export const sortTask = asyncHandler(async (req, res) => {
+    const scrumboardId = req.params?.scrumboardId;
+
+    const tasks = await Task.find({ scrumboard: scrumboardId });
+    if (tasks.length === 0) {
+        throw new ApiError(404, "Task not found");
+    }
+
+    const updatedTask = req.body;
+
+    if (updatedTask.length > 0) {
+        for (const row of updatedTask) {
+            await Task.findByIdAndUpdate(
+                { _id: row.id },
+                { position: row.position }
+            );
+        }
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(201, {}, "Task position updated successfully"));
 });
 
 export const addTaskToScrumboard = async (scrumboardId, taskId) => {
