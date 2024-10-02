@@ -14,9 +14,9 @@ const taskSchema = new Schema(
             ref: "User",
             index: true,
         },
-        name: {
+        title: {
             type: String,
-            required: [true, "Task name is required"],
+            required: [true, "Title is required"],
             trim: true,
         },
         description: {

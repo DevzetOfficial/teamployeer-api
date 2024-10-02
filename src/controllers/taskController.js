@@ -22,7 +22,7 @@ export const createTask = asyncHandler(async (req, res) => {
     const project = await Project.findOne({
         _id: projectId,
         companyId: companyId,
-    }).select("name status");
+    }).select("title status");
 
     if (!project) {
         throw new ApiError(404, "Project not found");
@@ -31,20 +31,20 @@ export const createTask = asyncHandler(async (req, res) => {
     const scrumboard = await Scrumboard.findOne({
         _id: scrumboardId,
         project: projectId,
-    }).select("name color");
+    }).select("title color");
 
     if (!scrumboard) {
         throw new ApiError(404, "Scrumboard not found");
     }
 
-    if (!req.body.name) {
-        throw new ApiError(404, "Task name is required");
+    if (!req.body.title) {
+        throw new ApiError(404, "Title is required");
     }
 
     const taskData = {
         scrumboard: scrumboardId,
         user: req.user?._id,
-        name: req.body.name,
+        title: req.body.title,
         description: req.body?.description || "",
         priority: req.body?.priority || "",
         assignMembers: req.body?.assignMembers || [],
@@ -76,15 +76,15 @@ export const getData = asyncHandler(async (req, res) => {
     const filters = { companyId: companyId, _id: projectId };
 
     const project = await Project.findOne(filters)
-        .populate({ path: "client", select: "name source avatar" })
-        .populate({ path: "projectManager", select: "name avatar" })
+        .populate({ path: "client", select: "title source avatar" })
+        .populate({ path: "projectManager", select: "title avatar" })
         .populate({
             path: "assignMembers",
-            select: "name avatar",
+            select: "title avatar",
             populate: {
                 path: "designation",
                 model: "Designation",
-                select: "name",
+                select: "title",
             },
         })
         .lean();

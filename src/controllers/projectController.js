@@ -27,7 +27,6 @@ export const createData = asyncHandler(async (req, res) => {
         projectManager: req.body.projectManager,
         submissionDate: req.body.submissionDate,
         assignMembers: req.body?.assignMembers || [],
-        scrumboards: [],
         projectImage: projectImage?.url || "",
         description: req.body?.description || "",
     };
@@ -38,7 +37,7 @@ export const createData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid credentials");
     }
 
-    // default scrumboard
+    // default scrumboard list
     const defaultScrumboards = [
         {
             project: newProject._id,

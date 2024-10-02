@@ -14,7 +14,7 @@ const subtaskSchema = new Schema(
             ref: "User",
             index: true,
         },
-        name: {
+        title: {
             type: String,
             required: [true, "Subtask name is required"],
             trim: true,
