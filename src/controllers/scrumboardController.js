@@ -22,6 +22,7 @@ export const createData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Name is required");
     }
 
+    // check exist
     const scrumboardExist = await Scrumboard.findOne({
         companyId: companyId,
         name: req.body.name.trim(),
@@ -31,9 +32,18 @@ export const createData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Data already exist");
     }
 
+    // get mex position
+    const maxPosition = await Scrumboard.findOne({ project: projectId })
+        .sort({
+            position: -1,
+        })
+        .select("position")
+        .exec();
+
     const scrumboardData = req.body;
 
     scrumboardData.project = projectId;
+    scrumboardData.position = maxPosition ? maxPosition.position + 1 : 1;
 
     const scrumboar = await Scrumboard.create(scrumboardData);
 
