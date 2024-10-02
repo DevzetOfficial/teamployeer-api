@@ -18,6 +18,19 @@ export const createData = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Project not found");
     }
 
+    if (!req.body?.name) {
+        throw new ApiError(400, "Name is required");
+    }
+
+    const scrumboardExist = await Scrumboard.findOne({
+        companyId: companyId,
+        name: req.body.name.trim(),
+    });
+
+    if (scrumboardExist) {
+        throw new ApiError(400, "Data already exist");
+    }
+
     const scrumboardData = req.body;
 
     scrumboardData.project = projectId;
