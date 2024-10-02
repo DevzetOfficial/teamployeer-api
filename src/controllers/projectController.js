@@ -10,8 +10,9 @@ import {
 import { Project } from "../models/projectModel.js";
 import { Scrumboard } from "../models/scrumboardModel.js";
 import { Task } from "../models/taskModel.js";
-import { TaskAttachment } from "../models/taskAttachmentModel.js";
+import { Subtask } from "../models/subtaskModel.js";
 import { TaskComment } from "../models/taskCommentModel.js";
+import { TaskAttachment } from "../models/taskAttachmentModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
     let projectImage;
@@ -36,6 +37,40 @@ export const createData = asyncHandler(async (req, res) => {
     if (!newProject) {
         throw new ApiError(400, "Invalid credentials");
     }
+
+    // default scrumboard
+    const defaultScrumboards = [
+        {
+            project: newProject._id,
+            name: "To Do",
+            color: "#E9EAEC",
+            tasks: [],
+            position: 1,
+        },
+        {
+            project: newProject._id,
+            name: "In Progress",
+            color: "#CCE0FF",
+            tasks: [],
+            position: 2,
+        },
+        {
+            project: newProject._id,
+            name: "In Review",
+            color: "#FFDEB8",
+            tasks: [],
+            position: 3,
+        },
+        {
+            project: newProject._id,
+            name: "Complete",
+            color: "#CCE7DE",
+            tasks: [],
+            position: 4,
+        },
+    ];
+
+    await Scrumboard.create(defaultScrumboards);
 
     return res
         .status(201)
@@ -152,44 +187,6 @@ export const getData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Project not found");
     }
 
-    const scrumboardExist = await Scrumboard.find({ project: project._id });
-
-    //if not exists scrumboard then create default scrumboard
-    if (scrumboardExist.length === 0) {
-        const defaultScrumboards = [
-            {
-                project: project._id,
-                name: "To Do",
-                color: "#E9EAEC",
-                tasks: [],
-                position: 1,
-            },
-            {
-                project: project._id,
-                name: "In Progress",
-                color: "#CCE0FF",
-                tasks: [],
-                position: 2,
-            },
-            {
-                project: project._id,
-                name: "In Review",
-                color: "#FFDEB8",
-                tasks: [],
-                position: 3,
-            },
-            {
-                project: project._id,
-                name: "Complete",
-                color: "#CCE7DE",
-                tasks: [],
-                position: 4,
-            },
-        ];
-
-        await Scrumboard.create(defaultScrumboards);
-    }
-
     const scrumboards = await Scrumboard.find({
         project: project._id,
     })
@@ -299,6 +296,7 @@ export const deleteData = asyncHandler(async (req, res) => {
     // delete task, taskComment, taskAttachment
     if (taskItes.length > 0) {
         await Task.deleteMany({ _id: { $in: taskItes } });
+        await Subtask.deleteMany({ task: { $in: taskItes } });
         await TaskComment.deleteMany({ task: { $in: taskItes } });
         await TaskAttachment.deleteMany({ task: { $in: taskItes } });
     }
