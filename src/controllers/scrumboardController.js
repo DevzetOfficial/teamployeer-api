@@ -4,6 +4,10 @@ import { ApiError } from "../utilities/ApiError.js";
 
 import { Project } from "../models/projectModel.js";
 import { Scrumboard } from "../models/scrumboardModel.js";
+import { Task } from "../models/taskModel.js";
+import { Subtask } from "../models/subtaskModel.js";
+import { TaskAttachment } from "../models/taskAttachmentModel.js";
+import { TaskComment } from "../models/taskCommentModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId;
@@ -53,8 +57,8 @@ export const createData = asyncHandler(async (req, res) => {
 });
 
 export const updateData = asyncHandler(async (req, res) => {
-    const scrumboardId = req.body?.scrumboardId;
     const projectId = req.params?.projectId;
+    const scrumboardId = req.params?.id;
 
     const scrumboar = await Scrumboard.findOne({
         _id: scrumboardId,
@@ -64,8 +68,6 @@ export const updateData = asyncHandler(async (req, res) => {
     if (!scrumboar) {
         throw new ApiError(404, "Scrumboard not found");
     }
-
-    delete req.body.scrumboardId;
 
     const updateScrumboard = await Scrumboard.findByIdAndUpdate(
         scrumboardId,
@@ -79,15 +81,41 @@ export const updateData = asyncHandler(async (req, res) => {
         .status(200)
         .json(
             new ApiResponse(
-                200,
+                201,
                 updateScrumboard,
                 "Scrumboard updated successfully"
             )
         );
 });
 
+export const updatePosition = asyncHandler(async (req, res) => {
+    const projectId = req.params?.projectId;
+
+    const scrumboards = await Scrumboard.find({ project: projectId });
+    if (scrumboards.length === 0) {
+        throw new ApiError(404, "Scrumboard not found");
+    }
+
+    const updatedScrumboard = req.body;
+
+    if (updatedScrumboard.length > 0) {
+        for (const row of updatedScrumboard) {
+            await Scrumboard.findByIdAndUpdate(
+                { _id: row.id },
+                { position: row.position }
+            );
+        }
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(201, {}, "Scrumboard position updated successfully")
+        );
+});
+
 export const deleteData = asyncHandler(async (req, res) => {
-    const scrumboardId = req.body?.scrumboardId;
+    const scrumboardId = req.params?.id;
     const projectId = req.params?.projectId;
 
     const scrumboar = await Scrumboard.findOne({
@@ -100,18 +128,19 @@ export const deleteData = asyncHandler(async (req, res) => {
     }
 
     // task ids
-    const taskItes = await Task.find({
-        scrumboard: { $in: scrumboardId },
+    const taskIdes = await Task.find({
+        scrumboard: scrumboardId,
     })
         .select("_id")
         .lean()
         .then((tasks) => tasks.map((task) => task._id));
 
     // delete task, taskComment, taskAttachment
-    if (taskItes.length > 0) {
-        await Task.deleteMany({ _id: { $in: taskItes } });
-        await TaskComment.deleteMany({ task: { $in: taskItes } });
-        await TaskAttachment.deleteMany({ task: { $in: taskItes } });
+    if (taskIdes.length > 0) {
+        await Task.deleteMany({ _id: { $in: taskIdes } });
+        await Subtask.deleteMany({ task: { $in: taskIdes } });
+        await TaskComment.deleteMany({ task: { $in: taskIdes } });
+        await TaskAttachment.deleteMany({ task: { $in: taskIdes } });
     }
 
     // delete scrumboard
@@ -119,5 +148,5 @@ export const deleteData = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, client, "Client delete successfully"));
+        .json(new ApiResponse(200, {}, "Scrumboard delete successfully"));
 });
