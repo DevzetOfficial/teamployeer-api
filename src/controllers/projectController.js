@@ -286,14 +286,14 @@ export const createDefaultScrumboards = async (projectId) => {
         {
             project: projectId,
             name: "To Do",
-            color: "#E9EAEC",
+            color: "#D9D9D9",
             tasks: [],
             position: 1,
         },
         {
             project: projectId,
             name: "In Progress",
-            color: "#CCE0FF",
+            color: "#B8D4FF",
             tasks: [],
             position: 2,
         },
