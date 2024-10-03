@@ -28,7 +28,7 @@ export const createData = asyncHandler(async (req, res) => {
 
     // check exist
     const scrumboardExist = await Scrumboard.findOne({
-        companyId: companyId,
+        project: projectId,
         name: req.body.name.trim(),
     });
 

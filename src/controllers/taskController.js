@@ -165,7 +165,7 @@ export const deleteData = asyncHandler(async (req, res) => {
 export const moveTask = asyncHandler(async (req, res) => {
     const taskId = req.params?.id;
     const scrumboardId = req.params?.scrumboardId;
-    const toScrumboardId = req.body?.toScrumboardId;
+    const toScrumboardId = req.params?.toScrumboardId;
 
     if (!toScrumboardId) {
         throw new ApiError(400, "To scrumboard is required");
@@ -180,11 +180,26 @@ export const moveTask = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Task not found");
     }
 
-    // remove scrumboard
+    // remove task from scrumboard
     await removeTaskFromScrumboard(scrumboardId, taskId);
 
     // add task to scrumboard
     await addTaskToScrumboard(toScrumboardId, taskId);
+
+    // get task max position
+    const taskPosition = await Task.findOne({ scrumboard: toScrumboardId })
+        .sort({ position: -1 })
+        .select("position");
+
+    // update task
+    const updateTask = await Task.findByIdAndUpdate(
+        taskId,
+        {
+            scrumboard: toScrumboardId,
+            position: taskPosition ? taskPosition.position + 1 : 1,
+        },
+        { new: true }
+    );
 
     return res
         .status(201)
