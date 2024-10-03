@@ -54,6 +54,7 @@ export const createData = asyncHandler(async (req, res) => {
         subtasks: [],
         attachments: [],
         comments: [],
+        dueDate: "",
         position: taskPosition ? taskPosition.position + 1 : 1,
     };
 

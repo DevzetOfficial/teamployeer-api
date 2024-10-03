@@ -57,8 +57,13 @@ const taskSchema = new Schema(
                 ref: "TaskComment",
             },
         ],
-        dueDate: {
+        startDate: {
             type: Date,
+            default: null,
+        },
+        endDate: {
+            type: Date,
+            default: null,
         },
         position: {
             type: Number,

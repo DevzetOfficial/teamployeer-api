@@ -30,9 +30,4 @@ route
     .put(authCheck, updateData)
     .delete(authCheck, deleteData);
 
-/* route
-    .route("/project/:projectId/task")
-    .get(authCheck, getData)
-    .delete(authCheck, deleteData); */
-
 export default route;
