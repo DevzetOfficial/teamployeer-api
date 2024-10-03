@@ -33,7 +33,7 @@ export const createData = asyncHandler(async (req, res) => {
     });
 
     if (scrumboardExist) {
-        throw new ApiError(400, "Data already exist");
+        throw new ApiError(400, "Column already exist");
     }
 
     // get mex position
