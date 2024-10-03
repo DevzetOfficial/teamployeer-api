@@ -13,11 +13,16 @@ import { Task } from "../models/taskModel.js";
 import { Subtask } from "../models/subtaskModel.js";
 import { TaskComment } from "../models/taskCommentModel.js";
 import { TaskAttachment } from "../models/taskAttachmentModel.js";
+import { Client } from "../models/clientModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
     let projectImage;
     if (req.file?.path) {
         projectImage = await uploadOnCloudinary(req.file?.path);
+    }
+
+    if (!req.body?.client) {
+        throw new ApiError(400, "Client is required");
     }
 
     const data = {
@@ -37,8 +42,10 @@ export const createData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid credentials");
     }
 
-    // set default scrumboards
+    // set default scrumboards column
     await createDefaultScrumboards(newProject._id);
+
+    await addProjectToClient(req.body.client, newProject._id);
 
     return res
         .status(201)
@@ -275,6 +282,8 @@ export const deleteData = asyncHandler(async (req, res) => {
 
     await Project.findByIdAndDelete(project._id);
 
+    await removeProjectFromClient(project.client, project._id);
+
     return res
         .status(200)
         .json(new ApiResponse(200, {}, "Project delete successfully"));
@@ -314,4 +323,42 @@ export const createDefaultScrumboards = async (projectId) => {
     ];
 
     await Scrumboard.create(defaultScrumboards);
+};
+
+export const addProjectToClient = async (clientId, projectId) => {
+    try {
+        const updateClient = await Client.findByIdAndUpdate(
+            clientId,
+            { $push: { projects: projectId } },
+            { new: true }
+        );
+
+        if (!updateClient) {
+            console.log("Client not found.");
+            return;
+        }
+
+        console.log("Successfully adding project to cleint");
+    } catch (error) {
+        console.error("Error adding project to client:", error);
+    }
+};
+
+export const removeProjectFromClient = async (clientId, projectId) => {
+    try {
+        const updateClient = await Client.findByIdAndUpdate(
+            clientId,
+            { $pull: { projects: projectId } },
+            { new: true }
+        );
+
+        if (!updateClient) {
+            console.log("Client not found.");
+            return;
+        }
+
+        console.log("Successfully remove project from client");
+    } catch (error) {
+        console.error("Error remove project from client:", error);
+    }
 };

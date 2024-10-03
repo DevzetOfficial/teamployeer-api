@@ -123,10 +123,10 @@ export const getCountData = asyncHandler(async (req, res) => {
 export const getData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    const client = await Client.findOne(filters).populate({
-        path: "country",
-        select: "name avatar",
-    });
+    const client = await Client.findOne(filters)
+        .populate({ path: "country", select: "name avatar" })
+        .populate({ path: "projects", select: "name status" });
+    //.populate({ path: "transactions", select: "name status" });
 
     if (!client) {
         throw new ApiError(400, "Client not found");

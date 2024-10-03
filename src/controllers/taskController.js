@@ -2,10 +2,7 @@ import { asyncHandler } from "../utilities/asyncHandler.js";
 import { ApiResponse } from "../utilities/ApiResponse.js";
 import { ApiError } from "../utilities/ApiError.js";
 
-import {
-    uploadOnCloudinary,
-    destroyOnCloudinary,
-} from "../utilities/cloudinary.js";
+import { destroyOnCloudinary } from "../utilities/cloudinary.js";
 
 import { Project } from "../models/projectModel.js";
 import { Scrumboard } from "../models/scrumboardModel.js";
@@ -149,12 +146,12 @@ export const deleteData = asyncHandler(async (req, res) => {
 
         await TaskAttachment.deleteMany({ taskId: taskId });
     }
-    // Delete the subtask, attachment, comment associated with the task
+
     await Subtask.deleteMany({ taskId: taskId });
     await TaskComment.deleteMany({ taskId: taskId });
-
-    // Delete task
     await Task.findByIdAndDelete(taskId);
+
+    await removeTaskFromScrumboard(scrumboardId, taskId);
 
     return res
         .status(200)
