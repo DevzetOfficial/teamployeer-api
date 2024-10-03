@@ -78,7 +78,7 @@ export const getData = asyncHandler(async (req, res) => {
     const filters = { scrumboard: scrumboardId, _id: taskId };
 
     const task = await Task.findOne(filters)
-        .populate({ path: "scrumboard", select: "project name color" })
+        .populate({ path: "scrumboard", select: "name color" })
         .populate({ path: "user", select: "fullName avatar" })
         .populate({ path: "members", select: "name avatar" })
         .populate("subtasks")

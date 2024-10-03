@@ -27,10 +27,21 @@ const subtaskSchema = new Schema(
         ],
         priority: {
             type: String,
-            trim: true,
+            required: [true, "Prioity is required"],
+            enum: {
+                values: ["Low", "Medium", "High", "Urgent"],
+                message: "{VALUE} is not a valid status",
+            },
+            default: "Low",
+            index: true,
         },
-        dueDate: {
+        startDate: {
             type: Date,
+            default: null,
+        },
+        endDate: {
+            type: Date,
+            default: null,
         },
         isComplete: {
             type: Boolean,

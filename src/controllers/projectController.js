@@ -26,7 +26,7 @@ export const createData = asyncHandler(async (req, res) => {
         client: req.body.client,
         projectManager: req.body.projectManager,
         submissionDate: req.body.submissionDate,
-        assignMembers: req.body?.assignMembers || [],
+        members: req.body?.members || [],
         projectImage: projectImage?.url || "",
         description: req.body?.description || "",
     };
@@ -59,7 +59,7 @@ export const getAllData = asyncHandler(async (req, res) => {
         .populate({ path: "client", select: "name source avatar" })
         .populate({ path: "projectManager", select: "name avatar" })
         .populate({
-            path: "assignMembers",
+            path: "members",
             select: "name avatar",
             populate: {
                 path: "designation",
@@ -141,7 +141,7 @@ export const getData = asyncHandler(async (req, res) => {
         .populate({ path: "client", select: "name source avatar" })
         .populate({ path: "projectManager", select: "name avatar" })
         .populate({
-            path: "assignMembers",
+            path: "members",
             select: "name avatar",
             populate: {
                 path: "designation",

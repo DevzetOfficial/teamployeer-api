@@ -15,7 +15,7 @@ const route = Router();
 route.route("/project/:projectId/task").post(authCheck, createData);
 
 route
-    .route("/project/:projectId/scrumboard/:scrumboardId/sort-task")
+    .route("/project/:projectId/scrumboard/:scrumboardId/task/sort")
     .put(authCheck, sortTask);
 
 route

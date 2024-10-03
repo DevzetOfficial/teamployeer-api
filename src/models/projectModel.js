@@ -28,16 +28,17 @@ const projectSchema = new Schema(
             required: [true, "Submission date is required"],
             trim: true,
         },
-        assignMembers: [
+        members: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                required: [true, "Assign member is required"],
+                required: [true, "Member is required"],
                 ref: "Employee",
             },
         ],
         projectImage: {
             type: String,
             trim: true,
+            default: null,
         },
         description: {
             type: String,
