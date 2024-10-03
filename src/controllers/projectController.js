@@ -31,7 +31,7 @@ export const createData = asyncHandler(async (req, res) => {
         client: req.body.client,
         projectManager: req.body.projectManager,
         submissionDate: req.body.submissionDate,
-        members: req.body?.members || [],
+        members: req.body?.members,
         projectImage: projectImage?.url || "",
         description: req.body?.description || "",
     };

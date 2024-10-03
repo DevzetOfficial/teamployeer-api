@@ -10,12 +10,12 @@ const projectSchema = new Schema(
         },
         name: {
             type: String,
-            required: [true, "Client name is required"],
+            required: [true, "Project name is required"],
             trim: true,
         },
         client: {
             type: mongoose.Schema.Types.ObjectId,
-            required: [true, "Client  is required"],
+            required: [true, "Client id is required"],
             ref: "Client",
         },
         projectManager: {
