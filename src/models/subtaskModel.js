@@ -19,12 +19,15 @@ const subtaskSchema = new Schema(
             required: [true, "Subtask name is required"],
             trim: true,
         },
-        members: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Employee",
-            },
-        ],
+        members: {
+            type: [
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Employee",
+                },
+            ],
+            default: [],
+        },
         priority: {
             type: String,
             required: [true, "Prioity is required"],

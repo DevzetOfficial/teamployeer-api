@@ -33,30 +33,42 @@ const taskSchema = new Schema(
             default: "Low",
             index: true,
         },
-        members: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Employee",
-            },
-        ],
-        subtasks: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Subtask",
-            },
-        ],
-        attachments: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "TaskAttachment",
-            },
-        ],
-        comments: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "TaskComment",
-            },
-        ],
+        members: {
+            type: [
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Employee",
+                },
+            ],
+            default: [],
+        },
+        subtasks: {
+            type: [
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Subtask",
+                },
+            ],
+            default: [],
+        },
+        attachments: {
+            type: [
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "TaskAttachment",
+                },
+            ],
+            default: [],
+        },
+        comments: {
+            type: [
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "TaskComment",
+                },
+            ],
+            default: [],
+        },
         startDate: {
             type: Date,
             default: null,
@@ -67,6 +79,7 @@ const taskSchema = new Schema(
         },
         position: {
             type: Number,
+            require: [true, "Position is required"],
         },
     },
     {

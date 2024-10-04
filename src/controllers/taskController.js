@@ -14,7 +14,7 @@ import { TaskComment } from "../models/taskCommentModel.js";
 export const createData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId;
     const projectId = req.params.projectId;
-    const scrumboardId = req.body?.scrumboardId;
+    const scrumboardId = req.params?.scrumboardId;
 
     const project = await Project.findOne({
         _id: projectId,
@@ -87,11 +87,6 @@ export const getData = asyncHandler(async (req, res) => {
             populate: {
                 path: "replies",
                 select: "taskId message createdAt",
-                populate: {
-                    path: "user",
-                    select: "fullName avatar",
-                },
-                options: { sort: { createdAt: -1 } },
             },
         })
         .sort({ position: 1 })
