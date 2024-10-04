@@ -59,6 +59,7 @@ const clientSchema = new Schema(
         note: {
             type: String,
             trim: true,
+            default: null,
         },
         projects: {
             type: [
