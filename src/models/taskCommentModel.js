@@ -24,12 +24,15 @@ const taskCommentSchema = new Schema(
             ref: "TaskComment",
             default: null,
         },
-        replies: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "TaskComment",
-            },
-        ],
+        replies: {
+            type: [
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "TaskComment",
+                },
+            ],
+            default: [],
+        },
     },
     {
         timestamps: true,

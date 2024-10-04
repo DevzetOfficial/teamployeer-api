@@ -7,7 +7,6 @@ import {
 } from "../utilities/cloudinary.js";
 
 import { EmployeeDocument } from "../models/employeeDecumentModel.js";
-import { Employee } from "../models/employeeModel.js";
 
 export const documentCreate = asyncHandler(async (req, res) => {
     if (!req.params?.employeeId) {

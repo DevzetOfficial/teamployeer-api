@@ -14,15 +14,18 @@ const taskAttachmentSchema = new Schema(
             ref: "User",
             index: true,
         },
-        name: {
+        fileName: {
             type: String,
             required: [true, "File name is required"],
             trim: true,
         },
-        path: {
+        filePath: {
             type: String,
             required: [true, "File path is required"],
             trim: true,
+        },
+        position: {
+            type: Number,
         },
     },
     {

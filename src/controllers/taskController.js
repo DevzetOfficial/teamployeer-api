@@ -82,9 +82,16 @@ export const getData = asyncHandler(async (req, res) => {
         .populate("attachments")
         .populate({
             path: "comments",
+            select: "taskId message createdAt",
+            options: { sort: { createdAt: -1 } },
             populate: {
                 path: "replies",
-                populate: { path: "user", select: "fullName avatar" },
+                select: "taskId message createdAt",
+                populate: {
+                    path: "user",
+                    select: "fullName avatar",
+                },
+                options: { sort: { createdAt: -1 } },
             },
         })
         .sort({ position: 1 })
