@@ -1,6 +1,6 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
 import { Country } from "../models/countryModel.js";
 import { EmployeeType } from "../models/employeeTypeModel.js";

@@ -1,6 +1,6 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
 import { Company } from "../models/companyModel.js";
 
@@ -10,13 +10,13 @@ export const getData = asyncHandler(async (req, res) => {
     const companyInfo = await Company.findById(companyId).lean();
 
     if (!companyInfo) {
-        throw new ApiError(400, "System settings not found");
+        throw new ApiError(404, "System settings not found");
     }
 
     const systemSettings = companyInfo?.systemSettings || "";
 
     return res
-        .status(200)
+        .status(201)
         .json(
             new ApiResponse(
                 200,
@@ -32,7 +32,7 @@ export const updateData = asyncHandler(async (req, res) => {
     const companyInfo = await Company.findById(companyId);
 
     if (!companyInfo) {
-        throw new ApiError(400, "Policies not found");
+        throw new ApiError(404, "System settings not found");
     }
 
     if (!req.body?.systemSettings) {
@@ -49,7 +49,7 @@ export const updateData = asyncHandler(async (req, res) => {
         .status(201)
         .json(
             new ApiResponse(
-                201,
+                200,
                 systemSettings,
                 "System settings update successfully"
             )

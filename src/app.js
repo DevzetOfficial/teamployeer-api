@@ -50,6 +50,7 @@ import taskRoute from "./routes/taskRoute.js";
 import subtaskRoute from "./routes/subtaskRoute.js";
 import taskAttachmentRoute from "./routes/taskAttachmentRoute.js";
 import taskCommentRoute from "./routes/taskCommentRoute.js";
+import taskActivitiesRoute from "./routes/taskActivitiesRoute.js";
 import employeeRoute from "./routes/employeeRoute.js";
 import shiftRoute from "./routes/shiftRoute.js";
 import companyRoute from "./routes/companyRoute.js";
@@ -60,7 +61,7 @@ import timeoffRoute from "./routes/timeoffRoute.js";
 import timeoffTypeRoute from "./routes/timeoffTypeRoute.js";
 import templateRoute from "./routes/templateRoute.js";
 import emailSettingsRoute from "./routes/emailSettingsRoute.js";
-import policieRoute from "./routes/policieRoute.js";
+import policyRoute from "./routes/policyRoute.js";
 
 // route declaration
 app.use("/api/v1", countryRoute);
@@ -73,6 +74,7 @@ app.use("/api/v1", taskRoute);
 app.use("/api/v1", subtaskRoute);
 app.use("/api/v1", taskAttachmentRoute);
 app.use("/api/v1", taskCommentRoute);
+app.use("/api/v1", taskActivitiesRoute);
 app.use("/api/v1", employeeRoute);
 app.use("/api/v1", shiftRoute);
 app.use("/api/v1", companyRoute);
@@ -83,6 +85,6 @@ app.use("/api/v1", timeoffRoute);
 app.use("/api/v1", timeoffTypeRoute);
 app.use("/api/v1", templateRoute);
 app.use("/api/v1", emailSettingsRoute);
-app.use("/api/v1", policieRoute);
+app.use("/api/v1", policyRoute);
 
 export { app };

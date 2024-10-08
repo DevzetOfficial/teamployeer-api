@@ -1,11 +1,11 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
-import { getSegments, ucfirst } from "../utilities/helper.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
+import { getSegments, ucfirst } from "../utils/helper.js";
 import {
     uploadOnCloudinary,
     destroyOnCloudinary,
-} from "../utilities/cloudinary.js";
+} from "../utils/cloudinary.js";
 
 import { Project } from "../models/projectModel.js";
 import { Scrumboard } from "../models/scrumboardModel.js";
@@ -49,7 +49,7 @@ export const createData = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(201, newProject, "Project created successfully"));
+        .json(new ApiResponse(200, newProject, "Project created successfully"));
 });
 
 export const getAllData = asyncHandler(async (req, res) => {
@@ -190,13 +190,18 @@ export const getData = asyncHandler(async (req, res) => {
                 },
                 {
                     path: "comments",
-                    model: "TaskComment",
+                    select: "taskId message createdAt",
+                    options: { sort: { createdAt: -1 } },
+                    populate: {
+                        path: "replies",
+                        select: "taskId message createdAt",
+                    },
                 },
             ],
         });
 
     return res
-        .status(200)
+        .status(201)
         .json(
             new ApiResponse(
                 200,
@@ -212,7 +217,7 @@ export const updateData = asyncHandler(async (req, res) => {
     const projectInfo = await Project.findOne(filters).lean();
 
     if (!projectInfo) {
-        throw new ApiError(400, "Project not found");
+        throw new ApiError(404, "Project not found");
     }
 
     const data = req.body;
@@ -239,7 +244,7 @@ export const updateData = asyncHandler(async (req, res) => {
     );
 
     return res
-        .status(200)
+        .status(201)
         .json(
             new ApiResponse(200, updateProject, "Project updated successfully")
         );
@@ -285,7 +290,7 @@ export const deleteData = asyncHandler(async (req, res) => {
     await removeProjectFromClient(project.client, project._id);
 
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, {}, "Project delete successfully"));
 });
 

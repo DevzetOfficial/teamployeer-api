@@ -1,20 +1,16 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
-import { objectId } from "../utilities/helper.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
+import { objectId } from "../utils/helper.js";
 
 import {
     uploadOnCloudinary,
     destroyOnCloudinary,
-} from "../utilities/cloudinary.js";
+} from "../utils/cloudinary.js";
 
 import { Company } from "../models/companyModel.js";
 
 export const getData = asyncHandler(async (req, res) => {
-    if (!req.user?.companyId) {
-        throw new ApiError(400, "Company is required");
-    }
-
     const companyId = req.user?.companyId;
 
     const comapny = await Company.findById(companyId).select(
@@ -22,7 +18,7 @@ export const getData = asyncHandler(async (req, res) => {
     );
 
     if (!comapny) {
-        throw new ApiError(400, "Company not found");
+        throw new ApiError(404, "Company not found");
     }
 
     return res
@@ -31,16 +27,12 @@ export const getData = asyncHandler(async (req, res) => {
 });
 
 export const updateData = asyncHandler(async (req, res) => {
-    if (!req.user?.companyId) {
-        throw new ApiError(400, "Company is required");
-    }
-
     const companyId = req.user?.companyId;
 
     if (req.body?.email) {
         const existEmail = await Company.findOne({
             email: req.body.email,
-            _id: { $ne: objectId(companyId) },
+            _id: { $ne: companyId },
         });
 
         if (existEmail) {
@@ -51,7 +43,7 @@ export const updateData = asyncHandler(async (req, res) => {
     const companyInfo = Company.findById(companyId);
 
     if (!companyInfo) {
-        throw new ApiError(400, "Company not found");
+        throw new ApiError(404, "Company not found");
     }
 
     const data = req.body;

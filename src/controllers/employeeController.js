@@ -1,12 +1,12 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
-import { generateCode, objectId } from "../utilities/helper.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
+import { generateCode, objectId } from "../utils/helper.js";
 import { differenceInMonths } from "date-fns";
 import {
     uploadOnCloudinary,
     destroyOnCloudinary,
-} from "../utilities/cloudinary.js";
+} from "../utils/cloudinary.js";
 
 import { Employee } from "../models/employeeModel.js";
 import { Team } from "../models/teamModel.js";
@@ -46,7 +46,7 @@ export const createData = asyncHandler(async (req, res) => {
     return res
         .status(201)
         .json(
-            new ApiResponse(201, newEmployee, "Employee created successfully")
+            new ApiResponse(200, newEmployee, "Employee created successfully")
         );
 });
 
@@ -145,11 +145,11 @@ export const getData = asyncHandler(async (req, res) => {
         .lean();
 
     if (!employee) {
-        throw new ApiError(400, "Employee not found");
+        throw new ApiError(404, "Employee not found");
     }
 
     return res
-        .status(200)
+        .status(201)
         .json(
             new ApiResponse(200, employee, "Employee retrieved successfully")
         );
@@ -180,7 +180,7 @@ export const updateData = asyncHandler(async (req, res) => {
     });
 
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, employee, "Employee updated successfully"));
 });
 
@@ -196,15 +196,15 @@ export const updateOffboarding = asyncHandler(async (req, res) => {
     const data = req.body;
 
     if (!data?.offboardingDate) {
-        throw new ApiError(404, "Offboardin date is required");
+        throw new ApiError(400, "Offboardin date is required");
     }
 
     if (!data?.offboardingType) {
-        throw new ApiError(404, "Offboardin type is required");
+        throw new ApiError(400, "Offboardin type is required");
     }
 
     if (!data?.reason) {
-        throw new ApiError(404, "Reason is required");
+        throw new ApiError(400, "Reason is required");
     }
 
     data.status = 0;
@@ -214,7 +214,7 @@ export const updateOffboarding = asyncHandler(async (req, res) => {
     });
 
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, employee, "Employee updated successfully"));
 });
 
@@ -234,7 +234,7 @@ export const deleteData = asyncHandler(async (req, res) => {
     );
 
     return res
-        .status(200)
+        .status(201)
         .json(
             new ApiResponse(
                 200,

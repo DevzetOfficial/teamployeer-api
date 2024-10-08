@@ -1,25 +1,18 @@
 import { Router } from "express";
 import authCheck from "../middlewares/authMiddleware.js";
 import {
-    createData,
-    updateData,
+    getData,
     deleteData,
-    sortSubtask,
 } from "../controllers/taskActivitiesController.js";
 
 const route = Router();
 
 route
-    .route("/project/:projectId/task/:taskId/subtask")
-    .post(authCheck, createData);
+    .route("/project/:projectId/task/:taskId/activity")
+    .get(authCheck, getData);
 
 route
-    .route("/project/:projectId/task/:taskId/subtask/sort")
-    .put(authCheck, sortSubtask);
-
-route
-    .route("/project/:projectId/task/:taskId/subtask/:id")
-    .put(authCheck, updateData)
+    .route("/project/:projectId/task/:taskId/activity/:id")
     .delete(authCheck, deleteData);
 
 export default route;

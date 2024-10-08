@@ -1,6 +1,6 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
 import { Task } from "../models/taskModel.js";
 import { Subtask } from "../models/subtaskModel.js";
@@ -15,7 +15,7 @@ export const createData = asyncHandler(async (req, res) => {
     }
 
     if (!req.body.title) {
-        throw new ApiError(404, "Title is required");
+        throw new ApiError(400, "Title is required");
     }
 
     const subtaskPosition = await Subtask.findOne({ taskId })
@@ -41,7 +41,7 @@ export const createData = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(201, newSubtask, "Subtask created successfully"));
+        .json(new ApiResponse(200, newSubtask, "Subtask created successfully"));
 });
 
 export const updateData = asyncHandler(async (req, res) => {
@@ -65,7 +65,7 @@ export const updateData = asyncHandler(async (req, res) => {
     return res
         .status(201)
         .json(
-            new ApiResponse(201, updateSubtask, "Subtask update successfully")
+            new ApiResponse(200, updateSubtask, "Subtask update successfully")
         );
 });
 
@@ -84,7 +84,7 @@ export const deleteData = asyncHandler(async (req, res) => {
     await Subtask.findByIdAndDelete(subtaskId);
 
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, {}, "Subtask delete successfully"));
 });
 
@@ -93,7 +93,7 @@ export const sortSubtask = asyncHandler(async (req, res) => {
 
     const tasks = await Subtask.find({ taskId });
     if (tasks.length === 0) {
-        throw new ApiError(404, "Task not found");
+        throw new ApiError(400, "Task not found");
     }
 
     const updatedSubtask = req.body;
@@ -105,9 +105,9 @@ export const sortSubtask = asyncHandler(async (req, res) => {
     }
 
     return res
-        .status(200)
+        .status(201)
         .json(
-            new ApiResponse(201, {}, "Subtask position updated successfully")
+            new ApiResponse(200, {}, "Subtask position updated successfully")
         );
 });
 

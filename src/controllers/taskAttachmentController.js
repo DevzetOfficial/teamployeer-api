@@ -1,6 +1,6 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
 import { Task } from "../models/taskModel.js";
 import { TaskAttachment } from "../models/taskAttachmentModel.js";
@@ -11,7 +11,7 @@ export const createData = asyncHandler(async (req, res) => {
     const task = await Task.findById(taskId).select("title");
 
     if (!task) {
-        throw new ApiError(404, "Task not found");
+        throw new ApiError(400, "Task not found");
     }
 
     if (!req.body.fileName) {
@@ -47,7 +47,7 @@ export const createData = asyncHandler(async (req, res) => {
         .status(201)
         .json(
             new ApiResponse(
-                201,
+                200,
                 newAttachment,
                 "Task attachment created successfully"
             )
@@ -81,7 +81,7 @@ export const updateData = asyncHandler(async (req, res) => {
         .status(201)
         .json(
             new ApiResponse(
-                201,
+                200,
                 updateAttachment,
                 "Task attachment update successfully"
             )
@@ -98,7 +98,7 @@ export const deleteData = asyncHandler(async (req, res) => {
     });
 
     if (!attachment) {
-        throw new ApiError(404, "Task attachment not found");
+        throw new ApiError(400, "Task attachment not found");
     }
 
     await removeAttachmentFromTask(taskId, attachmentId);
@@ -106,8 +106,8 @@ export const deleteData = asyncHandler(async (req, res) => {
     await TaskAttachment.findByIdAndDelete(attachmentId);
 
     return res
-        .status(200)
-        .json(new ApiResponse(201, {}, "Task attachment delete successfully"));
+        .status(201)
+        .json(new ApiResponse(200, {}, "Task attachment delete successfully"));
 });
 
 export const sortAttachment = asyncHandler(async (req, res) => {
@@ -115,7 +115,7 @@ export const sortAttachment = asyncHandler(async (req, res) => {
 
     const tasks = await TaskAttachment.find({ taskId });
     if (tasks.length === 0) {
-        throw new ApiError(404, "Task not found");
+        throw new ApiError(400, "Task not found");
     }
 
     const updatedAttachment = req.body;
@@ -129,10 +129,10 @@ export const sortAttachment = asyncHandler(async (req, res) => {
     }
 
     return res
-        .status(200)
+        .status(201)
         .json(
             new ApiResponse(
-                201,
+                200,
                 {},
                 "Task attachment position updated successfully"
             )

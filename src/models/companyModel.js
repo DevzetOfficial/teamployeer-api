@@ -56,14 +56,17 @@ const companySchema = new Schema(
         companyPolicy: {
             type: String,
             trim: true,
+            default: null,
         },
         medicalBenefits: {
             type: String,
             trim: true,
+            default: null,
         },
         festibalBenefits: {
             type: String,
             trim: true,
+            default: null,
         },
     },
     {

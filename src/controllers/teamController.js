@@ -1,6 +1,6 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
 import { Team } from "../models/teamModel.js";
 import { Employee } from "../models/employeeModel.js";
@@ -33,7 +33,7 @@ export const createData = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(201, newTeam, "Team created successfully"));
+        .json(new ApiResponse(200, newTeam, "Team created successfully"));
 });
 
 export const getAllData = asyncHandler(async (req, res) => {
@@ -83,8 +83,6 @@ export const getCountData = asyncHandler(async (req, res) => {
 export const getData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    console.log(filters);
-
     const team = await Team.findOne(filters)
         .select("name")
         .populate({
@@ -98,7 +96,7 @@ export const getData = asyncHandler(async (req, res) => {
     }
 
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, team, "Team retrieved successfully"));
 });
 
@@ -122,11 +120,11 @@ export const updateData = asyncHandler(async (req, res) => {
     const team = await Team.findOneAndUpdate(filters, data, { new: true });
 
     if (!team) {
-        throw new ApiError(404, "Team not found");
+        throw new ApiError(400, "Team not found");
     }
 
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, team, "Team updated successfully"));
 });
 
@@ -136,12 +134,12 @@ export const deleteData = asyncHandler(async (req, res) => {
     const team = await Team.findOne(filters);
 
     if (!team) {
-        throw new ApiError(404, "Team not found");
+        throw new ApiError(400, "Team not found");
     }
 
     await Team.findOneAndDelete(filters);
 
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, {}, "Team delete successfully"));
 });

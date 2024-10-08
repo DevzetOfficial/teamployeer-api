@@ -1,6 +1,6 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
 import { Employee } from "../models/employeeModel.js";
 import { Timeoff } from "../models/timeoffModel.js";
@@ -17,7 +17,7 @@ export const getAllTimeoff = asyncHandler(async (req, res) => {
     const employeeInfo = await Employee.findOne(filters);
 
     if (!employeeInfo) {
-        throw new ApiError(404, "Employee not found");
+        throw new ApiError(400, "Employee not found");
     }
 
     delete filters._id;
@@ -90,7 +90,7 @@ export const setEmployeeTimeOff = asyncHandler(async (req, res) => {
     }
 
     if (!req.body?.timeoffs) {
-        throw new ApiError(404, "Time off is required");
+        throw new ApiError(400, "Time off is required");
     }
 
     const employee = await Employee.findByIdAndUpdate(

@@ -1,12 +1,12 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
 import { User } from "../models/userModel.js";
 import { Usertoken } from "../models/usertokenModel.js";
 import { Company } from "../models/companyModel.js";
-import sendMail from "../utilities/mailer.js";
-import { generateCode } from "../utilities/helper.js";
+import sendMail from "../utils/mailer.js";
+import { generateCode } from "../utils/helper.js";
 import jwt from "jsonwebtoken";
 
 // send otp email
@@ -133,7 +133,7 @@ export const login = asyncHandler(async (req, res) => {
     };
 
     return res
-        .status(200)
+        .status(201)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToekn", refreshToken, options)
         .json(
@@ -243,7 +243,7 @@ export const googleLogin = asyncHandler(async (req, res) => {
     };
 
     return res
-        .status(200)
+        .status(201)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToekn", refreshToken, options)
         .json(
@@ -335,7 +335,7 @@ export const logoutUser = asyncHandler(async (req, res) => {
     };
 
     return res
-        .status(200)
+        .status(201)
         .clearCookie("accessToken", options)
         .clearCookie("refreshToken", options)
         .json(new ApiResponse(200, {}, "Logged out successfully"));
@@ -413,6 +413,6 @@ export const generateAccessAndRefreshToken = async (userId) => {
 
 export const getCurrentUser = asyncHandler(async (req, res) => {
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, req.user, "User fatched successfully"));
 });

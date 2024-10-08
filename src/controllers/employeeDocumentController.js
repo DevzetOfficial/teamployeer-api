@@ -1,10 +1,10 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 import {
     uploadOnCloudinary,
     destroyOnCloudinary,
-} from "../utilities/cloudinary.js";
+} from "../utils/cloudinary.js";
 
 import { EmployeeDocument } from "../models/employeeDecumentModel.js";
 
@@ -39,7 +39,7 @@ export const documentCreate = asyncHandler(async (req, res) => {
         .status(201)
         .json(
             new ApiResponse(
-                201,
+                200,
                 newDocument,
                 "Employee document add successfully"
             )
@@ -69,11 +69,11 @@ export const updateDocument = asyncHandler(async (req, res) => {
     const { employeeId, id } = req.params;
 
     if (!employeeId) {
-        throw new ApiError(404, "Employee id not found");
+        throw new ApiError(400, "Employee id is required");
     }
 
     if (!id) {
-        throw new ApiError(404, "Document id not found");
+        throw new ApiError(400, "Document id is required");
     }
 
     const filters = {
@@ -91,7 +91,7 @@ export const updateDocument = asyncHandler(async (req, res) => {
     const data = {};
 
     if (!req.body?.status) {
-        throw new ApiError(404, "Status not found");
+        throw new ApiError(400, "Status is required");
     }
 
     data.status = req.body.status;
@@ -107,7 +107,7 @@ export const updateDocument = asyncHandler(async (req, res) => {
     );
 
     return res
-        .status(200)
+        .status(201)
         .json(
             new ApiResponse(
                 200,
@@ -137,6 +137,6 @@ export const deleteDocument = asyncHandler(async (req, res) => {
     await EmployeeDocument.findByIdAndDelete(documentInfo._id);
 
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, {}, "Employee docemnt delete successfully"));
 });

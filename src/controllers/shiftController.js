@@ -1,6 +1,6 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
 import { Shift } from "../models/shiftModel.js";
 
@@ -48,7 +48,7 @@ export const getData = asyncHandler(async (req, res) => {
     const shiftInfo = await Shift.findOne(filters);
 
     if (!shiftInfo) {
-        throw new ApiError(400, "Shift not found");
+        throw new ApiError(404, "Shift not found");
     }
 
     return res
@@ -62,7 +62,7 @@ export const updateData = asyncHandler(async (req, res) => {
     const shiftInfo = await Shift.findOne(filters);
 
     if (!shiftInfo) {
-        throw new ApiError(400, "Shift not found");
+        throw new ApiError(404, "Shift not found");
     }
 
     const updateShift = await Shift.findByIdAndUpdate(shiftInfo._id, req.body, {
@@ -80,7 +80,7 @@ export const deleteData = asyncHandler(async (req, res) => {
     const shiftInfo = await Shift.findOne(filters);
 
     if (!shiftInfo) {
-        throw new ApiError(400, "Shift not found");
+        throw new ApiError(404, "Shift not found");
     }
 
     await Shift.findByIdAndDelete(shiftInfo._id);

@@ -1,8 +1,8 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
-import { destroyOnCloudinary } from "../utilities/cloudinary.js";
+import { destroyOnCloudinary } from "../utils/cloudinary.js";
 
 import { Project } from "../models/projectModel.js";
 import { Scrumboard } from "../models/scrumboardModel.js";
@@ -10,6 +10,7 @@ import { Task } from "../models/taskModel.js";
 import { Subtask } from "../models/subtaskModel.js";
 import { TaskAttachment } from "../models/taskAttachmentModel.js";
 import { TaskComment } from "../models/taskCommentModel.js";
+import { TaskActivities } from "../models/taskActivitiesModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId;
@@ -22,7 +23,7 @@ export const createData = asyncHandler(async (req, res) => {
     }).select("title status");
 
     if (!project) {
-        throw new ApiError(404, "Project not found");
+        throw new ApiError(400, "Project not found");
     }
 
     const scrumboard = await Scrumboard.findOne({
@@ -31,11 +32,11 @@ export const createData = asyncHandler(async (req, res) => {
     }).select("title color");
 
     if (!scrumboard) {
-        throw new ApiError(404, "Scrumboard not found");
+        throw new ApiError(400, "Scrumboard not found");
     }
 
     if (!req.body.title) {
-        throw new ApiError(404, "Title is required");
+        throw new ApiError(400, "Title is required");
     }
 
     const taskPosition = await Task.findOne({ scrumboard: scrumboardId })
@@ -47,10 +48,6 @@ export const createData = asyncHandler(async (req, res) => {
         user: req.user?._id,
         title: req.body.title,
         description: req.body?.description || "",
-        members: [],
-        subtasks: [],
-        attachments: [],
-        comments: [],
         position: taskPosition ? taskPosition.position + 1 : 1,
     };
 
@@ -63,9 +60,17 @@ export const createData = asyncHandler(async (req, res) => {
     // task push in scrumboard
     await addTaskToScrumboard(scrumboardId, newTask._id);
 
+    // store activities
+    await TaskActivities.create({
+        activityType: "create-task",
+        description: "create a new task",
+        task: newTask._id,
+        user: req.user?._id,
+    });
+
     return res
         .status(201)
-        .json(new ApiResponse(201, newTask, "Task created successfully"));
+        .json(new ApiResponse(200, newTask, "Task created successfully"));
 });
 
 export const getData = asyncHandler(async (req, res) => {
@@ -93,12 +98,20 @@ export const getData = asyncHandler(async (req, res) => {
         .lean();
 
     if (!task) {
-        throw new ApiError(404, "Task not found");
+        throw new ApiError(400, "Task not found");
     }
 
+    const activities = await TaskActivities.find({ task: taskId });
+
     return res
-        .status(200)
-        .json(new ApiResponse(200, task, "Project retrieved successfully"));
+        .status(201)
+        .json(
+            new ApiResponse(
+                200,
+                { task, activities },
+                "Project retrieved successfully"
+            )
+        );
 });
 
 export const updateData = asyncHandler(async (req, res) => {
@@ -111,7 +124,7 @@ export const updateData = asyncHandler(async (req, res) => {
     });
 
     if (!taskInfo) {
-        throw new ApiError(404, "Task not found");
+        throw new ApiError(400, "Task not found");
     }
 
     const updateTask = await Task.findByIdAndUpdate(taskId, req.body, {
@@ -122,9 +135,17 @@ export const updateData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid credentials");
     }
 
+    // store activities
+    await TaskActivities.create({
+        activityType: "update-task",
+        description: "update the task",
+        task: updateTask._id,
+        user: req.user?._id,
+    });
+
     return res
         .status(201)
-        .json(new ApiResponse(201, updateTask, "Task update successfully"));
+        .json(new ApiResponse(200, updateTask, "Task update successfully"));
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
@@ -137,7 +158,7 @@ export const deleteData = asyncHandler(async (req, res) => {
     }).populate({ path: "attachments", select: "name path" });
 
     if (!taskInfo) {
-        throw new ApiError(404, "Task not found");
+        throw new ApiError(400, "Task not found");
     }
 
     // delete attachment
@@ -155,8 +176,16 @@ export const deleteData = asyncHandler(async (req, res) => {
 
     await removeTaskFromScrumboard(scrumboardId, taskId);
 
+    // store activities
+    await TaskActivities.create({
+        activityType: "delete-task",
+        description: "delete task",
+        task: taskId,
+        user: req.user?._id,
+    });
+
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, {}, "Task delete successfully"));
 });
 
@@ -175,7 +204,7 @@ export const moveTask = asyncHandler(async (req, res) => {
     });
 
     if (!taskInfo) {
-        throw new ApiError(404, "Task not found");
+        throw new ApiError(400, "Task not found");
     }
 
     // remove task from scrumboard
@@ -201,7 +230,7 @@ export const moveTask = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(201, updateTask, "Task move successfully"));
+        .json(new ApiResponse(200, updateTask, "Task move successfully"));
 });
 
 export const sortTask = asyncHandler(async (req, res) => {
@@ -209,7 +238,7 @@ export const sortTask = asyncHandler(async (req, res) => {
 
     const tasks = await Task.find({ scrumboard: scrumboardId });
     if (tasks.length === 0) {
-        throw new ApiError(404, "Task not found");
+        throw new ApiError(400, "Task not found");
     }
 
     const updatedTask = req.body;
@@ -224,8 +253,8 @@ export const sortTask = asyncHandler(async (req, res) => {
     }
 
     return res
-        .status(200)
-        .json(new ApiResponse(201, {}, "Task position updated successfully"));
+        .status(201)
+        .json(new ApiResponse(200, {}, "Task position updated successfully"));
 });
 
 export const addTaskToScrumboard = async (scrumboardId, taskId) => {

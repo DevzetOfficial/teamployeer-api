@@ -1,6 +1,6 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
 import { Designation } from "../models/designationModel.js";
 
@@ -18,14 +18,12 @@ export const createData = asyncHandler(async (req, res) => {
     return res
         .status(201)
         .json(
-            new ApiResponse(201, newData, "Designation created successfully")
+            new ApiResponse(200, newData, "Designation created successfully")
         );
 });
 
 export const getAllData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId };
-
-    console.log(req.user);
 
     const allData = await Designation.find(filters).lean();
 
@@ -42,11 +40,11 @@ export const getData = asyncHandler(async (req, res) => {
     const designation = await Designation.findOne(filters);
 
     if (!designation) {
-        throw new ApiError(400, "Designation not found");
+        throw new ApiError(404, "Designation not found");
     }
 
     return res
-        .status(200)
+        .status(201)
         .json(
             new ApiResponse(
                 200,
@@ -62,7 +60,7 @@ export const updateData = asyncHandler(async (req, res) => {
     const designation = await Designation.findOne(filters);
 
     if (!designation) {
-        throw new ApiError(400, "Designation not found");
+        throw new ApiError(404, "Designation not found");
     }
 
     const updateDesignation = await Designation.findByIdAndUpdate(
@@ -72,11 +70,11 @@ export const updateData = asyncHandler(async (req, res) => {
     );
 
     if (!updateDesignation) {
-        throw new ApiError(404, "Designation not found");
+        throw new ApiError(400, "Designation not found");
     }
 
     return res
-        .status(200)
+        .status(201)
         .json(
             new ApiResponse(
                 200,
@@ -92,12 +90,12 @@ export const deleteData = asyncHandler(async (req, res) => {
     const designation = await Designation.findOne(filters);
 
     if (!designation) {
-        throw new ApiError(400, "Designation not found");
+        throw new ApiError(404, "Designation not found");
     }
 
     await Designation.findOneAndDelete(req.params.id);
 
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, {}, "Designation delete successfully"));
 });

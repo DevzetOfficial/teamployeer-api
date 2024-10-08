@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
-import { generateCode, strSlud } from "../utilities/helper.js";
+import { generateCode, strSlud } from "../utils/helper.js";
 import fs from "fs";
 
 cloudinary.config({

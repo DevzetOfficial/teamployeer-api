@@ -1,6 +1,6 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
 import { Task } from "../models/taskModel.js";
 import { TaskComment } from "../models/taskCommentModel.js";
@@ -11,7 +11,7 @@ export const createData = asyncHandler(async (req, res) => {
     const task = await Task.findById(taskId).select("title");
 
     if (!task) {
-        throw new ApiError(404, "Task not found");
+        throw new ApiError(400, "Task not found");
     }
 
     if (!req.body.message) {
@@ -37,7 +37,7 @@ export const createData = asyncHandler(async (req, res) => {
         .status(201)
         .json(
             new ApiResponse(
-                201,
+                200,
                 newComment,
                 "Task comment created successfully"
             )
@@ -71,7 +71,7 @@ export const updateData = asyncHandler(async (req, res) => {
         .status(201)
         .json(
             new ApiResponse(
-                201,
+                200,
                 updateComment,
                 "Task comment update successfully"
             )
@@ -88,7 +88,7 @@ export const deleteData = asyncHandler(async (req, res) => {
     });
 
     if (!comment) {
-        throw new ApiError(404, "Task comment not found");
+        throw new ApiError(400, "Task comment not found");
     }
 
     await removeCommentFromTask(taskId, commentId);
@@ -98,8 +98,8 @@ export const deleteData = asyncHandler(async (req, res) => {
     await TaskComment.deleteMany({ parentCommentId: { $in: comment.replies } });
 
     return res
-        .status(200)
-        .json(new ApiResponse(201, {}, "Task comment delete successfully"));
+        .status(201)
+        .json(new ApiResponse(200, {}, "Task comment delete successfully"));
 });
 
 export const addCommentToTask = async (taskId, commentId) => {
@@ -150,7 +150,7 @@ export const createReply = asyncHandler(async (req, res) => {
     });
 
     if (!comment) {
-        throw new ApiError(404, "Comment not found");
+        throw new ApiError(400, "Comment not found");
     }
 
     if (!req.body.message) {
@@ -176,7 +176,7 @@ export const createReply = asyncHandler(async (req, res) => {
     return res
         .status(201)
         .json(
-            new ApiResponse(201, newReply, "Comment reply created successfully")
+            new ApiResponse(200, newReply, "Comment reply created successfully")
         );
 });
 
@@ -205,7 +205,7 @@ export const updateReply = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(201, updateReply, "Reply update successfully"));
+        .json(new ApiResponse(200, updateReply, "Reply update successfully"));
 });
 
 export const deleteReply = asyncHandler(async (req, res) => {
@@ -228,8 +228,8 @@ export const deleteReply = asyncHandler(async (req, res) => {
     await TaskComment.findByIdAndDelete(replyId);
 
     return res
-        .status(200)
-        .json(new ApiResponse(201, {}, "Task comment delete successfully"));
+        .status(201)
+        .json(new ApiResponse(200, {}, "Task comment delete successfully"));
 });
 
 export const addReplayToComment = async (commentId, replyId) => {

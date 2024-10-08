@@ -1,6 +1,6 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
 import { Project } from "../models/projectModel.js";
 import { Scrumboard } from "../models/scrumboardModel.js";
@@ -53,7 +53,7 @@ export const createData = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(201, scrumboar, "Task created successfully"));
+        .json(new ApiResponse(200, scrumboar, "Task created successfully"));
 });
 
 export const updateData = asyncHandler(async (req, res) => {
@@ -78,10 +78,10 @@ export const updateData = asyncHandler(async (req, res) => {
     );
 
     return res
-        .status(200)
+        .status(201)
         .json(
             new ApiResponse(
-                201,
+                200,
                 updateScrumboard,
                 "Scrumboard updated successfully"
             )
@@ -108,9 +108,9 @@ export const updatePosition = asyncHandler(async (req, res) => {
     }
 
     return res
-        .status(200)
+        .status(201)
         .json(
-            new ApiResponse(201, {}, "Scrumboard position updated successfully")
+            new ApiResponse(200, {}, "Scrumboard position updated successfully")
         );
 });
 
@@ -147,6 +147,6 @@ export const deleteData = asyncHandler(async (req, res) => {
     await Scrumboard.findByIdAndDelete(scrumboardId);
 
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, {}, "Scrumboard delete successfully"));
 });

@@ -1,6 +1,6 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
 import { Company } from "../models/companyModel.js";
 
@@ -20,7 +20,7 @@ export const getData = asyncHandler(async (req, res) => {
     };
 
     return res
-        .status(200)
+        .status(201)
         .json(
             new ApiResponse(200, policies, "Policies retrieved successfully")
         );
@@ -32,7 +32,7 @@ export const updateData = asyncHandler(async (req, res) => {
     const companyInfo = await Company.findById({ _id: companyId });
 
     if (!companyInfo) {
-        throw new ApiError(400, "Invalid credentials");
+        throw new ApiError(404, "Company not found");
     }
 
     if (
@@ -55,5 +55,5 @@ export const updateData = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(201, policies, "Policies update successfully"));
+        .json(new ApiResponse(200, policies, "Policies update successfully"));
 });

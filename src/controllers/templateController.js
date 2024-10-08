@@ -1,6 +1,6 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
 import { Template } from "../models/templateModel.js";
 
@@ -18,7 +18,7 @@ export const createData = asyncHandler(async (req, res) => {
     return res
         .status(201)
         .json(
-            new ApiResponse(201, newTemplate, "Template created successfully")
+            new ApiResponse(200, newTemplate, "Template created successfully")
         );
 });
 
@@ -45,7 +45,7 @@ export const getData = asyncHandler(async (req, res) => {
     }
 
     return res
-        .status(200)
+        .status(201)
         .json(
             new ApiResponse(200, template, "Template retrieved successfully")
         );
@@ -67,11 +67,11 @@ export const updateData = asyncHandler(async (req, res) => {
     );
 
     if (!updateTemplate) {
-        throw new ApiError(404, "Template not found");
+        throw new ApiError(400, "Template not found");
     }
 
     return res
-        .status(200)
+        .status(201)
         .json(
             new ApiResponse(
                 200,
@@ -93,6 +93,6 @@ export const deleteData = asyncHandler(async (req, res) => {
     await Template.findOneAndDelete(req.params.id);
 
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, {}, "Template delete successfully"));
 });

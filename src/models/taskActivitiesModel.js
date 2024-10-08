@@ -2,28 +2,79 @@ import mongoose, { Schema } from "mongoose";
 
 const taskActivitiesSchema = new Schema(
     {
-        taskId: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: [true, "Task is required"],
-            ref: "Task",
-            index: true,
-        },
-        user: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: [true, "User id is required"],
-            ref: "User",
-            index: true,
+        activityType: {
+            type: String,
+            required: [true, "Activity type is required"],
         },
         description: {
             type: String,
             required: [true, "Description is required"],
             trim: true,
         },
+        task: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: [true, "Task id is required"],
+            ref: "Task",
+            index: true,
+        },
+        subtask: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Subtask",
+            default: null,
+        },
+        attachment: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "TaskAttachment",
+            default: null,
+        },
+        comment: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "TaskComment",
+            default: null,
+        },
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: [true, "User id is required"],
+            index: true,
+        },
     },
     {
         timestamps: true,
     }
 );
+
+taskActivitiesSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: "task",
+        select: "title",
+    });
+    next();
+});
+
+taskActivitiesSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: "subtask",
+        select: "title",
+    });
+    next();
+});
+
+taskActivitiesSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: "attachment",
+        select: "fileName",
+    });
+    next();
+});
+
+taskActivitiesSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: "comment",
+        select: "message",
+    });
+    next();
+});
 
 taskActivitiesSchema.pre(/^find/, function (next) {
     this.populate({

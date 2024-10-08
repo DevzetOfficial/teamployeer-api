@@ -1,6 +1,6 @@
 import { Router } from "express";
 import authCheck from "../middlewares/authMiddleware.js";
-import { getData, updateData } from "../controllers/policieController.js";
+import { getData, updateData } from "../controllers/policyController.js";
 
 const route = Router();
 

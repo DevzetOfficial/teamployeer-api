@@ -1,12 +1,12 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 import { format, differenceInDays } from "date-fns";
-import { objectId, getSegments, ucfirst } from "../utilities/helper.js";
+import { objectId, getSegments, ucfirst } from "../utils/helper.js";
 import {
     uploadOnCloudinary,
     destroyOnCloudinary,
-} from "../utilities/cloudinary.js";
+} from "../utils/cloudinary.js";
 
 import { Timeoff } from "../models/timeoffModel.js";
 import { TimeoffAttachment } from "../models/timeoffAttachmentModel.js";
@@ -65,7 +65,7 @@ export const createData = asyncHandler(async (req, res) => {
         .status(201)
         .json(
             new ApiResponse(
-                201,
+                200,
                 { newTimeOff },
                 "Time Off created successfully"
             )
@@ -230,7 +230,7 @@ export const updateData = asyncHandler(async (req, res) => {
     );
 
     return res
-        .status(200)
+        .status(201)
         .json(
             new ApiResponse(200, updtaeTimeOff, "Time Off updated successfully")
         );
@@ -242,7 +242,7 @@ export const deleteData = asyncHandler(async (req, res) => {
     const timeOffInfo = await Timeoff.findOne(filters);
 
     if (!timeOffInfo) {
-        throw new ApiError(404, "Time Off not found");
+        throw new ApiError(400, "Time Off not found");
     }
 
     const timeOffDocument = await TimeoffAttachment.find({
@@ -262,7 +262,7 @@ export const deleteData = asyncHandler(async (req, res) => {
     await Timeoff.findByIdAndDelete(timeOffInfo._id);
 
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, {}, "Time Off delete successfully"));
 });
 
@@ -274,7 +274,7 @@ export const deleteAttachment = asyncHandler(async (req, res) => {
     const timeOffInfo = await Timeoff.findOne(filters);
 
     if (!timeOffInfo) {
-        throw new ApiError(404, "Time Off not found");
+        throw new ApiError(400, "Time Off not found");
     }
 
     if (timeOffInfo.attachments.includes(id)) {
@@ -298,7 +298,7 @@ export const deleteAttachment = asyncHandler(async (req, res) => {
     await TimeoffAttachment.findByIdAndDelete(id);
 
     return res
-        .status(200)
+        .status(201)
         .json(
             new ApiResponse(200, {}, "Time Off attachment delete successfully")
         );

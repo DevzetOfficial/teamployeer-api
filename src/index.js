@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-import { ApiError } from "./utilities/ApiError.js";
+import { ApiError } from "./utils/ApiError.js";
 import connectDB from "./db/config.js";
 import { app } from "./app.js";
 

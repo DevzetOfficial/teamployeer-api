@@ -1,11 +1,11 @@
-import { asyncHandler } from "../utilities/asyncHandler.js";
-import { ApiResponse } from "../utilities/ApiResponse.js";
-import { ApiError } from "../utilities/ApiError.js";
-import { generateCode, objectId } from "../utilities/helper.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
+import { generateCode, objectId } from "../utils/helper.js";
 import {
     uploadOnCloudinary,
     destroyOnCloudinary,
-} from "../utilities/cloudinary.js";
+} from "../utils/cloudinary.js";
 
 import { Client } from "../models/clientModel.js";
 
@@ -48,7 +48,7 @@ export const createData = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(201, newClient, "Client created successfully."));
+        .json(new ApiResponse(200, newClient, "Client created successfully."));
 });
 
 export const getActiveData = asyncHandler(async (req, res) => {
@@ -126,14 +126,13 @@ export const getData = asyncHandler(async (req, res) => {
     const client = await Client.findOne(filters)
         .populate({ path: "country", select: "name avatar" })
         .populate({ path: "projects", select: "name status" });
-    //.populate({ path: "transactions", select: "name status" });
 
     if (!client) {
-        throw new ApiError(400, "Client not found");
+        throw new ApiError(404, "Client not found");
     }
 
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, client, "Client retrieved successfully"));
 });
 
@@ -143,7 +142,7 @@ export const updateData = asyncHandler(async (req, res) => {
     const clientInfo = await Client.findOne(filters);
 
     if (!clientInfo) {
-        throw new ApiError(400, "Client not found");
+        throw new ApiError(404, "Client not found");
     }
 
     const data = req.body;
@@ -162,7 +161,7 @@ export const updateData = asyncHandler(async (req, res) => {
     });
 
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, client, "Client updated successfully"));
 });
 
@@ -184,6 +183,6 @@ export const deleteData = asyncHandler(async (req, res) => {
     );
 
     return res
-        .status(200)
+        .status(201)
         .json(new ApiResponse(200, client, "Client delete successfully"));
 });
