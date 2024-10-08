@@ -49,8 +49,9 @@ export const createData = asyncHandler(async (req, res) => {
     await TaskActivities.create({
         projectId,
         taskId,
-        activityType: "create-task-attachment",
-        description: "create a new task <span>" + newTask.title + "</span>",
+        activityType: "create-attachment",
+        description:
+            "added a attachment <span>" + newAttachment.fileName + "</span>",
         user: req.user?._id,
     });
 
@@ -65,7 +66,32 @@ export const createData = asyncHandler(async (req, res) => {
         );
 });
 
+export const getData = asyncHandler(async (req, res) => {
+    const taskId = req.params?.taskId;
+
+    const task = await Task.findById(taskId).select("title");
+
+    if (!task) {
+        throw new ApiError(404, "Task not found");
+    }
+
+    const attachmentList = await TaskAttachment.find({ taskId }).select(
+        "-taskId -position -__v"
+    );
+
+    return res
+        .status(201)
+        .json(
+            new ApiResponse(
+                200,
+                attachmentList,
+                "Task attachments retrieved successfully"
+            )
+        );
+});
+
 export const updateData = asyncHandler(async (req, res) => {
+    const projectId = req.params?.projectId;
     const taskId = req.params?.taskId;
     const attachmentId = req.params?.id;
 
@@ -88,6 +114,18 @@ export const updateData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid credentials");
     }
 
+    // store activities
+    await TaskActivities.create({
+        projectId,
+        taskId,
+        activityType: "update-attachment",
+        description:
+            "updated a attachment <span>" +
+            updateAttachment.fileName +
+            "</span>",
+        user: req.user?._id,
+    });
+
     return res
         .status(201)
         .json(
@@ -100,6 +138,7 @@ export const updateData = asyncHandler(async (req, res) => {
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
+    const projectId = req.params?.projectId;
     const taskId = req.params?.taskId;
     const attachmentId = req.params?.id;
 
@@ -115,6 +154,16 @@ export const deleteData = asyncHandler(async (req, res) => {
     await removeAttachmentFromTask(taskId, attachmentId);
 
     await TaskAttachment.findByIdAndDelete(attachmentId);
+
+    // store activities
+    await TaskActivities.create({
+        projectId,
+        taskId,
+        activityType: "delete-attachment",
+        description:
+            "deleted a attachment <span>" + attachment.fileName + "</span>",
+        user: req.user?._id,
+    });
 
     return res
         .status(201)

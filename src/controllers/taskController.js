@@ -65,7 +65,7 @@ export const createData = asyncHandler(async (req, res) => {
         projectId,
         taskId: newTask._id,
         activityType: "create-task",
-        description: "create a new task <span>" + newTask.title + "</span>",
+        description: "created a new task <span>" + newTask.title + "</span>",
         user: req.user?._id,
     });
 
@@ -111,7 +111,7 @@ export const getData = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 { task, activities },
-                "Project retrieved successfully"
+                "Task retrieved successfully"
             )
         );
 });
@@ -244,7 +244,7 @@ export const moveTask = asyncHandler(async (req, res) => {
         taskId,
         activityType: "move-task",
         description:
-            "move task <span>" +
+            "moved task <span>" +
             taskInfo.scrumboard?.name +
             "</span> To <span>" +
             toScrumboard.name +

@@ -4,8 +4,10 @@ import { ApiError } from "../utils/ApiError.js";
 
 import { Task } from "../models/taskModel.js";
 import { TaskComment } from "../models/taskCommentModel.js";
+import { TaskActivities } from "../models/taskActivitiesModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
+    const projectId = req.params?.projectId;
     const taskId = req.params?.taskId;
 
     const task = await Task.findById(taskId).select("title");
@@ -33,6 +35,15 @@ export const createData = asyncHandler(async (req, res) => {
     // comment push in task
     await addCommentToTask(taskId, newComment._id);
 
+    // store activities
+    await TaskActivities.create({
+        projectId,
+        taskId,
+        activityType: "create-comment",
+        description: "commented <pre>" + newComment.message + "</pre>",
+        user: req.user?._id,
+    });
+
     return res
         .status(201)
         .json(
@@ -40,6 +51,30 @@ export const createData = asyncHandler(async (req, res) => {
                 200,
                 newComment,
                 "Task comment created successfully"
+            )
+        );
+});
+
+export const getData = asyncHandler(async (req, res) => {
+    const taskId = req.params?.taskId;
+
+    const task = await Task.findById(taskId).select("title");
+
+    if (!task) {
+        throw new ApiError(404, "Task not found");
+    }
+
+    const comments = await TaskComment.find({ taskId }).select(
+        "-taskId -position -__v"
+    );
+
+    return res
+        .status(201)
+        .json(
+            new ApiResponse(
+                200,
+                comments,
+                "Task comments retrieved successfully"
             )
         );
 });

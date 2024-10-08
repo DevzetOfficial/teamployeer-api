@@ -2,6 +2,7 @@ import { Router } from "express";
 import authCheck from "../middlewares/authMiddleware.js";
 import {
     createData,
+    getData,
     updateData,
     deleteData,
     sortAttachment,
@@ -11,6 +12,7 @@ const route = Router();
 
 route
     .route("/project/:projectId/task/:taskId/attachment")
+    .get(authCheck, getData)
     .post(authCheck, createData);
 
 route

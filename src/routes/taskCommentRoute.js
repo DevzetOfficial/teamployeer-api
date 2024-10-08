@@ -2,6 +2,7 @@ import { Router } from "express";
 import authCheck from "../middlewares/authMiddleware.js";
 import {
     createData,
+    getData,
     updateData,
     deleteData,
     createReply,
@@ -13,6 +14,7 @@ const route = Router();
 
 route
     .route("/project/:projectId/task/:taskId/comment")
+    .get(authCheck, getData)
     .post(authCheck, createData);
 
 route
