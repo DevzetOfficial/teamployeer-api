@@ -8,11 +8,11 @@ import {
 const route = Router();
 
 route
-    .route("/project/:projectId/task/:taskId/activity")
+    .route("/project/:projectId/task/:taskId/activities")
     .get(authCheck, getData);
 
 route
-    .route("/project/:projectId/task/:taskId/activity/:id")
+    .route("/project/:projectId/task/:taskId/activities/:id")
     .delete(authCheck, deleteData);
 
 export default route;

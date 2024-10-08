@@ -62,9 +62,10 @@ export const createData = asyncHandler(async (req, res) => {
 
     // store activities
     await TaskActivities.create({
+        projectId,
+        taskId: newTask._id,
         activityType: "create-task",
-        description: "create a new task",
-        task: newTask._id,
+        description: "create a new task <span>" + newTask.title + "</span>",
         user: req.user?._id,
     });
 
@@ -74,6 +75,7 @@ export const createData = asyncHandler(async (req, res) => {
 });
 
 export const getData = asyncHandler(async (req, res) => {
+    const projectId = req.params.projectId;
     const taskId = req.params.id;
     const scrumboardId = req.params?.scrumboardId;
 
@@ -101,7 +103,7 @@ export const getData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Task not found");
     }
 
-    const activities = await TaskActivities.find({ task: taskId });
+    const activities = await TaskActivities.find({ projectId, taskId });
 
     return res
         .status(201)
@@ -115,6 +117,7 @@ export const getData = asyncHandler(async (req, res) => {
 });
 
 export const updateData = asyncHandler(async (req, res) => {
+    const projectId = req.params.projectId;
     const taskId = req.params?.id;
     const scrumboardId = req.params?.scrumboardId;
 
@@ -137,9 +140,10 @@ export const updateData = asyncHandler(async (req, res) => {
 
     // store activities
     await TaskActivities.create({
+        projectId,
+        taskId,
         activityType: "update-task",
-        description: "update the task",
-        task: updateTask._id,
+        description: "update the task <span>" + updateTask.title + "</span>",
         user: req.user?._id,
     });
 
@@ -149,6 +153,7 @@ export const updateData = asyncHandler(async (req, res) => {
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
+    const projectId = req.params.projectId;
     const taskId = req.params?.id;
     const scrumboardId = req.params?.scrumboardId;
 
@@ -170,17 +175,19 @@ export const deleteData = asyncHandler(async (req, res) => {
         await TaskAttachment.deleteMany({ taskId: taskId });
     }
 
-    await Subtask.deleteMany({ taskId: taskId });
-    await TaskComment.deleteMany({ taskId: taskId });
-    await Task.findByIdAndDelete(taskId);
-
+    await Subtask.deleteMany({ taskId });
+    await TaskComment.deleteMany({ taskId });
+    await TaskActivities.deleteMany({ taskId });
     await removeTaskFromScrumboard(scrumboardId, taskId);
+
+    await Task.findByIdAndDelete(taskId);
 
     // store activities
     await TaskActivities.create({
+        projectId,
+        taskId,
         activityType: "delete-task",
-        description: "delete task",
-        task: taskId,
+        description: "delete the task <span>" + taskInfo.title + "</span>",
         user: req.user?._id,
     });
 
@@ -190,6 +197,7 @@ export const deleteData = asyncHandler(async (req, res) => {
 });
 
 export const moveTask = asyncHandler(async (req, res) => {
+    const projectId = req.params?.projectId;
     const taskId = req.params?.id;
     const scrumboardId = req.params?.scrumboardId;
     const toScrumboardId = req.params?.toScrumboardId;
@@ -201,7 +209,7 @@ export const moveTask = asyncHandler(async (req, res) => {
     const taskInfo = await Task.findOne({
         _id: taskId,
         scrumboard: scrumboardId,
-    });
+    }).populate({ path: "scrumboard", select: "name" });
 
     if (!taskInfo) {
         throw new ApiError(400, "Task not found");
@@ -227,6 +235,22 @@ export const moveTask = asyncHandler(async (req, res) => {
         },
         { new: true }
     );
+
+    const toScrumboard = Scrumboard.findById(toScrumboardId);
+
+    // store activities
+    await TaskActivities.create({
+        projectId,
+        taskId,
+        activityType: "move-task",
+        description:
+            "move task <span>" +
+            taskInfo.scrumboard?.name +
+            "</span> To <span>" +
+            toScrumboard.name +
+            "</span>",
+        user: req.user?._id,
+    });
 
     return res
         .status(201)

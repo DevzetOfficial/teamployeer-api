@@ -4,8 +4,10 @@ import { ApiError } from "../utils/ApiError.js";
 
 import { Task } from "../models/taskModel.js";
 import { TaskAttachment } from "../models/taskAttachmentModel.js";
+import { TaskActivities } from "../models/taskActivitiesModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
+    const projectId = req.params?.projectId;
     const taskId = req.params?.taskId;
 
     const task = await Task.findById(taskId).select("title");
@@ -42,6 +44,15 @@ export const createData = asyncHandler(async (req, res) => {
 
     // attachment push in task
     await addAttachmentToTask(taskId, newAttachment._id);
+
+    // store activities
+    await TaskActivities.create({
+        projectId,
+        taskId,
+        activityType: "create-task-attachment",
+        description: "create a new task <span>" + newTask.title + "</span>",
+        user: req.user?._id,
+    });
 
     return res
         .status(201)
