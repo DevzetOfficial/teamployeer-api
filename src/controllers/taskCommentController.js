@@ -102,6 +102,16 @@ export const updateData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid credentials");
     }
 
+    // store activities
+    await TaskActivities.create({
+        projectId,
+        taskId,
+        activityType: "update-comment",
+        description:
+            "updated a comment <pre>" + updateComment.message + "</pre>",
+        user: req.user?._id,
+    });
+
     return res
         .status(201)
         .json(
@@ -131,6 +141,15 @@ export const deleteData = asyncHandler(async (req, res) => {
     await TaskComment.findByIdAndDelete(commentId);
 
     await TaskComment.deleteMany({ parentCommentId: { $in: comment.replies } });
+
+    // store activities
+    await TaskActivities.create({
+        projectId,
+        taskId,
+        activityType: "delete-comment",
+        description: "deleted a comment <pre>" + comment.message + "</pre>",
+        user: req.user?._id,
+    });
 
     return res
         .status(201)
