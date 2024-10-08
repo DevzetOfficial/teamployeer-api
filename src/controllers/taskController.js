@@ -236,7 +236,7 @@ export const moveTask = asyncHandler(async (req, res) => {
         { new: true }
     );
 
-    const toScrumboard = Scrumboard.findById(toScrumboardId);
+    const toScrumboard = await Scrumboard.findById(toScrumboardId);
 
     // store activities
     await TaskActivities.create({
