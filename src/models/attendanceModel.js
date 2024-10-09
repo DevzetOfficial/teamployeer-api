@@ -8,10 +8,11 @@ const attendanceSchema = new Schema(
             ref: "Company",
             index: true,
         },
-        employeeId: {
-            type: String,
-            required: true,
-            trim: true,
+        employee: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: [true, "Employee is required"],
+            ref: "Employee",
+            index: true,
         },
         checkIn: {
             type: String,
@@ -34,7 +35,7 @@ const attendanceSchema = new Schema(
             default: null,
         },
         status: {
-            type: Number,
+            type: String,
             default: null,
         },
     },
