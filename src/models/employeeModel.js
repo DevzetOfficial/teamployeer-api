@@ -38,6 +38,7 @@ const employeeSchema = new Schema(
         avatar: {
             type: String,
             trim: true,
+            default: null,
         },
         employeeType: {
             type: mongoose.Schema.Types.ObjectId,

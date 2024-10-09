@@ -7,6 +7,7 @@ import { calculateWorkedTimeAndOvertime } from "../utils/helper.js";
 
 export const createData = asyncHandler(async (req, res) => {
     const formData = req.body;
+    formData.companyId = req.user?.companyId;
 
     if (!formData?.employee) {
         throw new ApiError(400, "Employee id is required");
@@ -23,42 +24,36 @@ export const createData = asyncHandler(async (req, res) => {
         createdAt: { $gte: startDate, $lt: endDate },
     });
 
-    if (existData > 0) {
+    /* if (existData > 0) {
         throw new ApiError(400, "Employee attendance has already been taken");
-    }
-
-    if (!formData?.checkIn) {
-        throw new ApiError(400, "Check in is required");
-    }
-
-    if (!formData?.checkOut) {
-        throw new ApiError(400, "Check out is required");
-    }
+    } */
 
     if (!formData?.status) {
         throw new ApiError(400, "Satus is required");
     }
 
-    const calculateTime = calculateWorkedTimeAndOvertime(
-        formData.checkIn,
-        formData.checkOut
-    );
+    if (formData.checkIn && formData?.checkOut) {
+        const calculateTime = calculateWorkedTimeAndOvertime(
+            formData.checkIn,
+            formData.checkOut
+        );
 
-    const workedHours =
-        calculateTime.workedHours +
-        " hrs " +
-        (calculateTime.workedMinutes > 0
-            ? calculateTime.workedMinutes + " mins"
-            : "");
+        const workedHours =
+            (calculateTime.workedHours > 0
+                ? calculateTime.workedHours + " hrs "
+                : "") +
+            (calculateTime.workedMinutes > 0
+                ? calculateTime.workedMinutes + " mins"
+                : "");
 
-    const overtime =
-        calculateTime.overtimeMinutes > 0
-            ? calculateTime.overtimeMinutes + " mins"
-            : "";
+        const overtime =
+            calculateTime.overtimeMinutes > 0
+                ? calculateTime.overtimeMinutes + " mins"
+                : "";
 
-    formData.companyId = req.user?.companyId;
-    formData.workedHours = workedHours;
-    formData.overtime = overtime;
+        formData.workedHours = workedHours;
+        formData.overtime = overtime;
+    }
 
     const newAttendance = await Attendance.create(formData);
 
@@ -88,7 +83,14 @@ export const getAllData = asyncHandler(async (req, res) => {
     filters.createdAt = { $gte: startDate, $lt: endDate };
 
     const attendances = await Attendance.find(filters)
-        .populate({ path: "employee", select: "employeeId name avatar" })
+        .populate({
+            path: "employee",
+            select: "employeeId name avatar",
+            populate: {
+                path: "designation",
+                select: "name",
+            },
+        })
         .lean();
 
     return res
@@ -135,46 +137,35 @@ export const updateData = asyncHandler(async (req, res) => {
 
     const formData = req.body;
 
-    if (!formData?.checkIn) {
-        throw new ApiError(400, "Check in is required");
-    }
-
-    if (!formData?.checkOut) {
-        throw new ApiError(400, "Check out is required");
-    }
-
     if (!formData?.status) {
         throw new ApiError(400, "Satus is required");
     }
 
-    const calculateTime = calculateWorkedTimeAndOvertime(
-        formData.checkIn,
-        formData.checkOut
-    );
+    if (formData.checkIn && formData?.checkOut) {
+        const calculateTime = calculateWorkedTimeAndOvertime(
+            formData.checkIn,
+            formData.checkOut
+        );
 
-    const workedHours =
-        calculateTime.workedHours +
-        " hrs " +
-        (calculateTime.workedMinutes > 0
-            ? calculateTime.workedMinutes + " mins"
-            : "");
+        const workedHours =
+            calculateTime.workedHours +
+            " hrs " +
+            (calculateTime.workedMinutes > 0
+                ? calculateTime.workedMinutes + " mins"
+                : "");
 
-    const overtime =
-        calculateTime.overtimeMinutes > 0
-            ? calculateTime.overtimeMinutes + " mins"
-            : "";
+        const overtime =
+            calculateTime.overtimeMinutes > 0
+                ? calculateTime.overtimeMinutes + " mins"
+                : "";
 
-    const data = {
-        checkIn: formData.checkIn,
-        checkOut: formData.checkOut,
-        workedHours: workedHours,
-        overtime: overtime,
-        status: formData.status,
-    };
+        formData.workedHours = workedHours;
+        formData.overtime = overtime;
+    }
 
     const updateAttendance = await Attendance.findByIdAndUpdate(
         attensdance._id,
-        data,
+        formData,
         {
             new: true,
         }

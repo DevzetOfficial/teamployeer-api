@@ -16,8 +16,8 @@ const attendanceSchema = new Schema(
         },
         checkIn: {
             type: String,
-            required: [true, "Check in is required"],
             trim: true,
+            default: null,
         },
         checkOut: {
             type: String,
@@ -36,7 +36,11 @@ const attendanceSchema = new Schema(
         },
         status: {
             type: String,
-            default: null,
+            required: [true, "Status is required"],
+            enum: {
+                values: ["Present", "Absent", "Late"],
+                message: "{VALUE} is not a valid status",
+            },
         },
     },
     {
