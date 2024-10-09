@@ -12,6 +12,21 @@ export const createData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Employee id is required");
     }
 
+    // check exist data
+    const startDate = new Date(req.query?.date || Date.now());
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 1);
+
+    const existData = await Attendance.countDocuments({
+        employee: formData.employee,
+        createdAt: { $gte: startDate, $lt: endDate },
+    });
+
+    if (existData > 0) {
+        throw new ApiError(400, "Employee attendance has already been taken");
+    }
+
     if (!formData?.checkIn) {
         throw new ApiError(400, "Check in is required");
     }
@@ -41,12 +56,11 @@ export const createData = asyncHandler(async (req, res) => {
             ? calculateTime.overtimeMinutes + " mins"
             : "";
 
-    const data = formData;
-    data.companyId = req.user?.companyId;
-    data.workedHours = workedHours;
-    data.overtime = overtime;
+    formData.companyId = req.user?.companyId;
+    formData.workedHours = workedHours;
+    formData.overtime = overtime;
 
-    const newAttendance = await Attendance.create(data);
+    const newAttendance = await Attendance.create(formData);
 
     if (!newAttendance) {
         throw new ApiError(400, "Invalid credentials");
