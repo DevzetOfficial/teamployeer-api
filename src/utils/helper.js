@@ -7,8 +7,8 @@ export const calculateWorkedTimeAndOvertime = (
     standardHours = 8
 ) => {
     // Parse the check-in and check-out times
-    const checkIn = parse(checkInTime, "hh:mm a", new Date());
-    const checkOut = parse(checkOutTime, "hh:mm a", new Date());
+    const checkIn = parse(checkInTime, "HH:mm", new Date());
+    const checkOut = parse(checkOutTime, "HH:mm", new Date());
 
     // Calculate the total worked minutes
     const workedMinutes = differenceInMinutes(checkOut, checkIn);
