@@ -41,15 +41,10 @@ export const createData = asyncHandler(async (req, res) => {
             ? calculateTime.overtimeMinutes + " mins"
             : "";
 
-    const data = {
-        companyId: req.user?.companyId,
-        employee: formData.employeeId,
-        checkIn: formData.checkIn,
-        checkOut: formData.checkOut,
-        workedHours: workedHours,
-        overtime: overtime,
-        status: formData.status,
-    };
+    const data = formData;
+    data.companyId = req.user?.companyId;
+    data.workedHours = workedHours;
+    data.overtime = overtime;
 
     const newAttendance = await Attendance.create(data);
 
