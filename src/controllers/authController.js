@@ -162,11 +162,6 @@ export const register = asyncHandler(async (req, res) => {
         companyType: companyType,
         companySize: companySize,
         email: email,
-        mobile: "",
-        address: "",
-        startTime: "",
-        endTime: "",
-        logo: "",
     });
 
     const companyInfo = await Company.findById(company._id).select("-__v");

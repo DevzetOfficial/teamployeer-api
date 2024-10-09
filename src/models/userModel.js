@@ -26,10 +26,12 @@ const userSchema = new Schema(
         employee: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Employee",
+            default: null,
         },
         client: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Client",
+            default: null,
         },
         userType: {
             type: String,
@@ -44,6 +46,7 @@ const userSchema = new Schema(
         },
         avatar: {
             type: String,
+            default: null,
         },
         isActive: {
             type: Boolean,
@@ -56,10 +59,12 @@ const userSchema = new Schema(
         googleId: {
             type: String,
             index: true,
+            default: null,
         },
         refreshToken: {
             type: String,
             index: true,
+            default: null,
         },
     },
     {
