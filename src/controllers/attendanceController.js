@@ -1,9 +1,13 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
+import {
+    calculateWorkedTimeAndOvertime,
+    getSegments,
+    ucfirst,
+} from "../utils/helper.js";
 
 import { Attendance } from "../models/attendanceModel.js";
-import { calculateWorkedTimeAndOvertime } from "../utils/helper.js";
 
 export const createData = asyncHandler(async (req, res) => {
     const formData = req.body;
@@ -24,9 +28,9 @@ export const createData = asyncHandler(async (req, res) => {
         createdAt: { $gte: startDate, $lt: endDate },
     });
 
-    /* if (existData > 0) {
+    if (existData > 0) {
         throw new ApiError(400, "Employee attendance has already been taken");
-    } */
+    }
 
     if (!formData?.status) {
         throw new ApiError(400, "Satus is required");
@@ -74,6 +78,12 @@ export const createData = asyncHandler(async (req, res) => {
 
 export const getAllData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId };
+
+    const segments = getSegments(req.url);
+
+    if (segments?.[1]) {
+        filters.status = ucfirst(segments?.[1]);
+    }
 
     const startDate = new Date(req.query?.date || Date.now());
     startDate.setHours(0, 0, 0, 0);
@@ -123,6 +133,56 @@ export const getData = asyncHandler(async (req, res) => {
                 attensdance,
                 "Attensance retrieved successfully"
             )
+        );
+});
+
+export const getCountData = asyncHandler(async (req, res) => {
+    const startDate = new Date(req.query?.date || Date.now());
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 1);
+
+    const attachments = await Attendance.aggregate([
+        {
+            $match: {
+                companyId: { $eq: req.user?.companyId },
+                createdAt: { $gte: startDate, $lt: endDate },
+            },
+        },
+        {
+            $group: {
+                _id: "$status",
+                count: { $sum: 1 },
+            },
+        },
+    ]);
+
+    const dataCount = {
+        present: 0,
+        absent: 0,
+        late: 0,
+    };
+
+    if (attachments) {
+        attachments.forEach((row) => {
+            if (row._id === "Present") {
+                dataCount.present = row.count;
+            }
+
+            if (row._id === "Absent") {
+                dataCount.absent = row.count;
+            }
+
+            if (row._id === "Late") {
+                dataCount.late = row.count;
+            }
+        });
+    }
+
+    return res
+        .status(201)
+        .json(
+            new ApiResponse(200, dataCount, "Attendance retrieved successfully")
         );
 });
 

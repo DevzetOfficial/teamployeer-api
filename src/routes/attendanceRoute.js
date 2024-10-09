@@ -4,6 +4,7 @@ import authCheck from "../middlewares/authMiddleware.js";
 import {
     createData,
     getAllData,
+    getCountData,
     getData,
     updateData,
     deleteData,
@@ -15,6 +16,11 @@ route
     .route("/attendance")
     .get(authCheck, getAllData)
     .post(authCheck, createData);
+
+route.route("/attendance/present").get(authCheck, getAllData);
+route.route("/attendance/absent").get(authCheck, getAllData);
+route.route("/attendance/late").get(authCheck, getAllData);
+route.route("/attendance/count").get(authCheck, getCountData);
 
 route
     .route("/attendance/:id")
