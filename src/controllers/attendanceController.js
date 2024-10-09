@@ -8,7 +8,7 @@ import { calculateWorkedTimeAndOvertime } from "../utils/helper.js";
 export const createData = asyncHandler(async (req, res) => {
     const formData = req.body;
 
-    if (!formData?.employeeId) {
+    if (!formData?.employee) {
         throw new ApiError(400, "Employee id is required");
     }
 
