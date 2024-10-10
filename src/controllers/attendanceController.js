@@ -154,12 +154,25 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
 
     const employees = await Employee.find({ _id: { $in: uniqueEmployeeIds } })
         .select("employeeId name avatar")
+        .populate({ path: "shift", select: "workDays" })
         .lean();
 
     const dateList = getAllDatesInMonthFromInput(startDate);
 
-    const monthlyAttendance = employees.map((employee) => {
-        return { ...employee, dateList };
+    const monthlyAttendance = employees.map((employee, index) => {
+        employee.attendance = [];
+
+        if (dateList.length > 0) {
+            for (const row of dateList) {
+                if (employee.shift.workDays.indexOf(row.dayName) === -1) {
+                    employee.attendance.push("Wek");
+                } else {
+                    employee.attendance.push("P");
+                }
+            }
+        }
+
+        return { ...employee };
     });
 
     return res.status(201).json(
