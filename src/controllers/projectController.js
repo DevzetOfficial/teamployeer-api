@@ -203,6 +203,12 @@ export const getData = asyncHandler(async (req, res) => {
     scrumboards.forEach((scrumboard) => {
         if (scrumboard.tasks) {
             scrumboard.tasks.sort((a, b) => a.position - b.position);
+
+            if (scrumboard.tasks.subtasks) {
+                scrumboard.tasks.subtasks.sort(
+                    (a, b) => a.position - b.position
+                );
+            }
         }
     });
 

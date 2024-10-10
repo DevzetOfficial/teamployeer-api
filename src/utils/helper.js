@@ -59,7 +59,7 @@ export const getAllDatesInMonthFromInput = (inputDate) => {
         allDatesArray.push({
             date: currentDate,
             dayName: dayName,
-            dayNumber: currentDate.getDay(),
+            dayNumber: currentDate.getDate(),
         });
     }
 

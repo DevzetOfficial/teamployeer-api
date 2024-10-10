@@ -269,7 +269,6 @@ export const sortTask = asyncHandler(async (req, res) => {
 
     if (updatedTask.length > 0) {
         for (const row of updatedTask) {
-            console.log(row);
             await Task.findByIdAndUpdate(row.id, { position: row.position });
         }
     }

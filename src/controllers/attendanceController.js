@@ -141,11 +141,11 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
 
     filters.createdAt = { $gte: startDate, $lt: endDate };
 
-    const attendances = await Attendance.find(filters).lean();
+    const attendanceList = await Attendance.find(filters).lean();
 
     // Extract unique employeeIds
     const employeeIds = [
-        ...new Set(attendances.map((attendance) => attendance.employee)),
+        ...new Set(attendanceList.map((attendance) => attendance.employee)),
     ];
 
     const uniqueEmployeeIds = Array.from(
@@ -158,22 +158,20 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
 
     const dateList = getAllDatesInMonthFromInput(startDate);
 
-    const results = employees.map((employee) => {
-        console.log(employee);
-        return { ...employee, date: 1 };
+    const monthlyAttendance = employees.map((employee) => {
+        return { ...employee, dateList };
     });
 
-    console.log(results, employees);
-
-    return res
-        .status(201)
-        .json(
-            new ApiResponse(
-                200,
-                attendances,
-                "Attendance retrieved successfully"
-            )
-        );
+    return res.status(201).json(
+        new ApiResponse(
+            200,
+            {
+                dateList,
+                monthlyAttendance,
+            },
+            "Attendance retrieved successfully"
+        )
+    );
 });
 
 export const getData = asyncHandler(async (req, res) => {
