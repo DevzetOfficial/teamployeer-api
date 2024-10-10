@@ -200,6 +200,12 @@ export const getData = asyncHandler(async (req, res) => {
             ],
         });
 
+    scrumboards.forEach((scrumboard) => {
+        if (scrumboard.tasks) {
+            scrumboard.tasks.sort((a, b) => a.position - b.position);
+        }
+    });
+
     return res
         .status(201)
         .json(
