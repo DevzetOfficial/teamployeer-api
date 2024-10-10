@@ -27,6 +27,11 @@ const shiftSchema = new Schema(
             required: [true, "End time is required"],
             trim: true,
         },
+        workedHours: {
+            type: String,
+            trim: true,
+            default: null,
+        },
         workDays: {
             type: [String],
             required: true,

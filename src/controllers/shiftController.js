@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
+import { differenceInMinutes, parse } from "date-fns";
 
 import { Shift } from "../models/shiftModel.js";
 
@@ -12,12 +13,21 @@ export const createData = asyncHandler(async (req, res) => {
         coordinator = formData.coordinator;
     }
 
+    const startTime = parse(formData.startTime, "hh:mm a", new Date());
+    const endTime = parse(formData.endTime, "hh:mm a", new Date());
+
+    // Calculate the total worked minutes
+    const workedMinutes = differenceInMinutes(endTime, startTime);
+    const workedHours = Math.floor(workedMinutes / 60);
+    const remainingMinutes = workedMinutes % 60;
+
     const storeData = {
         companyId: req.user?.companyId,
         name: formData.name,
         coordinator: coordinator,
         startTime: formData.startTime,
         endTime: formData.endTime,
+        workedHours: workedHours + ":" + remainingMinutes,
         workDays: formData.workDays,
     };
 
@@ -65,7 +75,25 @@ export const updateData = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Shift not found");
     }
 
-    const updateShift = await Shift.findByIdAndUpdate(shiftInfo._id, req.body, {
+    const formData = req.body;
+
+    const startTime = parse(formData.startTime, "hh:mm a", new Date());
+    const endTime = parse(formData.endTime, "hh:mm a", new Date());
+
+    if (endTime < startTime) {
+        endTime.setDate(endTime.getDate() + 1);
+    }
+
+    // Calculate the total worked minutes
+    const workedMinutes = differenceInMinutes(endTime, startTime);
+    const workedHours = Math.floor(workedMinutes / 60);
+    const remainingMinutes = workedMinutes % 60;
+
+    formData.workedHours = workedHours + ":" + remainingMinutes;
+
+    console.log(formData);
+
+    const updateShift = await Shift.findByIdAndUpdate(shiftInfo._id, formData, {
         new: true,
     });
 

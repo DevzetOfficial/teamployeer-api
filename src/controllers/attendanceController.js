@@ -23,14 +23,14 @@ export const createData = asyncHandler(async (req, res) => {
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + 1);
 
-    const existData = await Attendance.countDocuments({
+    /* const existData = await Attendance.countDocuments({
         employee: formData.employee,
         createdAt: { $gte: startDate, $lt: endDate },
-    });
+    }); 
 
     if (existData > 0) {
         throw new ApiError(400, "Employee attendance has already been taken");
-    }
+    }*/
 
     if (!formData?.status) {
         throw new ApiError(400, "Satus is required");

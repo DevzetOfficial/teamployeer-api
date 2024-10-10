@@ -4,11 +4,15 @@ import { parse, differenceInMinutes } from "date-fns";
 export const calculateWorkedTimeAndOvertime = (
     checkInTime,
     checkOutTime,
-    standardHours = 8
+    inputHours = "8:00"
 ) => {
     // Parse the check-in and check-out times
     const checkIn = parse(checkInTime, "HH:mm", new Date());
     const checkOut = parse(checkOutTime, "HH:mm", new Date());
+
+    if (checkOut < checkIn) {
+        checkOut.setDate(checkOut.getDate() + 1);
+    }
 
     // Calculate the total worked minutes
     const workedMinutes = differenceInMinutes(checkOut, checkIn);
@@ -16,9 +20,14 @@ export const calculateWorkedTimeAndOvertime = (
     const remainingMinutes = workedMinutes % 60;
 
     // Calculate the standard minutes and overtime minutes
-    const standardMinutes = standardHours * 60;
+    const [standardHours, standardMinutes] = inputHours.split(":").map(Number);
+
+    const totalStandardMinutes = standardHours * 60 + standardMinutes;
+
     const overtimeMinutes =
-        workedMinutes > standardMinutes ? workedMinutes - standardMinutes : 0;
+        workedMinutes > totalStandardMinutes
+            ? workedMinutes - totalStandardMinutes
+            : 0;
     const overtimeHours = Math.floor(overtimeMinutes / 60);
     const overtimeRemainingMinutes = overtimeMinutes % 60;
 
