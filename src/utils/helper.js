@@ -38,7 +38,7 @@ export const calculateWorkedTimeAndOvertime = (
     };
 };
 
-const getAllDatesInMonthFromInput = (inputDate) => {
+export const getAllDatesInMonthFromInput = (inputDate) => {
     const date = new Date(inputDate);
     const inputYear = date.getFullYear();
     const inputMonth = date.getMonth();
@@ -54,9 +54,13 @@ const getAllDatesInMonthFromInput = (inputDate) => {
 
     for (let day = 1; day <= daysInMonth; day++) {
         const currentDate = new Date(inputYear, inputMonth, day);
-        const formattedDate = currentDate.toISOString().split("T")[0];
+        //const formattedDate = currentDate.toISOString().split("T")[0];
         const dayName = dayNames[currentDate.getDay()];
-        allDatesArray.push({ formattedDate: dayName });
+        allDatesArray.push({
+            date: currentDate,
+            dayName: dayName,
+            dayNumber: currentDate.getDay(),
+        });
     }
 
     return allDatesArray;

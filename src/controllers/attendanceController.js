@@ -3,8 +3,10 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 import {
     calculateWorkedTimeAndOvertime,
+    getAllDatesInMonthFromInput,
     getSegments,
     ucfirst,
+    objectId,
 } from "../utils/helper.js";
 
 import { Attendance } from "../models/attendanceModel.js";
@@ -30,8 +32,6 @@ export const createData = asyncHandler(async (req, res) => {
     if (!employee) {
         throw new ApiError(404, "Employee not found");
     }
-
-    console.log(employee);
 
     // check exist data
     const startDate = new Date(req.query?.date || Date.now());
@@ -119,6 +119,51 @@ export const getAllData = asyncHandler(async (req, res) => {
             },
         })
         .lean();
+
+    return res
+        .status(201)
+        .json(
+            new ApiResponse(
+                200,
+                attendances,
+                "Attendance retrieved successfully"
+            )
+        );
+});
+
+export const getAllMonthlyData = asyncHandler(async (req, res) => {
+    const filters = { companyId: req.user?.companyId };
+
+    const startDate = new Date(req.query?.date || Date.now());
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 1);
+
+    filters.createdAt = { $gte: startDate, $lt: endDate };
+
+    const attendances = await Attendance.find(filters).lean();
+
+    // Extract unique employeeIds
+    const employeeIds = [
+        ...new Set(attendances.map((attendance) => attendance.employee)),
+    ];
+
+    const uniqueEmployeeIds = Array.from(
+        new Set(employeeIds.map((id) => id.toString()))
+    ).map((id) => objectId(id));
+
+    const employees = await Employee.find({ _id: { $in: uniqueEmployeeIds } })
+        .select("employeeId name avatar")
+        .lean();
+
+    const dateList = getAllDatesInMonthFromInput(startDate);
+
+    const results = employees.map((employee) => {
+        console.log(employee);
+        return { ...employee, date: 1 };
+    });
+
+    console.log(results, employees);
 
     return res
         .status(201)
