@@ -38,6 +38,30 @@ export const calculateWorkedTimeAndOvertime = (
     };
 };
 
+const getAllDatesInMonthFromInput = (inputDate) => {
+    const date = new Date(inputDate);
+    const inputYear = date.getFullYear();
+    const inputMonth = date.getMonth();
+
+    // Get the total number of days in the input month
+    const daysInMonth = new Date(inputYear, inputMonth + 1, 0).getDate();
+
+    // Full day names array
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    // Create an array of all full dates in the input month
+    const allDatesArray = [];
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const currentDate = new Date(inputYear, inputMonth, day);
+        const formattedDate = currentDate.toISOString().split("T")[0];
+        const dayName = dayNames[currentDate.getDay()];
+        allDatesArray.push({ formattedDate: dayName });
+    }
+
+    return allDatesArray;
+};
+
 export const generateCode = (length) => {
     const characters = "0123456789";
     let otp = "";

@@ -55,12 +55,4 @@ const shiftSchema = new Schema(
     }
 );
 
-shiftSchema.pre(/^find/, function (next) {
-    this.populate({
-        path: "coordinator",
-        select: "_id name email",
-    });
-    next();
-});
-
 export const Shift = mongoose.model("Shift", shiftSchema);

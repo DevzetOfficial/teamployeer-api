@@ -16,6 +16,10 @@ export const createData = asyncHandler(async (req, res) => {
     const startTime = parse(formData.startTime, "hh:mm a", new Date());
     const endTime = parse(formData.endTime, "hh:mm a", new Date());
 
+    if (endTime < startTime) {
+        endTime.setDate(endTime.getDate() + 1);
+    }
+
     // Calculate the total worked minutes
     const workedMinutes = differenceInMinutes(endTime, startTime);
     const workedHours = Math.floor(workedMinutes / 60);
@@ -45,7 +49,10 @@ export const createData = asyncHandler(async (req, res) => {
 export const getAllData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId };
 
-    const shifts = await Shift.find(filters);
+    const shifts = await Shift.find(filters).populate({
+        path: "coordinator",
+        select: "_id name email",
+    });
 
     return res
         .status(201)
@@ -55,7 +62,10 @@ export const getAllData = asyncHandler(async (req, res) => {
 export const getData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    const shiftInfo = await Shift.findOne(filters);
+    const shiftInfo = await Shift.findOne(filters).populate({
+        path: "coordinator",
+        select: "_id name email",
+    });
 
     if (!shiftInfo) {
         throw new ApiError(404, "Shift not found");

@@ -8,14 +8,30 @@ import {
 } from "../utils/helper.js";
 
 import { Attendance } from "../models/attendanceModel.js";
+import { Employee } from "../models/employeeModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
+    const companyId = req.user?.companyId;
+
     const formData = req.body;
-    formData.companyId = req.user?.companyId;
+    formData.companyId = companyId;
 
     if (!formData?.employee) {
         throw new ApiError(400, "Employee id is required");
     }
+
+    const employee = await Employee.findOne({
+        companyId,
+        _id: formData.employee,
+    })
+        .select("employeeId name")
+        .populate({ path: "shift", select: "name workedHours" });
+
+    if (!employee) {
+        throw new ApiError(404, "Employee not found");
+    }
+
+    console.log(employee);
 
     // check exist data
     const startDate = new Date(req.query?.date || Date.now());
@@ -39,7 +55,8 @@ export const createData = asyncHandler(async (req, res) => {
     if (formData.checkIn && formData?.checkOut) {
         const calculateTime = calculateWorkedTimeAndOvertime(
             formData.checkIn,
-            formData.checkOut
+            formData.checkOut,
+            employee.shift.workedHours
         );
 
         const workedHours =
