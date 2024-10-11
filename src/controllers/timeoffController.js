@@ -12,12 +12,14 @@ import { Timeoff } from "../models/timeoffModel.js";
 import { TimeoffAttachment } from "../models/timeoffAttachmentModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
-    const totalDay = differenceInDays(
-        new Date(req.body.endDate),
-        new Date(req.body.startDate)
-    );
+    const startDate = new Date(req.body.startDate).setHours(0, 0, 0, 0);
+    const endDate = new Date(req.body.endDate).setHours(0, 0, 0, 0);
+
+    const totalDay = differenceInDays(endDate, startDate);
 
     const data = req.body;
+    data.startDate = startDate;
+    data.endDate = endDate;
     data.companyId = req.user?.companyId;
     data.totalDay = totalDay + 1;
     data.attachments = [];
@@ -94,7 +96,7 @@ export const getAllData = asyncHandler(async (req, res) => {
         );
 
         return {
-            ...timeoff.toObject(),
+            ...timeoff,
             clashes: clasheData ? clasheData : [],
         };
     });
@@ -186,11 +188,13 @@ export const updateData = asyncHandler(async (req, res) => {
     data.attachments = timeOffInfo.attachments;
 
     if (req.body.startDate && req.body.endDate) {
-        const totalDay = differenceInDays(
-            new Date(req.body.endDate),
-            new Date(req.body.startDate)
-        );
+        const startDate = new Date(req.body.startDate).setHours(0, 0, 0, 0);
+        const endDate = new Date(req.body.endDate).setHours(0, 0, 0, 0);
 
+        const totalDay = differenceInDays(endDate, startDate);
+
+        data.startDate = startDate;
+        data.endDate = endDate;
         data.totalDay = totalDay + 1;
     }
 

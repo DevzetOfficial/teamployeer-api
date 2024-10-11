@@ -101,8 +101,6 @@ export const updateData = asyncHandler(async (req, res) => {
 
     formData.workedHours = workedHours + ":" + remainingMinutes;
 
-    console.log(formData);
-
     const updateShift = await Shift.findByIdAndUpdate(shiftInfo._id, formData, {
         new: true,
     });

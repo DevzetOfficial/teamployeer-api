@@ -11,6 +11,7 @@ import {
 
 import { Attendance } from "../models/attendanceModel.js";
 import { Employee } from "../models/employeeModel.js";
+import { Timeoff } from "../models/timeoffModel.js";
 
 export const createData = asyncHandler(async (req, res) => {
     const companyId = req.user?.companyId;
@@ -39,14 +40,14 @@ export const createData = asyncHandler(async (req, res) => {
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + 1);
 
-    /* const existData = await Attendance.countDocuments({
+    const existData = await Attendance.countDocuments({
         employee: formData.employee,
         createdAt: { $gte: startDate, $lt: endDate },
-    }); 
+    });
 
     if (existData > 0) {
         throw new ApiError(400, "Employee attendance has already been taken");
-    }*/
+    }
 
     if (!formData?.status) {
         throw new ApiError(400, "Satus is required");
@@ -134,12 +135,22 @@ export const getAllData = asyncHandler(async (req, res) => {
 export const getAllMonthlyData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId };
 
-    const startDate = new Date(req.query?.date || Date.now());
-    startDate.setHours(0, 0, 0, 0);
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 1);
+    const inputDate = new Date(req.query?.date || Date.now());
 
-    filters.createdAt = { $gte: startDate, $lt: endDate };
+    const startDate = new Date(
+        inputDate.getFullYear(),
+        inputDate.getMonth(),
+        1
+    );
+    startDate.setHours(0, 0, 0, 0);
+
+    const endDate = new Date(
+        inputDate.getFullYear(),
+        inputDate.getMonth() + 1,
+        0
+    );
+
+    filters.createdAt = { $gte: startDate, $lte: endDate };
 
     const attendanceList = await Attendance.find(filters).lean();
 
@@ -152,14 +163,22 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
         new Set(employeeIds.map((id) => id.toString()))
     ).map((id) => objectId(id));
 
+    filters.employee = { $in: uniqueEmployeeIds };
+
+    const timeoffs = await Timeoff.find(filters);
+
     const employees = await Employee.find({ _id: { $in: uniqueEmployeeIds } })
         .select("employeeId name avatar")
         .populate({ path: "shift", select: "workDays" })
         .lean();
 
+    console.log(filters, timeoffs);
+
+    // current month date list
     const dateList = getAllDatesInMonthFromInput(startDate);
 
-    const monthlyAttendance = employees.map((employee, index) => {
+    // generate monthly attendance
+    const monthlyAttendance = employees.map((employee) => {
         employee.attendance = [];
 
         if (dateList.length > 0) {
