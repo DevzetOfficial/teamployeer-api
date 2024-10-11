@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { parse, differenceInMinutes } from "date-fns";
+import { format, parse, differenceInMinutes } from "date-fns";
 
 export const calculateWorkedTimeAndOvertime = (
     checkInTime,
@@ -78,15 +78,9 @@ export const generateCode = (length) => {
     return otp;
 };
 
-export const dateFormat = (inputDate) => {
+export const dateFormat = (inputDate, inputformat = "yyyy-MM-dd") => {
     const timestamp = new Date(inputDate);
-
-    // Extract year and month
-    const year = timestamp.getFullYear();
-    const month = ("0" + (timestamp.getMonth() + 1)).slice(-2);
-    const date = ("0" + (timestamp.getDate() + 1)).slice(-2);
-
-    return year + "-" + month + "-" + date;
+    return format(timestamp, inputformat);
 };
 
 export const objectId = (id) => {

@@ -7,6 +7,7 @@ import {
     getSegments,
     ucfirst,
     objectId,
+    dateFormat,
 } from "../utils/helper.js";
 
 import { Attendance } from "../models/attendanceModel.js";
@@ -209,11 +210,11 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
 export const getData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    const attensdance = await Attendance.findOne(filters)
+    const attendance = await Attendance.findOne(filters)
         .populate({ path: "employee", select: "employeeId name avatar" })
         .lean();
 
-    if (!attensdance) {
+    if (!attendance) {
         throw new ApiError(404, "Attensance not found");
     }
 
@@ -222,7 +223,7 @@ export const getData = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                attensdance,
+                attendance,
                 "Attensance retrieved successfully"
             )
         );
@@ -279,12 +280,24 @@ export const getCountData = asyncHandler(async (req, res) => {
 });
 
 export const updateData = asyncHandler(async (req, res) => {
-    const filters = { companyId: req.user?.companyId, _id: req.params.id };
+    const companyId = req.user?.companyId;
+    const filters = { companyId: companyId, _id: req.params.id };
 
-    const attensdance = await Attendance.findOne(filters).lean();
+    const attendance = await Attendance.findOne(filters).lean();
 
-    if (!attensdance) {
+    if (!attendance) {
         throw new ApiError(404, "Attensance not found");
+    }
+
+    const employee = await Employee.findOne({
+        companyId,
+        _id: attendance.employee,
+    })
+        .select("employeeId name")
+        .populate({ path: "shift", select: "name workedHours" });
+
+    if (!employee) {
+        throw new ApiError(404, "Employee not found");
     }
 
     const formData = req.body;
@@ -296,7 +309,8 @@ export const updateData = asyncHandler(async (req, res) => {
     if (formData.checkIn && formData?.checkOut) {
         const calculateTime = calculateWorkedTimeAndOvertime(
             formData.checkIn,
-            formData.checkOut
+            formData.checkOut,
+            employee.shift.workedHours
         );
 
         const workedHours =
@@ -311,12 +325,14 @@ export const updateData = asyncHandler(async (req, res) => {
                 ? calculateTime.overtimeMinutes + " mins"
                 : "";
 
+        console.log(workedHours);
+
         formData.workedHours = workedHours;
         formData.overtime = overtime;
     }
 
     const updateAttendance = await Attendance.findByIdAndUpdate(
-        attensdance._id,
+        attendance._id,
         formData,
         {
             new: true,
@@ -337,13 +353,13 @@ export const updateData = asyncHandler(async (req, res) => {
 export const deleteData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    const attensdance = await Attendance.findOne(filters).lean();
+    const attendance = await Attendance.findOne(filters).lean();
 
-    if (!attensdance) {
+    if (!attendance) {
         throw new ApiError(404, "Attensance not found");
     }
 
-    await Attendance.findByIdAndDelete(attensdance._id);
+    await Attendance.findByIdAndDelete(attendance._id);
 
     return res
         .status(201)
