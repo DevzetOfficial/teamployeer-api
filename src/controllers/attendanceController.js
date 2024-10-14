@@ -74,8 +74,22 @@ export const createData = asyncHandler(async (req, res) => {
                 ? calculateTime.overtimeMinutes + " mins"
                 : "";
 
+        const latetime =
+            calculateTime.latetimeMinutes > 0
+                ? calculateTime.latetimeMinutes + " mins"
+                : "";
+
         formData.workedHours = workedHours;
         formData.overtime = overtime;
+        formData.latetime = latetime;
+    }
+
+    if (formData.status == "Absent") {
+        formData.checkIn = null;
+        formData.checkOut = null;
+        formData.workedHours = null;
+        formData.overtime = null;
+        formData.latetime = null;
     }
 
     const newAttendance = await Attendance.create(formData);
@@ -150,6 +164,14 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
         1
     );
 
+    const preMonthStartDate = new Date(
+        inputDate.getFullYear(),
+        inputDate.getMonth() - 1,
+        1
+    ).setHours(0, 0, 0, 0);
+
+    const preMonthEndDate = startDate;
+
     filters.createdAt = { $gte: startDate, $lt: endDate };
     const attendanceList = await Attendance.find(filters).lean();
 
@@ -164,14 +186,11 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
     ).map((id) => objectId(id));
 
     // get timeoff data list
-    const timeoffFilters = {
+    const timeoffs = await Timeoff.find({
         employee: { $in: uniqueEmployeeIds },
         status: "Approved",
         startDate: { $gte: startDate, $lt: endDate },
-    };
-    const timeoffs = await Timeoff.find(timeoffFilters).select(
-        "startDate endDate totalDay"
-    );
+    }).select("employee startDate endDate");
 
     // get employee list
     const employees = await Employee.find({ _id: { $in: uniqueEmployeeIds } })
@@ -182,90 +201,154 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
     // current month date list
     const dateList = getAllDatesInMonthFromInput(startDate);
 
-    // generate monthly attendance
+    const dateArray = [...new Set(dateList.map((date) => date.date))];
+
+    // get prevous month time off data
+    const previousMonthTimeoffs = await Timeoff.find({
+        employee: { $in: uniqueEmployeeIds },
+        status: "Approved",
+        startDate: { $gte: preMonthStartDate, $lt: preMonthEndDate },
+        endDate: { $in: dateArray },
+    }).select("employee startDate endDate");
 
     const monthlyAttendance = employees.map((employee) => {
+        const { shift, _id } = employee;
         employee.attendance = [];
 
-        const leaveDataArray = [];
+        const leaveDays = [];
         let workingDays = 0;
         let presentDays = 0;
+
+        // generate previous month leave day
+        const preTimeOff = previousMonthTimeoffs.find(
+            (tRow) => String(tRow.employee) === String(_id)
+        );
+
+        if (preTimeOff) {
+            const {
+                startDate: sDate,
+                endDate: eDate,
+                timeoffType,
+            } = preTimeOff;
+
+            let currentDate = new Date(sDate);
+
+            while (currentDate <= new Date(eDate)) {
+                const firstLetters = timeoffType.name
+                    .split(" ")
+                    .map((word) => word.charAt(0))
+                    .join("");
+                leaveDays.push({
+                    date: currentDate.toISOString(),
+                    name: firstLetters,
+                    status: timeoffType.name,
+                });
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+        }
+
         if (dateList.length > 0) {
             for (const row of dateList) {
-                if (employee.shift.workDays.indexOf(row.dayName) === -1) {
-                    employee.attendance.push("Wek");
-                } else {
-                    ++workingDays;
+                const isWorkingDay = shift.workDays.indexOf(row.dayName) !== -1;
 
-                    const timeoff = timeoffs.find((tRow) => {
-                        return (
+                if (!isWorkingDay) {
+                    employee.attendance.push({
+                        date: row.date,
+                        name: "Wek",
+                        status: "Weekly Holiday",
+                    });
+                } else {
+                    workingDays++;
+                    const timeoff = timeoffs.find(
+                        (tRow) =>
                             dateFormat(tRow.startDate) ===
                                 dateFormat(row.date) &&
-                            String(tRow.employee._id) === String(employee._id)
-                        );
-                    });
+                            String(tRow.employee) === String(_id)
+                    );
 
                     if (timeoff) {
-                        const sDate = timeoff.startDate;
-                        const eDate = timeoff.endDate;
+                        const {
+                            startDate: sDate,
+                            endDate: eDate,
+                            timeoffType,
+                        } = timeoff;
 
-                        while (sDate <= eDate) {
-                            const firstLetters = timeoff.timeoffType.name
+                        let currentDate = new Date(sDate);
+
+                        while (currentDate <= new Date(eDate)) {
+                            const firstLetters = timeoffType.name
                                 .split(" ")
                                 .map((word) => word.charAt(0))
                                 .join("");
-                            leaveDataArray.push({
-                                date: new Date(sDate).toISOString(),
+                            leaveDays.push({
+                                date: currentDate.toISOString(),
                                 name: firstLetters,
+                                status: timeoffType.name,
                             });
-                            sDate.setDate(sDate.getDate() + 1);
+                            currentDate.setDate(currentDate.getDate() + 1);
                         }
                     }
 
-                    // get leave data
-                    const leaveInfo = leaveDataArray.find(
+                    const leaveInfo = leaveDays.find(
                         (lInfo) => lInfo.date === row.date
                     );
 
                     if (leaveInfo) {
-                        employee.attendance.push(leaveInfo.name);
+                        employee.attendance.push({
+                            date: row.date,
+                            name: leaveInfo.name,
+                            status: leaveInfo.status,
+                        });
                     } else {
                         const attendanceInfo = attendanceList.find(
                             (att) =>
                                 dateFormat(att.createdAt) ===
                                     dateFormat(row.date) &&
-                                String(att.employee) === String(employee._id)
+                                String(att.employee) === String(_id)
                         );
 
                         if (attendanceInfo) {
-                            employee.attendance.push(
-                                attendanceInfo.status
-                                    .split(" ")
-                                    .map((word) => word.charAt(0))
-                                    .join("")
-                            );
+                            const statusFirstWords = attendanceInfo.status
+                                .split(" ")
+                                .map((word) => word.charAt(0))
+                                .join("");
+
+                            employee.attendance.push({
+                                date: row.date,
+                                name: statusFirstWords,
+                                checkIn: attendanceInfo.checkIn,
+                                checkOut: attendanceInfo.checkOut,
+                                workedHours: attendanceInfo.workedHours,
+                                overtime: attendanceInfo.overtime,
+                                latetime: attendanceInfo.latetime,
+                                status: attendanceInfo.status,
+                            });
 
                             if (attendanceInfo.status !== "Absent") {
-                                ++presentDays;
+                                presentDays++;
                             }
                         } else {
-                            employee.attendance.push("-");
+                            employee.attendance.push({
+                                date: row.date,
+                                name: "-",
+                                status: "",
+                            });
                         }
                     }
                 }
             }
 
+            // Calculate and store attendance percentage
             const attendancePercentage = (presentDays / workingDays) * 100;
-            //employee.attendance.push(workingDays);
             employee.attendance.push(presentDays);
             employee.attendance.push(
                 parseFloat(attendancePercentage.toFixed(2))
             );
         }
 
-        delete employee.shift;
+        delete employee.shift; // Remove shift property
 
-        return { ...employee };
+        return { ...employee }; // Return updated employee object
     });
 
     return res.status(201).json(
@@ -398,10 +481,22 @@ export const updateData = asyncHandler(async (req, res) => {
                 ? calculateTime.overtimeMinutes + " mins"
                 : "";
 
-        console.log(workedHours);
+        const latetime =
+            calculateTime.latetimeMinutes > 0
+                ? calculateTime.latetimeMinutes + " mins"
+                : "";
 
         formData.workedHours = workedHours;
         formData.overtime = overtime;
+        formData.latetime = latetime;
+    }
+
+    if (formData.status == "Absent") {
+        formData.checkIn = null;
+        formData.checkOut = null;
+        formData.workedHours = null;
+        formData.overtime = null;
+        formData.latetime = null;
     }
 
     const updateAttendance = await Attendance.findByIdAndUpdate(

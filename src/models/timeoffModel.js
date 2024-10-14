@@ -60,18 +60,6 @@ const timeoffSchema = new Schema(
 
 timeoffSchema.pre(/^find/, function (next) {
     this.populate({
-        path: "employee",
-        select: "employeeId name avatar",
-        populate: [
-            { path: "designation", model: "Designation", select: "name" },
-            { path: "team", model: "Team", select: "name" },
-        ],
-    });
-    next();
-});
-
-timeoffSchema.pre(/^find/, function (next) {
-    this.populate({
         path: "timeoffType",
         select: "name",
     });

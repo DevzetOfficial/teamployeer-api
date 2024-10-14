@@ -34,6 +34,11 @@ const attendanceSchema = new Schema(
             trim: true,
             default: null,
         },
+        latetime: {
+            type: String,
+            trim: true,
+            default: null,
+        },
         status: {
             type: String,
             required: [true, "Status is required"],

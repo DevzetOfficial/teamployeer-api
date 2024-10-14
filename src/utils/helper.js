@@ -29,17 +29,23 @@ export const calculateWorkedTimeAndOvertime = (
 
     const totalStandardMinutes = standardHours * 60 + standardMinutes;
 
+    const latetimeMinutes =
+        workedMinutes < totalStandardMinutes
+            ? totalStandardMinutes - workedMinutes
+            : 0;
+
     const overtimeMinutes =
         workedMinutes > totalStandardMinutes
             ? workedMinutes - totalStandardMinutes
             : 0;
-    const overtimeHours = Math.floor(overtimeMinutes / 60);
-    const overtimeRemainingMinutes = overtimeMinutes % 60;
+    //const overtimeHours = Math.floor(overtimeMinutes / 60);
+    //const overtimeRemainingMinutes = overtimeMinutes % 60;
 
     return {
         workedHours,
         workedMinutes: remainingMinutes,
         overtimeMinutes,
+        latetimeMinutes,
     };
 };
 

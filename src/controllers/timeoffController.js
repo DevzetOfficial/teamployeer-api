@@ -83,7 +83,16 @@ export const getAllData = asyncHandler(async (req, res) => {
         filters.status = ucfirst(segments[1]);
     }
 
-    const timeOffs = await Timeoff.find(filters).lean();
+    const timeOffs = await Timeoff.find(filters)
+        .populate({
+            path: "employee",
+            select: "employeeId name avatar",
+            populate: [
+                { path: "designation", model: "Designation", select: "name" },
+                { path: "team", model: "Team", select: "name" },
+            ],
+        })
+        .lean();
 
     const pendingList = timeOffs.filter((row) => row.status === "Pending");
 
@@ -164,7 +173,16 @@ export const getCountData = asyncHandler(async (req, res) => {
 export const getData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    const timeOff = await Timeoff.findOne(filters).populate("attachments");
+    const timeOff = await Timeoff.findOne(filters)
+        .populate({
+            path: "employee",
+            select: "employeeId name avatar",
+            populate: [
+                { path: "designation", model: "Designation", select: "name" },
+                { path: "team", model: "Team", select: "name" },
+            ],
+        })
+        .populate("attachments");
 
     if (!timeOff) {
         throw new ApiError(400, "Time Off not found");
