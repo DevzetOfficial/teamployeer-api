@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
-import { format, parse, differenceInMinutes } from "date-fns";
+import {
+    format,
+    eachDayOfInterval,
+    parse,
+    differenceInMinutes,
+} from "date-fns";
 
 export const calculateWorkedTimeAndOvertime = (
     checkInTime,
@@ -54,16 +59,28 @@ export const getAllDatesInMonthFromInput = (inputDate) => {
 
     for (let day = 1; day <= daysInMonth; day++) {
         const currentDate = new Date(inputYear, inputMonth, day);
-        //const formattedDate = currentDate.toISOString().split("T")[0];
+        const formattedDate = currentDate.toISOString();
         const dayName = dayNames[currentDate.getDay()];
         allDatesArray.push({
-            date: currentDate,
+            date: formattedDate,
             dayName: dayName,
             dayNumber: currentDate.getDate(),
         });
     }
 
     return allDatesArray;
+};
+
+export const getDateArray = (startDate, endDate) => {
+    // Get an array of all dates between startDate and endDate
+    const dateArray = eachDayOfInterval({ start: startDate, end: endDate });
+
+    // Format the dates as strings (optional) for easier readability
+    const formattedDateArray = dateArray.map((date) =>
+        format(date, "yyyy-MM-dd")
+    );
+
+    return formattedDateArray;
 };
 
 export const generateCode = (length) => {

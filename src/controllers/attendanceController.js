@@ -173,8 +173,6 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
         "startDate endDate totalDay"
     );
 
-    console.log(timeoffFilters, timeoffs);
-
     // get employee list
     const employees = await Employee.find({ _id: { $in: uniqueEmployeeIds } })
         .select("employeeId name avatar")
@@ -185,17 +183,84 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
     const dateList = getAllDatesInMonthFromInput(startDate);
 
     // generate monthly attendance
+
     const monthlyAttendance = employees.map((employee) => {
         employee.attendance = [];
 
+        const leaveDataArray = [];
+        let workingDays = 0;
+        let presentDays = 0;
         if (dateList.length > 0) {
             for (const row of dateList) {
                 if (employee.shift.workDays.indexOf(row.dayName) === -1) {
                     employee.attendance.push("Wek");
                 } else {
-                    employee.attendance.push("P");
+                    ++workingDays;
+
+                    const timeoff = timeoffs.find((tRow) => {
+                        return (
+                            dateFormat(tRow.startDate) ===
+                                dateFormat(row.date) &&
+                            String(tRow.employee._id) === String(employee._id)
+                        );
+                    });
+
+                    if (timeoff) {
+                        const sDate = timeoff.startDate;
+                        const eDate = timeoff.endDate;
+
+                        while (sDate <= eDate) {
+                            const firstLetters = timeoff.timeoffType.name
+                                .split(" ")
+                                .map((word) => word.charAt(0))
+                                .join("");
+                            leaveDataArray.push({
+                                date: new Date(sDate).toISOString(),
+                                name: firstLetters,
+                            });
+                            sDate.setDate(sDate.getDate() + 1);
+                        }
+                    }
+
+                    // get leave data
+                    const leaveInfo = leaveDataArray.find(
+                        (lInfo) => lInfo.date === row.date
+                    );
+
+                    if (leaveInfo) {
+                        employee.attendance.push(leaveInfo.name);
+                    } else {
+                        const attendanceInfo = attendanceList.find(
+                            (att) =>
+                                dateFormat(att.createdAt) ===
+                                    dateFormat(row.date) &&
+                                String(att.employee) === String(employee._id)
+                        );
+
+                        if (attendanceInfo) {
+                            employee.attendance.push(
+                                attendanceInfo.status
+                                    .split(" ")
+                                    .map((word) => word.charAt(0))
+                                    .join("")
+                            );
+
+                            if (attendanceInfo.status !== "Absent") {
+                                ++presentDays;
+                            }
+                        } else {
+                            employee.attendance.push("-");
+                        }
+                    }
                 }
             }
+
+            const attendancePercentage = (presentDays / workingDays) * 100;
+            //employee.attendance.push(workingDays);
+            employee.attendance.push(presentDays);
+            employee.attendance.push(
+                parseFloat(attendancePercentage.toFixed(2))
+            );
         }
 
         return { ...employee };
@@ -206,7 +271,7 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
             200,
             {
                 //dateList,
-                timeoffs,
+                //timeoffs,
                 monthlyAttendance,
             },
             "Attendance retrieved successfully"
