@@ -263,6 +263,8 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
             );
         }
 
+        delete employee.shift;
+
         return { ...employee };
     });
 
