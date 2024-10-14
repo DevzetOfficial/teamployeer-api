@@ -270,8 +270,7 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
         new ApiResponse(
             200,
             {
-                //dateList,
-                //timeoffs,
+                dateList,
                 monthlyAttendance,
             },
             "Attendance retrieved successfully"
