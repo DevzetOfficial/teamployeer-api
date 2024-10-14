@@ -198,6 +198,8 @@ export const updateData = asyncHandler(async (req, res) => {
         data.totalDay = totalDay + 1;
     }
 
+    console.log(req.body);
+
     await Timeoff.findByIdAndUpdate(timeOffInfo._id, data, { new: true });
 
     if (typeof req.files !== "undefined" && req.files.length > 0) {

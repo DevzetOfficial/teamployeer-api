@@ -142,17 +142,15 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
         inputDate.getFullYear(),
         inputDate.getMonth(),
         1
-    );
-    startDate.setHours(0, 0, 0, 0);
+    ).setHours(0, 0, 0, 0);
 
     const endDate = new Date(
         inputDate.getFullYear(),
         inputDate.getMonth() + 1,
-        0
+        1
     );
 
-    filters.createdAt = { $gte: startDate, $lte: endDate };
-
+    filters.createdAt = { $gte: startDate, $lt: endDate };
     const attendanceList = await Attendance.find(filters).lean();
 
     // Extract unique employeeIds
@@ -160,20 +158,28 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
         ...new Set(attendanceList.map((attendance) => attendance.employee)),
     ];
 
+    // unique employee id
     const uniqueEmployeeIds = Array.from(
         new Set(employeeIds.map((id) => id.toString()))
     ).map((id) => objectId(id));
 
-    filters.employee = { $in: uniqueEmployeeIds };
+    // get timeoff data list
+    const timeoffFilters = {
+        employee: { $in: uniqueEmployeeIds },
+        status: "Approved",
+        startDate: { $gte: startDate, $lt: endDate },
+    };
+    const timeoffs = await Timeoff.find(timeoffFilters).select(
+        "startDate endDate totalDay"
+    );
 
-    const timeoffs = await Timeoff.find(filters);
+    console.log(timeoffFilters, timeoffs);
 
+    // get employee list
     const employees = await Employee.find({ _id: { $in: uniqueEmployeeIds } })
         .select("employeeId name avatar")
         .populate({ path: "shift", select: "workDays" })
         .lean();
-
-    console.log(filters, timeoffs);
 
     // current month date list
     const dateList = getAllDatesInMonthFromInput(startDate);
@@ -199,7 +205,8 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
         new ApiResponse(
             200,
             {
-                dateList,
+                //dateList,
+                timeoffs,
                 monthlyAttendance,
             },
             "Attendance retrieved successfully"
