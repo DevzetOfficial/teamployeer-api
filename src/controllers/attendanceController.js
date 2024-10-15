@@ -75,17 +75,14 @@ export const createData = asyncHandler(async (req, res) => {
                 ? calculateTime.overtimeMinutes + " mins"
                 : "";
 
-        const latein =
-            calculateTime.lateinMinutes > 0
-                ? calculateTime.lateinMinutes + " mins"
-                : "";
+        const latein = calculateLateTime(
+            employee.shift.startTime,
+            formData.checkIn
+        );
 
         formData.workedHours = workedHours;
         formData.overtime = overtime;
-        formData.latein = calculateLateTime(
-            employee.startTime,
-            formData.checkIn
-        );
+        formData.latein = latein > 0 ? latein + " mins" : "";
     }
 
     if (formData.status == "Absent") {
@@ -450,7 +447,7 @@ export const updateData = asyncHandler(async (req, res) => {
         _id: attendance.employee,
     })
         .select("employeeId name")
-        .populate({ path: "shift", select: "name workedHours" });
+        .populate({ path: "shift", select: "name startTime workedHours" });
 
     if (!employee) {
         throw new ApiError(404, "Employee not found");
@@ -481,14 +478,14 @@ export const updateData = asyncHandler(async (req, res) => {
                 ? calculateTime.overtimeMinutes + " mins"
                 : "";
 
-        const latein =
-            calculateTime.lateinMinutes > 0
-                ? calculateTime.lateinMinutes + " mins"
-                : "";
+        const latein = calculateLateTime(
+            employee.shift.startTime,
+            formData.checkIn
+        );
 
         formData.workedHours = workedHours;
         formData.overtime = overtime;
-        formData.latein = latein;
+        formData.latein = latein > 0 ? latein + " mins" : "";
     }
 
     if (formData.status == "Absent") {

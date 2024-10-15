@@ -45,14 +45,12 @@ export const calculateWorkedTimeAndOvertime = (
 };
 
 export const calculateLateTime = (startTime, checkIn) => {
-    // Parse the startTime and checkIn into Date objects
-    const start = parse(startTime, "hh:mm", new Date());
-    const checkInTime = parse(checkIn, "hh:mm", new Date());
+    const start = parse(startTime, "hh:mm a", new Date());
+    const newStart = parse(format(start, "HH:mm"), "HH:mm", new Date());
+    const checkInTime = parse(checkIn, "HH:mm", new Date());
 
-    // Calculate the difference in minutes
-    const difference = differenceInMinutes(checkInTime, start);
+    const difference = differenceInMinutes(checkInTime, newStart);
 
-    // If the difference is negative or zero, the user is not late
     return difference > 0 ? difference : 0;
 };
 
