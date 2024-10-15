@@ -34,7 +34,7 @@ const attendanceSchema = new Schema(
             trim: true,
             default: null,
         },
-        latein: {
+        lateIn: {
             type: String,
             trim: true,
             default: null,

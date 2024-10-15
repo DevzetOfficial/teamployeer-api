@@ -75,14 +75,14 @@ export const createData = asyncHandler(async (req, res) => {
                 ? calculateTime.overtimeMinutes + " mins"
                 : "";
 
-        const latein = calculateLateTime(
+        const lateIn = calculateLateTime(
             employee.shift.startTime,
             formData.checkIn
         );
 
         formData.workedHours = workedHours;
         formData.overtime = overtime;
-        formData.latein = latein > 0 ? latein + " mins" : "";
+        formData.lateIn = lateIn > 0 ? lateIn + " mins" : "";
     }
 
     if (formData.status == "Absent") {
@@ -90,7 +90,7 @@ export const createData = asyncHandler(async (req, res) => {
         formData.checkOut = null;
         formData.workedHours = null;
         formData.overtime = null;
-        formData.latein = null;
+        formData.lateIn = null;
     }
 
     const newAttendance = await Attendance.create(formData);
@@ -318,7 +318,7 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
                                 checkOut: attendanceInfo.checkOut,
                                 workedHours: attendanceInfo.workedHours,
                                 overtime: attendanceInfo.overtime,
-                                latein: attendanceInfo.latein,
+                                lateIn: attendanceInfo.lateIn,
                                 status: attendanceInfo.status,
                             });
 
@@ -478,14 +478,14 @@ export const updateData = asyncHandler(async (req, res) => {
                 ? calculateTime.overtimeMinutes + " mins"
                 : "";
 
-        const latein = calculateLateTime(
+        const lateIn = calculateLateTime(
             employee.shift.startTime,
             formData.checkIn
         );
 
         formData.workedHours = workedHours;
         formData.overtime = overtime;
-        formData.latein = latein > 0 ? latein + " mins" : "";
+        formData.lateIn = lateIn > 0 ? lateIn + " mins" : "";
     }
 
     if (formData.status == "Absent") {
@@ -493,7 +493,7 @@ export const updateData = asyncHandler(async (req, res) => {
         formData.checkOut = null;
         formData.workedHours = null;
         formData.overtime = null;
-        formData.latein = null;
+        formData.lateIn = null;
     }
 
     const updateAttendance = await Attendance.findByIdAndUpdate(
