@@ -8,6 +8,7 @@ import {
     ucfirst,
     objectId,
     dateFormat,
+    calculateLateTime,
 } from "../utils/helper.js";
 
 import { Attendance } from "../models/attendanceModel.js";
@@ -29,7 +30,7 @@ export const createData = asyncHandler(async (req, res) => {
         _id: formData.employee,
     })
         .select("employeeId name")
-        .populate({ path: "shift", select: "name workedHours" });
+        .populate({ path: "shift", select: "name startTime workedHours" });
 
     if (!employee) {
         throw new ApiError(404, "Employee not found");
@@ -74,14 +75,17 @@ export const createData = asyncHandler(async (req, res) => {
                 ? calculateTime.overtimeMinutes + " mins"
                 : "";
 
-        const latetime =
-            calculateTime.latetimeMinutes > 0
-                ? calculateTime.latetimeMinutes + " mins"
+        const latein =
+            calculateTime.lateinMinutes > 0
+                ? calculateTime.lateinMinutes + " mins"
                 : "";
 
         formData.workedHours = workedHours;
         formData.overtime = overtime;
-        formData.latetime = latetime;
+        formData.latein = calculateLateTime(
+            employee.startTime,
+            formData.checkIn
+        );
     }
 
     if (formData.status == "Absent") {
@@ -89,7 +93,7 @@ export const createData = asyncHandler(async (req, res) => {
         formData.checkOut = null;
         formData.workedHours = null;
         formData.overtime = null;
-        formData.latetime = null;
+        formData.latein = null;
     }
 
     const newAttendance = await Attendance.create(formData);
@@ -253,7 +257,6 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
 
                 if (!isWorkingDay) {
                     employee.attendance.push({
-                        date: row.date,
                         name: "Wek",
                         status: "Weekly Holiday",
                     });
@@ -295,7 +298,6 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
 
                     if (leaveInfo) {
                         employee.attendance.push({
-                            date: row.date,
                             name: leaveInfo.name,
                             status: leaveInfo.status,
                         });
@@ -314,13 +316,12 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
                                 .join("");
 
                             employee.attendance.push({
-                                date: row.date,
                                 name: statusFirstWords,
                                 checkIn: attendanceInfo.checkIn,
                                 checkOut: attendanceInfo.checkOut,
                                 workedHours: attendanceInfo.workedHours,
                                 overtime: attendanceInfo.overtime,
-                                latetime: attendanceInfo.latetime,
+                                latein: attendanceInfo.latein,
                                 status: attendanceInfo.status,
                             });
 
@@ -329,7 +330,6 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
                             }
                         } else {
                             employee.attendance.push({
-                                date: row.date,
                                 name: "-",
                                 status: "",
                             });
@@ -481,14 +481,14 @@ export const updateData = asyncHandler(async (req, res) => {
                 ? calculateTime.overtimeMinutes + " mins"
                 : "";
 
-        const latetime =
-            calculateTime.latetimeMinutes > 0
-                ? calculateTime.latetimeMinutes + " mins"
+        const latein =
+            calculateTime.lateinMinutes > 0
+                ? calculateTime.lateinMinutes + " mins"
                 : "";
 
         formData.workedHours = workedHours;
         formData.overtime = overtime;
-        formData.latetime = latetime;
+        formData.latein = latein;
     }
 
     if (formData.status == "Absent") {
@@ -496,7 +496,7 @@ export const updateData = asyncHandler(async (req, res) => {
         formData.checkOut = null;
         formData.workedHours = null;
         formData.overtime = null;
-        formData.latetime = null;
+        formData.latein = null;
     }
 
     const updateAttendance = await Attendance.findByIdAndUpdate(

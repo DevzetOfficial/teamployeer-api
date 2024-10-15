@@ -6,7 +6,7 @@ import {
     destroyOnCloudinary,
 } from "../utils/cloudinary.js";
 
-import { EmployeeDocument } from "../models/employeeDecumentModel.js";
+import { EmployeeDocument } from "../models/employeeDocumentModel.js";
 
 export const documentCreate = asyncHandler(async (req, res) => {
     if (!req.params?.employeeId) {

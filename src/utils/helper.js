@@ -29,15 +29,11 @@ export const calculateWorkedTimeAndOvertime = (
 
     const totalStandardMinutes = standardHours * 60 + standardMinutes;
 
-    const latetimeMinutes =
-        workedMinutes < totalStandardMinutes
-            ? totalStandardMinutes - workedMinutes
-            : 0;
-
     const overtimeMinutes =
         workedMinutes > totalStandardMinutes
             ? workedMinutes - totalStandardMinutes
             : 0;
+
     //const overtimeHours = Math.floor(overtimeMinutes / 60);
     //const overtimeRemainingMinutes = overtimeMinutes % 60;
 
@@ -45,8 +41,19 @@ export const calculateWorkedTimeAndOvertime = (
         workedHours,
         workedMinutes: remainingMinutes,
         overtimeMinutes,
-        latetimeMinutes,
     };
+};
+
+export const calculateLateTime = (startTime, checkIn) => {
+    // Parse the startTime and checkIn into Date objects
+    const start = parse(startTime, "hh:mm", new Date());
+    const checkInTime = parse(checkIn, "hh:mm", new Date());
+
+    // Calculate the difference in minutes
+    const difference = differenceInMinutes(checkInTime, start);
+
+    // If the difference is negative or zero, the user is not late
+    return difference > 0 ? difference : 0;
 };
 
 export const getAllDatesInMonthFromInput = (inputDate) => {

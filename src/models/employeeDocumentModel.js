@@ -42,29 +42,21 @@ const employeeDocumentSchema = new Schema(
         submitted: {
             type: Date,
             required: [true, "Submitted date is required"],
-            get: (date) => {
-                return date ? date.toISOString().split("T")[0] : date;
-            },
         },
         approved: {
             type: Date,
-            get: (date) => {
-                return date ? date.toISOString().split("T")[0] : date;
-            },
         },
         status: {
             type: String,
             required: [true, "Status is required"],
-            default: "Pending",
             enum: ["Pending", "Approved", "Rejected"],
+            default: "Pending",
         },
     },
     {
         timestamps: true,
     }
 );
-
-employeeDocumentSchema.set("toJSON", { getters: true });
 
 export const EmployeeDocument = mongoose.model(
     "EmployeeDocument",
