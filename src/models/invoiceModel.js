@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const clientSchema = new Schema(
+const invoiceSchema = new Schema(
     {
         companyId: {
             type: mongoose.Schema.Types.ObjectId,
@@ -8,30 +8,95 @@ const clientSchema = new Schema(
             ref: "Company",
             index: true,
         },
-        clientId: {
+        invoiceType: {
+            type: String,
+            required: [true, "Invoice type is required"],
+            enum: {
+                values: ["Single", "Recurring"],
+                message: "{VALUE} is not a valid invoice type",
+            },
+        },
+        client: {
             type: mongoose.Schema.Types.ObjectId,
-            required: true,
+            required: [true, "Client is requried"],
             trim: true,
             index: true,
         },
-        projectId: {
-            type: String,
-            required: [true, "Client name is required"],
+        project: {
+            type: mongoose.Schema.Types.ObjectId,
             trim: true,
+            index: true,
+            default: null,
         },
-        totalbill: {
+        issueDate: {
+            type: Date,
+            default: Date.now,
+        },
+        dueDate: {
+            type: Date,
+            default: Date.now,
+        },
+        recurringDate: {
+            type: Date,
+            default: null,
+        },
+        repeatUntil: {
+            type: Date,
+            default: null,
+        },
+        subtotal: {
             type: Number,
             default: 0,
         },
-        isPaid: {
+        discountPercentage: {
+            type: Number,
+            default: 0,
+        },
+        discountAmount: {
+            type: Number,
+            default: 0,
+        },
+        taxPercentage: {
+            type: Number,
+            default: 0,
+        },
+        texAmount: {
+            type: Number,
+            default: 0,
+        },
+        totalBill: {
+            type: Number,
+            default: 0,
+        },
+        isDraft: {
             type: Boolean,
             default: 0,
         },
         status: {
             type: Number,
             required: true,
-            default: 1,
-            enum: [0, 1],
+            default: "Unpaid",
+            enum: {
+                values: ["Unpaid", "Paid", "On Hold"],
+                message: "{VALUE} is not a valid invoice type",
+            },
+        },
+        invoiceItems: {
+            type: [
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "InvoiceItems",
+                },
+            ],
+            default: [],
+        },
+        signature: {
+            type: String,
+            default: null,
+        },
+        template: {
+            type: Object,
+            default: null,
         },
     },
     {
@@ -39,4 +104,4 @@ const clientSchema = new Schema(
     }
 );
 
-export const Client = mongoose.model("Client", clientSchema);
+export const Invoice = mongoose.model("Invoice", invoiceSchema);
