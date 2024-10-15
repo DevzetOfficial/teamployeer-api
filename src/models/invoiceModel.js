@@ -8,6 +8,12 @@ const invoiceSchema = new Schema(
             ref: "Company",
             index: true,
         },
+        invoiceNo: {
+            type: String,
+            required: [true, "Invoice on is required"],
+            index: true,
+            trim: true,
+        },
         invoiceType: {
             type: String,
             required: [true, "Invoice type is required"],
@@ -35,6 +41,10 @@ const invoiceSchema = new Schema(
         dueDate: {
             type: Date,
             default: Date.now,
+        },
+        reminder: {
+            type: String,
+            default: null,
         },
         recurringDate: {
             type: Date,
@@ -81,15 +91,6 @@ const invoiceSchema = new Schema(
                 message: "{VALUE} is not a valid invoice type",
             },
         },
-        invoiceItems: {
-            type: [
-                {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: "InvoiceItems",
-                },
-            ],
-            default: [],
-        },
         signature: {
             type: String,
             default: null,
@@ -97,6 +98,10 @@ const invoiceSchema = new Schema(
         template: {
             type: Object,
             default: null,
+        },
+        position: {
+            type: Number,
+            require: [true, "Position is required"],
         },
     },
     {

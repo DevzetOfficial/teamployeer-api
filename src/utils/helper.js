@@ -115,7 +115,6 @@ export const objectId = (id) => {
     if (typeof id === "string" && mongoose.Types.ObjectId.isValid(id)) {
         return new mongoose.Types.ObjectId(id);
     }
-
     return id;
 };
 
@@ -146,4 +145,8 @@ export const strSlud = (str) => {
         .replace(/\s+/g, "-")
         .replace(/--+/g, "-")
         .replace(/^-+|-+$/g, "");
+};
+
+export const generateInvoice = (str) => {
+    return str;
 };
