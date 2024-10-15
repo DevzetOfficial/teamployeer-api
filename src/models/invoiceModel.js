@@ -4,7 +4,7 @@ const invoiceSchema = new Schema(
     {
         companyId: {
             type: mongoose.Schema.Types.ObjectId,
-            required: [true, "Comapny is required"],
+            required: [true, "Comapny id is required"],
             ref: "Company",
             index: true,
         },
@@ -19,12 +19,12 @@ const invoiceSchema = new Schema(
         client: {
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Client is requried"],
-            trim: true,
+            ref: "Client",
             index: true,
         },
         project: {
             type: mongoose.Schema.Types.ObjectId,
-            trim: true,
+            ref: "Project",
             index: true,
             default: null,
         },

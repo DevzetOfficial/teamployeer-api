@@ -4,8 +4,8 @@ const invoiceItemsSchema = new Schema(
     {
         invoiceId: {
             type: mongoose.Schema.Types.ObjectId,
-            required: [true, "Comapny is required"],
-            ref: "Company",
+            required: [true, "Invoice id is required"],
+            ref: "Invoice",
             index: true,
         },
         name: {
