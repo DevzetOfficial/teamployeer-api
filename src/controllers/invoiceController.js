@@ -63,7 +63,7 @@ export const createData = asyncHandler(async (req, res) => {
 
     if (req.file?.path) {
         const signature = await uploadOnCloudinary(req.file?.path);
-        data.signature = signature?.url || "";
+        invoiceData.signature = signature?.url || "";
     }
 
     if (formData.template) {
@@ -76,6 +76,8 @@ export const createData = asyncHandler(async (req, res) => {
     }
 
     const invoiceItems = formData?.invoiceItems || "";
+
+    console.log(invoiceItems);
 
     if (invoiceItems) {
         for (const item of invoiceItems) {

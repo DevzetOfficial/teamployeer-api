@@ -7,6 +7,6 @@ const route = Router();
 route
     .route("/settings/policies")
     .get(authCheck, getData)
-    .patch(authCheck, updateData);
+    .put(authCheck, updateData);
 
 export default route;

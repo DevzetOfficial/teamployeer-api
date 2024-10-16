@@ -18,7 +18,7 @@ route
 route
     .route("/settings/timeoff/:id")
     .get(authCheck, getData)
-    .patch(authCheck, updateData)
+    .put(authCheck, updateData)
     .delete(authCheck, deleteData);
 
 export default route;

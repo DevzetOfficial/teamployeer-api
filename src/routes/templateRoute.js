@@ -18,7 +18,7 @@ route
 route
     .route("/settings/template/:id")
     .get(authCheck, getData)
-    .patch(authCheck, updateData)
+    .put(authCheck, updateData)
     .delete(authCheck, deleteData);
 
 export default route;

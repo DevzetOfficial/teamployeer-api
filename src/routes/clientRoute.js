@@ -24,7 +24,7 @@ route.route("/client/count").get(authCheck, getCountData);
 route
     .route("/client/:id")
     .get(authCheck, getData)
-    .patch(authCheck, upload.single("avatar"), updateData)
+    .put(authCheck, upload.single("avatar"), updateData)
     .delete(authCheck, deleteData);
 
 export default route;

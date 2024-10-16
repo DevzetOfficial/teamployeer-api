@@ -8,6 +8,6 @@ const route = Router();
 route
     .route("/settings/company")
     .get(authCheck, getData)
-    .patch(authCheck, upload.single("logo"), updateData);
+    .put(authCheck, upload.single("logo"), updateData);
 
 export default route;

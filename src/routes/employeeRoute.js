@@ -41,10 +41,10 @@ route.route("/employee/ratio").get(authCheck, getEmployeeRatio);
 route
     .route("/employee/:id")
     .get(authCheck, getData)
-    .patch(authCheck, upload.single("avatar"), updateData)
+    .put(authCheck, upload.single("avatar"), updateData)
     .delete(authCheck, deleteData);
 
-route.route("/employee/offboarding/:id").patch(authCheck, updateOffboarding);
+route.route("/employee/offboarding/:id").put(authCheck, updateOffboarding);
 
 route
     .route("/employee/:employeeId/document")
@@ -54,11 +54,11 @@ route
 route
     .route("/employee/:employeeId/timeoff")
     .get(authCheck, getAllTimeoff)
-    .patch(authCheck, setEmployeeTimeOff);
+    .put(authCheck, setEmployeeTimeOff);
 
 route
     .route("/employee/:employeeId/document/:id")
-    .patch(authCheck, updateDocument)
+    .put(authCheck, updateDocument)
     .delete(authCheck, deleteDocument);
 
 export default route;

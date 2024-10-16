@@ -29,7 +29,7 @@ route
 route
     .route("/timeoff/:id")
     .get(authCheck, getData)
-    .patch(authCheck, upload.array("attachments"), updateData)
+    .put(authCheck, upload.array("attachments"), updateData)
     .delete(authCheck, deleteData);
 
 export default route;
