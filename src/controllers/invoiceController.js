@@ -19,10 +19,20 @@ export const createData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Client is required");
     }
 
-    const invoiceData = req.body;
-    invoiceData.companyId = companyId;
-    invoiceData.invoiceNo = invoiceNo;
+    const formData = req.body;
 
+    const invoiceData = {
+        companyId,
+        invoiceNo,
+        issueDate: formData.issueDate,
+    };
+
+    if (formData.invoiceType == "Recurring") {
+        invoiceData.issueDate = formData.issueDate;
+    }
+    if (formData.issueDate) {
+        invoiceData.issueDate = formData.issueDate;
+    }
     if (req.body?.dueDate) {
         invoiceData.dueDate = req.body?.dueDate;
     }

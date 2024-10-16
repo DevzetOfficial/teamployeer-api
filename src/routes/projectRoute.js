@@ -26,7 +26,7 @@ route.route("/project/count").get(authCheck, getCountData);
 route
     .route("/project/:id")
     .get(authCheck, getData)
-    .patch(authCheck, upload.single("projectImage"), updateData)
+    .put(authCheck, upload.single("projectImage"), updateData)
     .delete(authCheck, deleteData);
 
 export default route;
