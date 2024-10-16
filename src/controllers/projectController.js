@@ -247,8 +247,6 @@ export const updateData = asyncHandler(async (req, res) => {
         }
     }
 
-    console.log(data);
-
     const updateProject = await Project.findByIdAndUpdate(
         projectInfo._id,
         data,
