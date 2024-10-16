@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
-import { getSegments, ucfirst } from "../utils/helper.js";
+import { getSegments, objectId, ucfirst } from "../utils/helper.js";
 import {
     uploadOnCloudinary,
     destroyOnCloudinary,
@@ -25,13 +25,17 @@ export const createData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Client is required");
     }
 
+    const members = JSON.parse(req.body.members.replace(/'/g, '"')).map((id) =>
+        objectId(id)
+    );
+
     const data = {
         companyId: req.user?.companyId,
         name: req.body.name,
         client: req.body.client,
         projectManager: req.body.projectManager,
         submissionDate: req.body.submissionDate,
-        members: req.body?.members,
+        members: members,
         projectImage: projectImage?.url || "",
         description: req.body?.description || "",
     };
@@ -234,7 +238,13 @@ export const updateData = asyncHandler(async (req, res) => {
 
     const data = req.body;
 
-    console.log(req.file?.path, data);
+    let members;
+    if (req.body?.members) {
+        members = JSON.parse(req.body.members.replace(/'/g, '"')).map((id) =>
+            objectId(id)
+        );
+        data.members = members;
+    }
 
     if (req.file?.path) {
         const projectImage = await uploadOnCloudinary(req.file?.path);
