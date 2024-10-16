@@ -234,9 +234,11 @@ export const updateData = asyncHandler(async (req, res) => {
 
     const data = req.body;
 
+    console.log(req.file?.path, data);
+
     if (req.file?.path) {
-        const uploadProjectImage = await uploadOnCloudinary(req.file?.path);
-        data.projectImage = uploadProjectImage?.url || "";
+        const projectImage = await uploadOnCloudinary(req.file?.path);
+        data.projectImage = projectImage?.url || "";
 
         if (projectInfo.projectImage) {
             await destroyOnCloudinary(projectInfo.projectImage);

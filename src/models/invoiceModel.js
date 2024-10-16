@@ -11,8 +11,8 @@ const invoiceSchema = new Schema(
         invoiceNo: {
             type: String,
             required: [true, "Invoice on is required"],
-            index: true,
             trim: true,
+            index: true,
         },
         invoiceType: {
             type: String,
@@ -21,6 +21,7 @@ const invoiceSchema = new Schema(
                 values: ["Single", "Recurring"],
                 message: "{VALUE} is not a valid invoice type",
             },
+            index: true,
         },
         client: {
             type: mongoose.Schema.Types.ObjectId,
@@ -31,12 +32,18 @@ const invoiceSchema = new Schema(
         project: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Project",
+            default: null,
             index: true,
+        },
+        subject: {
+            type: String,
+            trim: true,
             default: null,
         },
         issueDate: {
             type: Date,
             default: Date.now,
+            index: true,
         },
         dueDate: {
             type: Date,
@@ -80,16 +87,17 @@ const invoiceSchema = new Schema(
         },
         isDraft: {
             type: Boolean,
-            default: 0,
+            default: false,
         },
         status: {
-            type: Number,
+            type: String,
             required: true,
             default: "Unpaid",
             enum: {
                 values: ["Unpaid", "Paid", "On Hold"],
                 message: "{VALUE} is not a valid invoice type",
             },
+            index: true,
         },
         signature: {
             type: String,

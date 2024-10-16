@@ -1,6 +1,11 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
+import { strPad, getSegments, ucfirst } from "../utils/helper.js";
+import {
+    uploadOnCloudinary,
+    destroyOnCloudinary,
+} from "../utils/cloudinary.js";
 
 import { Invoice } from "../models/invoiceModel.js";
 import { InvoiceItems } from "../models/InvoiceItemsModel.js";
@@ -23,158 +28,185 @@ export const createData = asyncHandler(async (req, res) => {
 
     const invoiceData = {
         companyId,
-        invoiceNo,
+        invoiceNo: strPad(invoiceNo),
+        invoiceType: formData.invoiceType,
+        client: formData.client,
         issueDate: formData.issueDate,
+        subject: formData.subject,
+        subtotal: formData.subtotal,
+        discountPercentage: formData.discountPercentage,
+        discountAmount: formData.discountAmount,
+        taxPercentage: formData.taxPercentage,
+        taxAmount: formData.taxAmount,
+        totalBill: formData.totalBill,
+        position: invoicePosition ? invoicePosition.position + 1 : 1,
     };
 
-    if (formData.invoiceType == "Recurring") {
-        invoiceData.issueDate = formData.issueDate;
+    if (formData.project) {
+        invoiceData.project = formData.project;
     }
-    if (formData.issueDate) {
-        invoiceData.issueDate = formData.issueDate;
+
+    if (formData.isDraft) {
+        invoiceData.isDraft = formData.isDraft;
     }
-    if (req.body?.dueDate) {
-        invoiceData.dueDate = req.body?.dueDate;
+
+    if (formData.invoiceType === "Single") {
+        invoiceData.dueDate = formData.dueDate;
+    }
+
+    if (formData.invoiceType === "Recurring") {
+        invoiceData.dueDate = formData.issueDate;
+        invoiceData.reminder = formData.reminder;
+        invoiceData.recurringDate = formData.recurringDate;
+        invoiceData.repeatUntil = formData.repeatUntil;
+    }
+
+    if (req.file?.path) {
+        const signature = await uploadOnCloudinary(req.file?.path);
+        data.signature = signature?.url || "";
+    }
+
+    if (formData.template) {
+        invoiceData.template = formData.template;
     }
 
     const newInvoice = await Invoice.create(invoiceData);
-
     if (!newInvoice) {
         throw new ApiError(400, "Invalid credentials");
     }
 
-    const invoiceItemIdes = [];
+    const invoiceItems = formData?.invoiceItems || "";
 
-    // update invoice items
-    const updateInvoice = await Invoice.findByIdAndUpdate(
-        newInvoice._id,
-        { $push: { invoiceItems: invoiceItemIdes } },
-        { new: true }
-    );
+    if (invoiceItems) {
+        for (const item of invoiceItems) {
+            const invoiceItem = new InvoiceItems({
+                invoiceId: newInvoice._id,
+                name: item.name,
+                description: item.description,
+                unitPrice: item.unitPrice,
+                quantity: item.quantity,
+                totalPrice: item.totalPrice,
+            });
 
-    if (!updateInvoice) {
-        throw new ApiError(400, "Invalid invoice credentials");
+            await invoiceItem.save();
+        }
     }
 
     return res
         .status(201)
-        .json(
-            new ApiResponse(200, updateInvoice, "Invoice created successfully")
-        );
+        .json(new ApiResponse(200, newInvoice, "Invoice created successfully"));
 });
 
-export const getActiveData = asyncHandler(async (req, res) => {
-    const filters = { companyId: req.user?.companyId, status: 1 };
+export const getAllData = asyncHandler(async (req, res) => {
+    const filters = { companyId: req.user?.companyId };
 
-    const employees = await Employee.find(filters)
-        .select("employeeId name avatar email mobile onboardingDate")
-        .populate({ path: "designation", select: "name" })
-        .populate({ path: "shift", select: "name" })
-        .populate({ path: "provationPeriod", select: "name month" })
-        .populate({ path: "supervisor", select: "name avatar" })
+    const segments = getSegments(req.url);
+
+    if (segments?.[1]) {
+        if (segments[1] === "draft") {
+            filters.isDraft = true;
+        } else {
+            filters.invoiceType = ucfirst(segments[1]);
+            filters.isDraft = false;
+        }
+    }
+
+    const invoices = await Invoice.find(filters)
+        .select("invoiceNo invoiceType totalBill issueDate")
+        .populate({ path: "client", select: "name avatar" })
+        .populate({ path: "project", select: "name" })
         .lean();
 
     return res
         .status(201)
-        .json(
-            new ApiResponse(200, employees, "Employee retrieved successfully")
-        );
-});
-
-export const getInactiveData = asyncHandler(async (req, res) => {
-    const filters = { companyId: req.user?.companyId, status: 0 };
-
-    const employees = await Employee.find(filters)
-        .select("employeeId name avatar email mobile onboardingDate")
-        .populate({ path: "designation", select: "name" })
-        .populate({ path: "shift", select: "name" })
-        .populate({ path: "provationPeriod", select: "name month" })
-        .populate({ path: "supervisor", select: "name avatar" })
-        .lean();
-
-    return res
-        .status(201)
-        .json(
-            new ApiResponse(200, employees, "Employee retrieved successfully")
-        );
+        .json(new ApiResponse(200, invoices, "Invoice retrieved successfully"));
 });
 
 export const getCountData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
+    const companyId = req.user?.companyId;
 
-    const employees = await Employee.aggregate([
-        {
-            $match: {
-                companyId: { $eq: objectId(companyId) },
+    const [invoices, totalDraft] = await Promise.all([
+        Invoice.aggregate([
+            {
+                $match: {
+                    companyId: { $eq: companyId },
+                    isDraft: false,
+                },
             },
-        },
-        {
-            $group: {
-                _id: "$status",
-                count: { $sum: 1 },
+            {
+                $group: {
+                    _id: "$invoiceType",
+                    count: { $sum: 1 },
+                },
             },
-        },
+        ]),
+        Invoice.countDocuments({ companyId, isDraft: true }),
     ]);
 
-    let active = 0;
-    let inactive = 0;
+    const dataCount = {
+        all: 0,
+        single: 0,
+        recurring: 0,
+        draft: totalDraft,
+    };
 
-    if (employees) {
-        employees.forEach((row) => {
-            if (row._id === 1) {
-                active = row.count;
+    if (invoices) {
+        invoices.forEach((row) => {
+            if (row._id === "Single") {
+                dataCount.single = row.count;
             }
 
-            if (row._id === 0) {
-                inactive = row.count;
+            if (row._id === "Recurring") {
+                dataCount.recurring = row.count;
             }
         });
     }
+
+    dataCount.all = dataCount.single + dataCount.recurring + dataCount.draft;
+
+    return res
+        .status(201)
+        .json(new ApiResponse(200, dataCount, "Invoice count successfully"));
+});
+
+export const getData = asyncHandler(async (req, res) => {
+    const filters = { companyId: req.user?.companyId, _id: req.params.id };
+
+    const invoice = await Invoice.findOne(filters)
+        .select("-position -updatedAt -__v")
+        .populate({
+            path: "client",
+            select: "name email mobile address avatar",
+        })
+        .populate({ path: "project", select: "name" })
+        .lean();
+
+    if (!invoice) {
+        throw new ApiError(404, "Invoice not found");
+    }
+
+    const invoiceItems = await InvoiceItems.find({
+        invoiceId: invoice._id,
+    }).select("-__v -createdAt -updatedAt");
 
     return res
         .status(201)
         .json(
             new ApiResponse(
                 200,
-                { active, inactive },
-                "Employee retrieved successfully"
+                { invoice, invoiceItems },
+                "Invoice retrieved successfully"
             )
-        );
-});
-
-export const getData = asyncHandler(async (req, res) => {
-    const filters = { companyId: req.user?.companyId, _id: req.params.id };
-
-    const employee = await Employee.findOne(filters)
-        .populate({ path: "employeeType", select: "name" })
-        .populate({ path: "team", select: "name" })
-        .populate({ path: "provationPeriod", select: "name month" })
-        .populate({ path: "designation", select: "name" })
-        .populate({ path: "employeeLevel", select: "name" })
-        .populate({ path: "shift", select: "name" })
-        .populate({ path: "offboardingType", select: "name" })
-        .populate({ path: "reason", select: "name" })
-        .populate({ path: "supervisor", select: "name avatar" })
-        .lean();
-
-    if (!employee) {
-        throw new ApiError(404, "Employee not found");
-    }
-
-    return res
-        .status(201)
-        .json(
-            new ApiResponse(200, employee, "Employee retrieved successfully")
         );
 });
 
 export const updateData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    const employeeInfo = await Employee.findOne(filters).lean();
+    const employeeInfo = await Invoice.findOne(filters).lean();
 
     if (!employeeInfo) {
-        throw new ApiError(404, "Employee not found");
+        throw new ApiError(404, "Invoice not found");
     }
 
     const data = req.body;
@@ -188,158 +220,36 @@ export const updateData = asyncHandler(async (req, res) => {
         }
     }
 
-    const employee = await Employee.findOneAndUpdate(filters, data, {
+    const employee = await Invoice.findOneAndUpdate(filters, data, {
         new: true,
     });
 
     return res
         .status(201)
-        .json(new ApiResponse(200, employee, "Employee updated successfully"));
-});
-
-export const updateOffboarding = asyncHandler(async (req, res) => {
-    const filters = { companyId: req.user?.companyId, _id: req.params.id };
-
-    const employeeInfo = await Employee.findOne(filters).lean();
-
-    if (!employeeInfo) {
-        throw new ApiError(404, "Employee not found");
-    }
-
-    const data = req.body;
-
-    if (!data?.offboardingDate) {
-        throw new ApiError(400, "Offboardin date is required");
-    }
-
-    if (!data?.offboardingType) {
-        throw new ApiError(400, "Offboardin type is required");
-    }
-
-    if (!data?.reason) {
-        throw new ApiError(400, "Reason is required");
-    }
-
-    data.status = 0;
-
-    const employee = await Employee.findByIdAndUpdate(employeeInfo._id, data, {
-        new: true,
-    });
-
-    return res
-        .status(201)
-        .json(new ApiResponse(200, employee, "Employee updated successfully"));
+        .json(new ApiResponse(200, employee, "Invoice updated successfully"));
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    const employeeInfo = await Employee.findOne(filters);
+    const invoiceInfo = await Invoice.findOne(filters);
 
-    if (!employeeInfo) {
-        throw new ApiError(404, "Employee not found");
+    if (!invoiceInfo) {
+        throw new ApiError(404, "Invoice not found");
     }
 
-    const employee = await Employee.findByIdAndUpdate(
-        employeeInfo._id,
-        { status: employeeInfo.status === 0 ? 1 : 0 },
-        { new: true }
-    );
+    // delete invoice
+    await Invoice.findByIdAndDelete(invoiceInfo._id);
+
+    // delete invoice item
+    await InvoiceItems.deleteMany({ invoiceId: invoiceInfo._id });
+
+    // delete signature
+    if (invoiceInfo.signature) {
+        await destroyOnCloudinary(invoiceInfo.signature);
+    }
 
     return res
         .status(201)
-        .json(
-            new ApiResponse(
-                200,
-                employee,
-                "Employee status update successfully"
-            )
-        );
+        .json(new ApiResponse(200, {}, "Invoice delete successfully"));
 });
-
-export const getSelectList = asyncHandler(async (req, res) => {
-    const filters = { companyId: req.user?.companyId, status: 1 };
-
-    const employees = await Employee.find(filters)
-        .select("name email avatar")
-        .populate({ path: "team", select: "name" });
-
-    return res
-        .status(201)
-        .json(
-            new ApiResponse(200, employees, "Employee retrieved successfully")
-        );
-});
-
-export const getEmployeeRatio = asyncHandler(async (req, res) => {
-    const data = await calculateEmployeeRatio(req);
-
-    return res
-        .status(201)
-        .json(
-            new ApiResponse(200, data, "Employee ratio retrieved successfully")
-        );
-});
-
-async function calculateEmployeeRatio(req) {
-    const today = new Date();
-
-    const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-
-    const employeeList = await Employee.find({ companyId: req.user?.companyId })
-        .select("name onboardingDate offboardingDate status")
-        .populate({ path: "provationPeriod", select: "name month" });
-
-    const totalEmployees = employeeList.length;
-
-    // Fetch the total number of employees at the start date (previous)
-    const totalEmployeesPreviously = await Employee.countDocuments({
-        onboardingDate: { $lt: startDate },
-    });
-
-    const activeEmployees = employeeList.filter(
-        (row) => row.status === 1
-    ).length;
-
-    const inactiveEmployees = employeeList.filter(
-        (row) => row.status === 0
-    ).length;
-
-    const newEmployeesList = [];
-    employeeList.map((row) => {
-        const diffInMonth = differenceInMonths(
-            new Date(),
-            new Date(row.onboardingDate)
-        );
-
-        if (diffInMonth <= row.provationPeriod.month) {
-            newEmployeesList.push(row);
-        }
-    });
-
-    const newEmployees = newEmployeesList.length;
-
-    const employeeRatio =
-        totalEmployeesPreviously > 0
-            ? ((totalEmployees - totalEmployeesPreviously) /
-                  totalEmployeesPreviously) *
-              100
-            : 0;
-    const activeEmployeeRatio =
-        totalEmployees > 0 ? (activeEmployees / totalEmployees) * 100 : 0;
-    const newEmployeeRatio = (newEmployees / totalEmployees) * 100;
-    const inactiveEmployeeRatio = (inactiveEmployees / totalEmployees) * 100;
-
-    const data = {
-        employees: totalEmployees,
-        employeeRatio: parseFloat(employeeRatio.toFixed(2)),
-        activeEmployees: activeEmployees,
-        activeEmployeeRatio: parseFloat(activeEmployeeRatio.toFixed(2)),
-        inactiveEmployees: inactiveEmployees,
-        inactiveEmployeeRatio: parseFloat(inactiveEmployeeRatio.toFixed(2)),
-        newEmployees: newEmployees,
-        newEmployeeRatio: parseFloat(newEmployeeRatio.toFixed(2)),
-    };
-
-    return data;
-}

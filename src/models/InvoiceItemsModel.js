@@ -16,7 +16,7 @@ const invoiceItemsSchema = new Schema(
             type: String,
             trim: true,
         },
-        price: {
+        unitPrice: {
             type: Number,
             default: 0,
         },
@@ -24,7 +24,7 @@ const invoiceItemsSchema = new Schema(
             type: Number,
             default: 0,
         },
-        subtotal: {
+        totalPrice: {
             type: Number,
             default: 0,
         },

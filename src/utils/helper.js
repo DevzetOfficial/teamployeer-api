@@ -147,6 +147,19 @@ export const strSlud = (str) => {
         .replace(/^-+|-+$/g, "");
 };
 
-export const generateInvoice = (str) => {
-    return str;
+export const strPad = (
+    str,
+    targetLength = 6,
+    padChar = "0",
+    direction = "start"
+) => {
+    str = String(str);
+
+    if (str.length >= targetLength) {
+        return str;
+    }
+
+    const padLength = targetLength - str.length;
+    const padding = padChar.repeat(padLength);
+    return direction === "start" ? padding + str : str + padding;
 };
