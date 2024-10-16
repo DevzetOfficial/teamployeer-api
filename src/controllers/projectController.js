@@ -25,9 +25,9 @@ export const createData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Client is required");
     }
 
-    const members = JSON.parse(req.body.members.replace(/'/g, '"')).map((id) =>
-        objectId(id)
-    );
+    const members = JSON.parse(req.body.members.replace(/'/g, '"'))
+        .filter((id) => id)
+        .map((id) => objectId(id));
 
     const data = {
         companyId: req.user?.companyId,
@@ -238,12 +238,15 @@ export const updateData = asyncHandler(async (req, res) => {
 
     const data = req.body;
 
-    let members;
     if (req.body?.members) {
-        members = JSON.parse(req.body.members.replace(/'/g, '"')).map((id) =>
-            objectId(id)
-        );
+        const members = JSON.parse(req.body.members.replace(/'/g, '"'))
+            .filter((id) => id)
+            .map((id) => objectId(id));
         data.members = members;
+    } else {
+        if (data?.members == "") {
+            delete data.members;
+        }
     }
 
     if (req.file?.path) {
@@ -253,10 +256,10 @@ export const updateData = asyncHandler(async (req, res) => {
         if (projectInfo.projectImage) {
             await destroyOnCloudinary(projectInfo.projectImage);
         }
-    } else {
-        if (req.body?.projectImage === "") {
-            delete req.body.projectImage;
-        }
+    }
+
+    if (req.body?.projectImage == "") {
+        delete req.body.projectImage;
     }
 
     const updateProject = await Project.findByIdAndUpdate(
