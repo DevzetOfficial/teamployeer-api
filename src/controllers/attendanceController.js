@@ -337,9 +337,9 @@ export const getAllMonthlyData = asyncHandler(async (req, res) => {
 
             // Calculate and store attendance percentage
             const attendancePercentage = (presentDays / workingDays) * 100;
-            employee.attendance.push(presentDays);
-            employee.attendance.push(
-                parseFloat(attendancePercentage.toFixed(2))
+            employee.presentDays = presentDays;
+            employee.attendancePercentage = parseFloat(
+                attendancePercentage.toFixed(2)
             );
         }
 
