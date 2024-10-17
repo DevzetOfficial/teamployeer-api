@@ -1,6 +1,10 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
+import {
+    uploadOnCloudinary,
+    destroyOnCloudinary,
+} from "../utils/cloudinary.js";
 
 import { Task } from "../models/taskModel.js";
 import { TaskAttachment } from "../models/taskAttachmentModel.js";
@@ -16,42 +20,54 @@ export const createData = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Task not found");
     }
 
-    if (!req.body.fileName) {
-        throw new ApiError(400, "File name is required");
+    const attachments = [];
+    if (req?.files && req.files.length > 0) {
+        try {
+            for (const file of req.files) {
+                // Upload the file to Cloudinary
+                const uploadData = await uploadOnCloudinary(file.path);
+
+                const attachmentPosition = await TaskAttachment.findOne({
+                    taskId,
+                })
+                    .sort({ position: -1 })
+                    .select("position");
+
+                // Prepare the attachment data to be saved in the database
+                const attachmentData = {
+                    taskId: taskId,
+                    user: req.user?._id,
+                    fileName: file.originalname,
+                    filePath: uploadData?.url || "",
+                    position: attachmentPosition
+                        ? attachmentPosition.position + 1
+                        : 1,
+                };
+
+                // Save the new attachment record to the database
+                const newAttachment =
+                    await TaskAttachment.create(attachmentData);
+
+                attachments.push(newAttachment);
+
+                await addAttachmentToTask(taskId, newAttachment._id);
+            }
+        } catch (error) {
+            throw new ApiError(
+                404,
+                "Error uploading files or creating attachment:",
+                error
+            );
+        }
     }
-
-    if (!req.body.filePath) {
-        throw new ApiError(400, "File path is required");
-    }
-
-    const attachmentPosition = await TaskAttachment.findOne({ taskId })
-        .sort({ position: -1 })
-        .select("position");
-
-    const attachmentData = {
-        taskId: taskId,
-        user: req.user?._id,
-        fileName: req.body.fileName,
-        filePath: req.body.filePath,
-        position: attachmentPosition ? attachmentPosition.position + 1 : 1,
-    };
-
-    const newAttachment = await TaskAttachment.create(attachmentData);
-
-    if (!newAttachment) {
-        throw new ApiError(400, "Invalid credentials");
-    }
-
-    // attachment push in task
-    await addAttachmentToTask(taskId, newAttachment._id);
 
     // store activities
+    const fileNames = attachments.map((file) => file.fileName).join(", ");
     await TaskActivities.create({
         projectId,
         taskId,
         activityType: "create-attachment",
-        description:
-            "added a attachment <span>" + newAttachment.fileName + "</span>",
+        description: "added a attachment <span>" + fileNames + "</span>",
         user: req.user?._id,
     });
 
@@ -60,7 +76,7 @@ export const createData = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                newAttachment,
+                attachments,
                 "Task attachment created successfully"
             )
         );
@@ -105,7 +121,7 @@ export const updateData = asyncHandler(async (req, res) => {
     }
 
     const updateAttachment = await TaskAttachment.findByIdAndUpdate(
-        attachmentId,
+        attachment._id,
         req.body,
         { new: true }
     );
@@ -150,6 +166,8 @@ export const deleteData = asyncHandler(async (req, res) => {
     if (!attachment) {
         throw new ApiError(400, "Task attachment not found");
     }
+
+    await destroyOnCloudinary(attachment.filePath);
 
     await removeAttachmentFromTask(taskId, attachmentId);
 

@@ -77,8 +77,6 @@ export const createData = asyncHandler(async (req, res) => {
 
     const invoiceItems = formData?.invoiceItems || "";
 
-    console.log(invoiceItems);
-
     if (invoiceItems) {
         for (const item of invoiceItems) {
             const invoiceItem = new InvoiceItems({
