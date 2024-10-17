@@ -1,7 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
-import { objectId } from "../utils/helper.js";
 
 import { Task } from "../models/taskModel.js";
 import { TaskActivities } from "../models/taskActivitiesModel.js";
@@ -16,17 +15,35 @@ export const getData = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Task not found");
     }
 
-    const activities = await TaskActivities.find({ projectId, taskId });
+    const filters = { projectId, taskId };
 
-    return res
-        .status(201)
-        .json(
-            new ApiResponse(
-                200,
-                activities,
-                "Task activities retrieved successfully"
-            )
-        );
+    const page = parseInt(req.query?.page) || 1;
+    const limit = parseInt(req.query?.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const activities = await TaskActivities.find(filters)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean();
+
+    const totalItems = await TaskActivities.countDocuments(filters);
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return res.status(201).json(
+        new ApiResponse(
+            200,
+            {
+                results: activities,
+                currentPage: page,
+                totalPage: totalPages,
+                firstPage: 1,
+                lastPage: totalPages,
+                totalItems: totalItems,
+            },
+            "Task activities retrieved successfully"
+        )
+    );
 });
 
 export const deleteData = asyncHandler(async (req, res) => {
@@ -39,8 +56,6 @@ export const deleteData = asyncHandler(async (req, res) => {
         taskId,
         _id: activityId,
     });
-
-    console.log(activity);
 
     if (!activity) {
         throw new ApiError(404, "Task activities not found");

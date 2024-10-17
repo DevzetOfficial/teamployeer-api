@@ -169,9 +169,9 @@ export const deleteData = asyncHandler(async (req, res) => {
 
     await destroyOnCloudinary(attachment.filePath);
 
-    await removeAttachmentFromTask(taskId, attachmentId);
+    await removeAttachmentFromTask(taskId, attachment._id);
 
-    await TaskAttachment.findByIdAndDelete(attachmentId);
+    await TaskAttachment.findByIdAndDelete(attachment._id);
 
     // store activities
     await TaskActivities.create({

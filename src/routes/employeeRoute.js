@@ -2,10 +2,9 @@ import { Router } from "express";
 import authCheck from "../middlewares/authMiddleware.js";
 import { upload } from "../middlewares/multerMiddleware.js";
 import {
-    getActiveData,
-    getInactiveData,
-    getCountData,
     getData,
+    getAllData,
+    getCountData,
     createData,
     updateData,
     updateOffboarding,
@@ -30,11 +29,11 @@ const route = Router();
 
 route
     .route("/employee")
-    .get(authCheck, getActiveData)
+    .get(authCheck, getAllData)
     .post(authCheck, upload.single("avatar"), createData);
 
+route.route("/employee/inactive").get(authCheck, getAllData);
 route.route("/employee/count").get(authCheck, getCountData);
-route.route("/employee/inactive").get(authCheck, getInactiveData);
 route.route("/employee/select-list").get(authCheck, getSelectList);
 route.route("/employee/ratio").get(authCheck, getEmployeeRatio);
 

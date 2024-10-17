@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
-import { generateCode, objectId } from "../utils/helper.js";
+import { generateCode, getSegments } from "../utils/helper.js";
 import { differenceInMonths } from "date-fns";
 import {
     uploadOnCloudinary,
@@ -50,8 +50,24 @@ export const createData = asyncHandler(async (req, res) => {
         );
 });
 
-export const getActiveData = asyncHandler(async (req, res) => {
-    const filters = { companyId: req.user?.companyId, status: 1 };
+export const getAllData = asyncHandler(async (req, res) => {
+    const filters = { companyId: req.user?.companyId };
+
+    const segments = getSegments(req.url);
+
+    if (segments?.[1]) {
+        if (segments?.[1] === "inactive") {
+            filters.status = 0;
+        } else {
+            throw new ApiError(400, "Invalid credential");
+        }
+    } else {
+        filters.status = 1;
+    }
+
+    const page = parseInt(req.query?.page) || 1;
+    const limit = parseInt(req.query?.limit) || 10;
+    const skip = (page - 1) * limit;
 
     const employees = await Employee.find(filters)
         .select("employeeId name avatar email mobile onboardingDate")
@@ -59,40 +75,37 @@ export const getActiveData = asyncHandler(async (req, res) => {
         .populate({ path: "shift", select: "name" })
         .populate({ path: "provationPeriod", select: "name month" })
         .populate({ path: "supervisor", select: "name avatar" })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
         .lean();
 
-    return res
-        .status(201)
-        .json(
-            new ApiResponse(200, employees, "Employee retrieved successfully")
-        );
-});
+    const totalItems = await Employee.countDocuments(filters);
+    const totalPages = Math.ceil(totalItems / limit);
 
-export const getInactiveData = asyncHandler(async (req, res) => {
-    const filters = { companyId: req.user?.companyId, status: 0 };
-
-    const employees = await Employee.find(filters)
-        .select("employeeId name avatar email mobile onboardingDate")
-        .populate({ path: "designation", select: "name" })
-        .populate({ path: "shift", select: "name" })
-        .populate({ path: "provationPeriod", select: "name month" })
-        .populate({ path: "supervisor", select: "name avatar" })
-        .lean();
-
-    return res
-        .status(201)
-        .json(
-            new ApiResponse(200, employees, "Employee retrieved successfully")
-        );
+    return res.status(201).json(
+        new ApiResponse(
+            200,
+            {
+                results: employees,
+                currentPage: page,
+                totalPage: totalPages,
+                firstPage: 1,
+                lastPage: totalPages,
+                totalItems: totalItems,
+            },
+            "Employee retrieved successfully"
+        )
+    );
 });
 
 export const getCountData = asyncHandler(async (req, res) => {
-    const companyId = req.user?.companyId || "66bdec36e1877685a60200ac";
+    const companyId = req.user?.companyId;
 
     const employees = await Employee.aggregate([
         {
             $match: {
-                companyId: { $eq: objectId(companyId) },
+                companyId: { $eq: companyId },
             },
         },
         {
@@ -103,29 +116,30 @@ export const getCountData = asyncHandler(async (req, res) => {
         },
     ]);
 
-    let active = 0;
-    let inactive = 0;
+    const dataCount = {
+        all: 0,
+        active: 0,
+        inactive: 0,
+    };
 
     if (employees) {
         employees.forEach((row) => {
             if (row._id === 1) {
-                active = row.count;
+                dataCount.active = row.count;
             }
 
             if (row._id === 0) {
-                inactive = row.count;
+                dataCount.inactive = row.count;
             }
         });
     }
 
+    dataCount.all = dataCount.active + dataCount.inactive;
+
     return res
         .status(201)
         .json(
-            new ApiResponse(
-                200,
-                { active, inactive },
-                "Employee retrieved successfully"
-            )
+            new ApiResponse(200, dataCount, "Employee retrieved successfully")
         );
 });
 

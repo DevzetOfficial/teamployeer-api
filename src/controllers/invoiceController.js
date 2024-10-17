@@ -111,15 +111,36 @@ export const getAllData = asyncHandler(async (req, res) => {
         }
     }
 
+    const page = parseInt(req.query?.page) || 1;
+    const limit = parseInt(req.query?.limit) || 10;
+    const skip = (page - 1) * limit;
+
     const invoices = await Invoice.find(filters)
         .select("invoiceNo invoiceType totalBill issueDate")
         .populate({ path: "client", select: "name avatar" })
         .populate({ path: "project", select: "name" })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
         .lean();
 
-    return res
-        .status(201)
-        .json(new ApiResponse(200, invoices, "Invoice retrieved successfully"));
+    const totalItems = await Invoice.countDocuments(filters);
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return res.status(201).json(
+        new ApiResponse(
+            200,
+            {
+                results: invoices,
+                currentPage: page,
+                totalPage: totalPages,
+                firstPage: 1,
+                lastPage: totalPages,
+                totalItems: totalItems,
+            },
+            "Invoice retrieved successfully"
+        )
+    );
 });
 
 export const getCountData = asyncHandler(async (req, res) => {

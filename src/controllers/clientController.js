@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
-import { generateCode, objectId } from "../utils/helper.js";
+import { generateCode, getSegments } from "../utils/helper.js";
 import {
     uploadOnCloudinary,
     destroyOnCloudinary,
@@ -40,7 +40,7 @@ export const createData = asyncHandler(async (req, res) => {
         note: formData.note,
     };
 
-    const newClient = await Client.create(data).lean();
+    const newClient = await Client.create(data);
 
     if (!newClient) {
         throw new ApiError(400, "Invalid credentials");
@@ -51,34 +51,52 @@ export const createData = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, newClient, "Client created successfully."));
 });
 
-export const getActiveData = asyncHandler(async (req, res) => {
-    const filters = { companyId: req.user?.companyId, status: 1 };
+export const getAllData = asyncHandler(async (req, res) => {
+    const filters = { companyId: req.user?.companyId };
+
+    const segments = getSegments(req.url);
+
+    if (segments?.[1]) {
+        if (segments?.[1] === "inactive") {
+            filters.status = 0;
+        } else {
+            throw new ApiError(400, "Invalid credential");
+        }
+    } else {
+        filters.status = 1;
+    }
+
+    const page = parseInt(req.query?.page) || 1;
+    const limit = parseInt(req.query?.limit) || 10;
+    const skip = (page - 1) * limit;
 
     const clients = await Client.find(filters)
         .populate({
             path: "country",
             select: "name avatar",
         })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
         .lean();
 
-    return res
-        .status(201)
-        .json(new ApiResponse(200, clients, "Client retrieved successfully."));
-});
+    const totalItems = await Client.countDocuments(filters);
+    const totalPages = Math.ceil(totalItems / limit);
 
-export const getInactiveData = asyncHandler(async (req, res) => {
-    const filters = { companyId: req.user?.companyId, status: 0 };
-
-    const clients = await Client.find(filters)
-        .populate({
-            path: "country",
-            select: "name avatar",
-        })
-        .lean();
-
-    return res
-        .status(201)
-        .json(new ApiResponse(200, clients, "Client retrieved successfully."));
+    return res.status(201).json(
+        new ApiResponse(
+            200,
+            {
+                results: clients,
+                currentPage: page,
+                totalPage: totalPages,
+                firstPage: 1,
+                lastPage: totalPages,
+                totalItems: totalItems,
+            },
+            "Client retrieved successfully."
+        )
+    );
 });
 
 export const getCountData = asyncHandler(async (req, res) => {
@@ -96,7 +114,8 @@ export const getCountData = asyncHandler(async (req, res) => {
         },
     ]);
 
-    const clientCount = {
+    const dataCount = {
+        all: 0,
         active: 0,
         inactive: 0,
     };
@@ -104,36 +123,45 @@ export const getCountData = asyncHandler(async (req, res) => {
     if (clients.length > 0) {
         clients.forEach((row) => {
             if (row._id === 1) {
-                clientCount.active = row.count;
+                dataCount.active = row.count;
             }
 
             if (row._id === 0) {
-                clientCount.inactive = row.count;
+                dataCount.inactive = row.count;
             }
         });
     }
 
+    dataCount.all = dataCount.active + dataCount.inactive;
+
     return res
         .status(201)
         .json(
-            new ApiResponse(200, clientCount, "Client retrieved successfully.")
+            new ApiResponse(200, dataCount, "Client retrieved successfully.")
         );
 });
 
 export const getData = asyncHandler(async (req, res) => {
     const filters = { companyId: req.user?.companyId, _id: req.params.id };
 
-    const client = await Client.findOne(filters)
-        .populate({ path: "country", select: "name avatar" })
-        .populate({ path: "projects", select: "name status" });
+    const client = await Client.findOne(filters);
 
     if (!client) {
         throw new ApiError(404, "Client not found");
     }
 
+    const transactions = [];
+    const projects = [];
+
     return res
         .status(201)
-        .json(new ApiResponse(200, client, "Client retrieved successfully"));
+        .json(
+            new ApiResponse(
+                200,
+                { client, projects, transactions },
+                "Client retrieved successfully"
+            )
+        );
 });
 
 export const updateData = asyncHandler(async (req, res) => {

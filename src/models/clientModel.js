@@ -61,24 +61,6 @@ const clientSchema = new Schema(
             trim: true,
             default: null,
         },
-        projects: {
-            type: [
-                {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: "Project",
-                },
-            ],
-            default: [],
-        },
-        transactions: {
-            type: [
-                {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: "Invoice",
-                },
-            ],
-            default: [],
-        },
         status: {
             type: Number,
             required: true,

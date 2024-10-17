@@ -49,8 +49,6 @@ export const createData = asyncHandler(async (req, res) => {
     // set default scrumboards column
     await createDefaultScrumboards(newProject._id);
 
-    await addProjectToClient(req.body.client, newProject._id);
-
     return res
         .status(201)
         .json(new ApiResponse(200, newProject, "Project created successfully"));
@@ -66,6 +64,10 @@ export const getAllData = asyncHandler(async (req, res) => {
             segments[1] === "onhold" ? "On Hold" : ucfirst(segments[1]);
     }
 
+    const page = parseInt(req.query?.page) || 1;
+    const limit = parseInt(req.query?.limit) || 10;
+    const skip = (page - 1) * limit;
+
     const projects = await Project.find(filters)
         .populate({ path: "client", select: "name source avatar" })
         .populate({ path: "projectManager", select: "name avatar" })
@@ -78,7 +80,13 @@ export const getAllData = asyncHandler(async (req, res) => {
                 select: "name",
             },
         })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
         .lean();
+
+    const totalItems = await Project.countDocuments(filters);
+    const totalPages = Math.ceil(totalItems / limit);
 
     const newProjects = projects.map((row) => {
         return {
@@ -87,11 +95,20 @@ export const getAllData = asyncHandler(async (req, res) => {
         };
     });
 
-    return res
-        .status(201)
-        .json(
-            new ApiResponse(200, newProjects, "Project retrieved successfully")
-        );
+    return res.status(201).json(
+        new ApiResponse(
+            200,
+            {
+                results: newProjects,
+                currentPage: page,
+                totalPage: totalPages,
+                firstPage: 1,
+                lastPage: totalPages,
+                totalItems: totalItems,
+            },
+            "Project retrieved successfully"
+        )
+    );
 });
 
 export const getCountData = asyncHandler(async (req, res) => {
@@ -110,6 +127,7 @@ export const getCountData = asyncHandler(async (req, res) => {
     ]);
 
     const dataCount = {
+        all: 0,
         ongoing: 0,
         onhold: 0,
         completed: 0,
@@ -135,6 +153,12 @@ export const getCountData = asyncHandler(async (req, res) => {
             }
         });
     }
+
+    dataCount.all =
+        dataCount.ongoing +
+        dataCount.onhold +
+        dataCount.completed +
+        dataCount.canceled;
 
     return res
         .status(201)
@@ -314,8 +338,6 @@ export const deleteData = asyncHandler(async (req, res) => {
 
     await Project.findByIdAndDelete(project._id);
 
-    await removeProjectFromClient(project.client, project._id);
-
     return res
         .status(201)
         .json(new ApiResponse(200, {}, "Project delete successfully"));
@@ -355,42 +377,4 @@ export const createDefaultScrumboards = async (projectId) => {
     ];
 
     await Scrumboard.create(defaultScrumboards);
-};
-
-export const addProjectToClient = async (clientId, projectId) => {
-    try {
-        const updateClient = await Client.findByIdAndUpdate(
-            clientId,
-            { $push: { projects: projectId } },
-            { new: true }
-        );
-
-        if (!updateClient) {
-            console.log("Client not found.");
-            return;
-        }
-
-        console.log("Successfully adding project to cleint");
-    } catch (error) {
-        console.error("Error adding project to client:", error);
-    }
-};
-
-export const removeProjectFromClient = async (clientId, projectId) => {
-    try {
-        const updateClient = await Client.findByIdAndUpdate(
-            clientId,
-            { $pull: { projects: projectId } },
-            { new: true }
-        );
-
-        if (!updateClient) {
-            console.log("Client not found.");
-            return;
-        }
-
-        console.log("Successfully remove project from client");
-    } catch (error) {
-        console.error("Error remove project from client:", error);
-    }
 };
